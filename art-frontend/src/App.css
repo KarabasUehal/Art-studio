@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
+
+body, .App {
+  font-family: 'Caveat', cursive, sans-serif !important; 
+  font-size: 1.5em !important; 
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(20px + 2vmin);
+  color: rgba(112, 104, 104, 0.8);
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.container {
+  background-color: rgba(163, 145, 145, 0.86);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 1200px;
+  font-size: 1.1em; 
+  line-height: 1.1; 
+}
+
+.app-background {
+  background-size: contain;  
+  background-position: center;  
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.btn-success, .btn-primary, .btn-info, .btn-outline-primary, .btn-outline-danger {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400; 
+  color: #6ddd23 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-color: rgba(49, 109, 72, 0.932) !important;
+  padding: 12px 28px !important;
+  font-size: 24px !important;
+  line-height: 1.1; 
+}
+
+.btn-warning {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400; 
+  color: #ffa600 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-color: rgba(49, 109, 72, 0.932) !important;
+  padding: 12px 28px !important;
+  font-size: 24px !important;
+  line-height: 1.1; 
+}
+
+.btn-danger {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400; 
+  color: #ff0000 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-color: rgba(49, 109, 72, 0.932) !important;
+  padding: 12px 28px !important;
+  font-size: 28px !important; 
+  line-height: 1.1; 
+}
+
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-danger {
+  background-color: rgba(0, 0, 0, 0.35) !important; 
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  border-color: rgba(49,109,72,0.6) !important;
+}
+
+.btn-outline-warning {
+  color: #ffa600 !important;
+}
+.btn-outline-success,
+.btn-outline-primary {
+  color: #6ddd23 !important;
+}
+.btn-outline-danger {
+  color: #ff0000 !important;
+}
+
+.btn-success.active,
+.btn-primary.active,
+.btn-warning.active {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.form-control, .form-select, select option {
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400;
+  background-color: transparent !important;
+  color: #6ddd23 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  font-size: 22px !important;
+  line-height: 1.1;
+}
+
+h1 {
+  font-family: 'Caveat', cursive !important;
+  font-weight: 700; 
+  font-size: 3em !important; 
+  color: #6fd32d !important;
+  text-shadow: 1px 1px 2px rgb(0, 0, 0);
+} 
+
+h2, h4 {
+  font-family: 'Caveat', cursive !important;
+  font-weight: 700; 
+  font-size: 3em !important; 
+  color: #6ddd23 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+h3 {
+  font-family: 'Caveat', cursive !important;
+  font-weight: 700; 
+  font-size: 3em !important; 
+  color: #18bb6a !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.badge-right {
+  text-align: right;
+}
+
+/* Responsive для nav */
+@media (max-width: 768px) {
+  body {
+    font-size: 1.1em !important;
+  }
+  
+  h1 {
+    font-size: 1.1em !important;
+  }
+}
+
+.nav-buttons {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  flex-direction: row;
+  gap: 10px;
+  margin: 0;
+}
+
+.nav-buttons .btn {
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+@media (max-width: 768px) {
+  .nav-buttons {
+    top: 10px;
+    right: 10px;
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-img { width: 100px !important; }
+}

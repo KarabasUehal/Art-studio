@@ -1,0 +1,3 @@
+DROP INDEX IF EXISTS "idx_deleted";
+
+DROP TABLE IF EXISTS "activities" CASCADE;

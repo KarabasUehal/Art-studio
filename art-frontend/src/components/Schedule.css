@@ -1,0 +1,216 @@
+/* --- Основной контейнер страницы --- */
+.schedule-container {
+  background: rgba(0, 0, 0, 0.7); /* тёмный полупрозрачный фон */
+  padding: 30px;
+  border-radius: 15px;
+  min-height: 100vh;
+  font-family: 'Caveat', cursive, sans-serif;
+  color: #fff; /* базовый цвет текста */
+}
+
+/* Заголовок страницы */
+.schedule-container h2 {
+  font-weight: 700; 
+  font-size: 2em !important; 
+  color: #6fd32d !important; /* ярко-зелёный */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Сообщения об ошибке и загрузке */
+.error-message {
+  color: #ff4d4d;
+  margin: 10px 0;
+}
+
+.loading {
+  text-align: center;
+  color: #64ee08;
+  margin: 10px 0;
+}
+
+/* --- Сетка дней --- */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 15px;
+}
+
+/* --- Карточки дня --- */
+.day-card {
+  background: rgba(255, 255, 255, 0.05); /* слегка светлый полупрозрачный фон */
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.day-card h5 {
+  font-weight: 700;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #64ee08; /* зелёный */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+/* --- Слоты --- */
+.slot-item {
+  position: relative; /* Для кнопки удаления */
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 10px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  overflow: visible;
+  transition: background-color 0.2s, transform 0.2s;
+  text-align: center;
+}
+
+.slot-item:hover {
+  background-color: rgba(49, 109, 72, 0.6);
+  transform: translateY(-2px);
+}
+
+/* --- Название, время и места слота --- */
+.slot-name {
+  font-size: 1.2em !important;
+  color: #64ee08; /* зелёный */
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.slot-time,
+.slot-places {
+  font-size: 1em !important;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
+.delete-slot-btn {  
+  display: inline-block;      
+  padding: 4px 8px;            
+  font-size: 14px;          
+  border-radius: 50%;       
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;                              
+  background: rgb(241, 10, 33) !important; 
+  margin-top: 5px; 
+  z-index: 10 !important;
+  opacity: 0.9 !important;
+  transition: opacity 0.2s, transform 0.2s !important;
+}
+
+.delete-slot-btn:hover {
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Тусклый слот, если нет мест */
+.slot-item[style*="opacity: 0.5"] {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+.slot-item[style*="opacity: 0.5"] .delete-slot-btn {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* --- Навигация по неделям --- */
+.week-navigation {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.week-navigation button {
+  font-family: 'Caveat', cursive;
+  font-weight: 400;
+  font-size: 1em;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(49, 109, 72, 0.8);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  transition: background 0.2s;
+}
+
+.week-navigation button:hover {
+  background: rgba(49, 109, 72, 1);
+}
+
+/* --- Модальные окна --- */
+.modal-header {
+  background-color: #dc3545; /* красный */
+  color: white;
+  border-radius: 10px 10px 0 0;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+.modal-body {
+  font-size: 1.1em;
+  padding: 20px;
+}
+
+.modal-footer .btn {
+  border-radius: 25px;
+  font-weight: 500;
+  margin: 0 5px;
+  padding: 0.6rem 1.8rem;
+  font-size: 1.2em;
+  min-width: 80px;
+  transition: all 0.2s ease;
+}
+
+.modal-footer .btn-success-custom {
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+  color: white !important;
+}
+
+.modal-footer .btn-danger-custom {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.modal-footer .btn-secondary-custom {
+  background-color: #17a2b8 !important;
+  border-color: #17a2b8 !important;
+  color: white !important;
+}
+
+.modal-footer .btn-success-custom:hover {
+  background-color: #218838 !important;
+  border-color: #1e7e34 !important;
+  transform: translateY(-2px);
+}
+
+.modal-footer .btn-danger-custom:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+  transform: translateY(-2px);
+}
+
+.modal-footer .btn-secondary-custom:hover {
+  background-color: #138496 !important;
+  border-color: #117a8b !important;
+  transform: translateY(-2px);
+}
+
+/* --- Адаптив --- */
+@media (max-width: 768px) {
+  .days-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
