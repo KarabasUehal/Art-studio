@@ -100,20 +100,14 @@ func AddSlot() gin.HandlerFunc {
 			return
 		}
 
-		mskZone := time.FixedZone("MSK", 3*60*60)
-		parsedLocal, parseErr := time.ParseInLocation("2006-01-02T15:04:05", input.StartTimeStr, mskZone)
-		if parseErr != nil {
-			log.Error().Err(parseErr).Str("input_time", input.StartTimeStr).Msg("Time parse failed")
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid time format: use YYYY-MM-DDTHH:MM (e.g., 2025-11-14T17:00)"})
+		parsedTime, err := time.Parse("2006-01-02T15:04:05", input.StartTimeStr)
+		if err != nil {
+			log.Error().Err(err).Msg("Error parsing time")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse time"})
 			return
 		}
-
-		// Конверт в UTC для БД.
-		slot.StartTime = parsedLocal.UTC()
-
-		// EndTime от local Start + Duration, затем в UTC.
-		endLocal := parsedLocal.Add(time.Duration(act.Duration) * time.Minute)
-		slot.EndTime = endLocal.UTC()
+		slot.StartTime = parsedTime.UTC()
+		slot.EndTime = slot.StartTime.Add(time.Duration(act.Duration) * time.Minute)
 
 		slot.ActivityID = uint(activityID)
 		slot.Capacity = input.Capacity

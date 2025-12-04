@@ -1,0 +1,220 @@
+h2{
+  font-family: 'Caveat', cursive !important;
+  font-weight: 500; 
+  font-size: 1.8em !important; 
+  color: #fde401 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+h3 {
+  font-family: 'Caveat', cursive !important;
+  font-weight: 400; 
+  font-size: 1.5em !important; 
+  color: #fdf901 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.record-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, rgba(99, 93, 93, 0.5), rgba(141, 132, 132, 0.5));
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.record-card {
+  background: #181414;
+  color: #c7e0bd;
+  border-radius: 16px;
+  padding: 35px 40px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 0 25px rgba(27, 212, 27, 0.4);
+  border: 2px solid #1bd41b;
+  position: relative;
+  overflow: hidden;
+}
+
+.record-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(27, 212, 27, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulse 8s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.record-title {
+  text-align: center;
+  font-size: 2.2em;
+  margin-bottom: 10px;
+  color: #d4d11b;
+  text-shadow: 0 0 10px #1bd41b;
+}
+
+.record-price {
+  display: block;
+  font-size: 0.6em;
+  color: #dadb7f;
+  margin-top: 8px;
+  text-shadow: none;
+}
+
+.slot-info {
+  background: #222;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+  border: 1px solid #cfe414;
+  font-size: 1.1em;
+}
+
+.places-left {
+  color: #dadb7f;
+  margin-left: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.record-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #d8da7c;
+  text-shadow: 0 0 5px rgb(36, 44, 8);
+}
+
+.record-input,
+.record-select {
+  width: 100%;
+  padding: 12px 14px;
+  background: #222;
+  border: 2px solid #f1f506;
+  border-radius: 10px;
+  color: #c0c77f;
+  font-size: 1em;
+  transition: all 0.3s;
+}
+
+.record-input:focus,
+.record-select:focus {
+  outline: none;
+  border-color: #eeff00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+  background: #2a2a2a;
+}
+
+.places-hint {
+  margin-top: 6px;
+  color: #dbda7f;
+  font-size: 0.9em;
+}
+
+.kids-title {
+  margin: 30px 0 15px;
+  color: #eff306;
+  text-align: center;
+  text-shadow: 0 0 8px #1bd41b;
+}
+
+.kid-card {
+  background: rgba(27, 212, 27, 0.08);
+  border: 1px dashed #d1d41b;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.btn-remove-kid {
+  margin-top: 10px;
+  background: #e78989;
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+.btn-remove-kid:hover {
+  background: #ff3030;
+}
+
+.btn-add-kid {
+  display: block;
+  margin: 20px auto;
+  background: transparent;
+  color: #dbca7f;
+  border: 2px dashed #dbda7f;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-add-kid:hover {
+  background: rgba(127, 219, 127, 0.2);
+  border-color: #00ff00;
+}
+
+.record-error {
+  background: rgba(255, 50, 50, 0.2);
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 15px 0;
+  border: 1px solid #ff3030;
+}
+
+.btn-record-submit {
+  width: 50%;
+  margin-top: 30px;
+  padding: 16px;
+  font-size: 0.8em;
+  font-weight: bold;
+  background: linear-gradient(90deg, #d5db7f, #d6aa19);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(157, 255, 0, 0.5);
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.btn-record-submit:hover:not(:disabled) {
+  background: linear-gradient(90deg, #fbff00, #dadb7f);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(43, 255, 0, 0.623);
+}
+
+.btn-record-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.record-loading {
+  color: #dbda7f;
+  text-align: center;
+  padding: 100px;
+  font-size: 1.5em;
+}

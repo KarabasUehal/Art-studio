@@ -66,7 +66,11 @@ func ActivityInsertData(db *gorm.DB) error {
     ('Шахи', 
 	  'Навчання дитини грі в шахи та стратегічному мисленню', 
 	  300, 12, 60, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/1XtVX6JJ/Shahi.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb)
+	  '{"main_image_url": "https://i.postimg.cc/1XtVX6JJ/Shahi.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+    ('Вiльнi ранки', 
+	  'За дитиною доглядатимуть весь ранок і не дадуть скучити', 
+	  500, 15, 240, true, true,
+	  '{"main_image_url": "https://i.postimg.cc/bNFjfjLS/Freemorning.jpg", "caption": "Вiльнi ранки", "photo": []}'::jsonb)
         ON CONFLICT (name) DO NOTHING;
         `
 		_, err = DB.Exec(insertData)

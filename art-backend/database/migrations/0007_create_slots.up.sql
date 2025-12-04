@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS "activity_slots" (
     "end_time" TIMESTAMP NOT NULL,
     "capacity" INTEGER NOT NULL CHECK ("capacity" > 0),
     "booked" INTEGER NOT NULL DEFAULT 0 CHECK ("booked" >= 0),
+    "template_id" BIGINT NULL REFERENCES "schedule_templates"("id") ON DELETE SET NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP NULL
@@ -13,5 +14,7 @@ CREATE TABLE IF NOT EXISTS "activity_slots" (
 CREATE INDEX IF NOT EXISTS "idx_activity_slots_activity_id" ON "activity_slots" ("activity_id");
 CREATE INDEX IF NOT EXISTS "idx_activity_slots_start_time" ON "activity_slots" ("start_time");
 CREATE INDEX IF NOT EXISTS "idx_activity_slots_deleted" ON "activity_slots" ("deleted_at");
+
+CREATE INDEX IF NOT EXISTS "idx_activity_slots_template_id"  ON "activity_slots" ("template_id");
 
 CREATE UNIQUE INDEX "idx_activity_slots_unique" ON "activity_slots" ("activity_id", "start_time");

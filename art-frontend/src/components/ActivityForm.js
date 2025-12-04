@@ -151,13 +151,13 @@ const ActivityForm = () => {
                     onChange={e => setFormData({...formData, duration: +e.target.value})}
                     required
                     min="15"
+                    max="480"
                   />
                   <span className="input-group-text fw-bold">хв</span>
                 </div>
               </div>
             </div>
 
-            {/* Фото */}
             <div className="mb-4">
               <label htmlFor="image_url" className="form-label fw-bold text-dark">
                 Головна картинка майстер-класу
@@ -204,7 +204,7 @@ const ActivityForm = () => {
           />
                <button
                type="button"
-               className="btn btn-little-success mt-3"
+               className="btn btn-little-warning mt-3"
               onClick={() => {
                 if (newPhotoUrl.trim() !== "") {
                 setFormData({

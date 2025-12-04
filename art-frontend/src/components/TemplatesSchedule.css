@@ -1,0 +1,128 @@
+.template-card {
+  background-color: rgb(157, 190, 118) !important; /* бледно-серый полупрозрачный */
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 238, 8, 0.4);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(100, 238, 8, 0.3);
+  border-color: #64ee08;
+}
+
+.template-card-inner {
+  padding: 16px;
+  text-align: center;
+}
+
+.template-card-title {
+  font-family: 'Caveat', cursive !important;
+  font-size: 1.45em !important;
+  font-weight: 700 !important;
+  color: #5bdd10 !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  margin: 0 0 10px 0;
+  padding: 0 8px;
+}
+
+.template-card-time,
+.template-card-capacity {
+  font-size: 1.3em !important;
+  color: #000000 !important;
+  margin: 6px 0;
+  text-shadow: 1px 1px 2px rgb(201, 197, 0);
+}
+
+.template-card-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.template-card-buttons button {
+  font-size: 18px !important;
+  padding: 6px 14px !important;
+}
+
+.table-container {
+  max-height: 75vh;
+  overflow-y: auto;
+  overflow-x: hidden;                /* ← запрещаем горизонтальный скролл */
+  border: 3px solid #97e662;
+  border-radius: 16px;
+  background-color: rgb(55, 58, 51);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(27, 212, 27, 0.4);
+  margin-top: 20px;
+
+  /* ← УБИРАЕМ БЕЛЫЙ СКРОЛЛБАР НАВСЕГДА и делаем свой зелёный */
+  scrollbar-width: thin;                    /* Firefox */
+  scrollbar-color: #64ee08 rgba(0,0,0,0.6); /* Firefox */
+}
+
+/* Webkit + Chrome/Edge/Safari — кастомный скроллбар */
+.table-container::-webkit-scrollbar {
+  width: 14px;                     /* толщина скроллбара */
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #64ee08, #1bd41b);
+  border-radius: 16px;
+  border: 3px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 10px rgba(100, 238, 8, 0.8);
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8bff4a, #2eff2e);
+  box-shadow: 0 0 15px rgba(100, 238, 8, 1);
+}
+
+.table-container table {
+  width: 100%;
+  table-layout: fixed;              
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-container th,
+.table-container td {
+  width: 20%;
+  min-width: 260px;
+  vertical-align: top;
+  padding: 12px !important;
+}
+
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #062706, #104710);
+  color: black;
+  font-weight: bold;
+  z-index: 10;
+  text-align: center;
+  padding: 18px !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.6);
+}
+
+.no-templates {
+  color: rgba(100, 238, 8, 0.7) !important;
+  font-style: italic;
+  font-size: 1.4em;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.4em;
+}

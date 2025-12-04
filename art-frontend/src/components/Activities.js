@@ -40,27 +40,36 @@ const Activities = ({ isAuthenticated }) => {
 }, [activeTab]);  
 
   const fetchActivities = async (pageNum = page, sizeNum = size) => {
-    setLoading(true);
-    try {
-        const params = { page: pageNum, size };
-      if (activeTab === 'regular') params.filter = 'regular';
-      if (activeTab === 'one-time') params.filter = 'one-time';
+  setLoading(true);
+  try {
+    // ← НОВАЯ ЛОГИКА: вместо filter=regular/one-time используем regular=true/false
+    const params = {
+      page: pageNum,
+      size: sizeNum,
+    };
 
-      const response = await api.get('/activities', { params });
-      const data = response.data;
-
-      setActivities(data.activity || []);
-      setTotalPages(data.total_pages || 1);
-      setTotalCount(data.total_count || 0);
-      setPage(data.current_page || 1);
-    } catch (err) {
-      setError('Не удалось загрузить мастер-классы.');
-    } finally {
-      setLoading(false);
+    // Определяем, что показывать
+    if (activeTab === 'regular') {
+      params.regular = 'true';        // → /activities?regular=true
+    } else if (activeTab === 'one-time') {
+      params.regular = 'false';       // → /activities?regular=false
     }
 
-    console.log("Fetching activities with filter:", activeTab);
-  };
+    const response = await api.get('/activities', { params });
+    const data = response.data;
+
+    setActivities(data.activity || []);
+    setTotalPages(data.total_pages || 1);
+    setTotalCount(data.total_count || 0);
+    setPage(data.current_page || 1);
+
+  } catch (err) {
+    console.error('Ошибка загрузки активностей:', err);
+    setError('Не удалось загрузить мастер-классы.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handlePageChange = ({ selected }) => {
     const newPage = selected + 1;

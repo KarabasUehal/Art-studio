@@ -2,51 +2,17 @@ package middleware
 
 import (
 	"art/models"
-	"context"
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
 var JwtKey = []byte(os.Getenv("JWT_SECRET"))
-var redisClient *redis.Client
-
-func NewRedisClient() (*redis.Client, error) {
-	addr := os.Getenv("REDIS_ADDR")
-	if addr == "" {
-		addr = "redis:6379"
-	}
-	log.Printf("Connecting to Redis at %s", addr)
-	password := os.Getenv("REDIS_PASSWORD")
-	dbStr := os.Getenv("REDIS_DB")
-	db := 0
-	if dbStr != "" {
-		if parsed, err := strconv.Atoi(dbStr); err == nil {
-			db = parsed
-		}
-	}
-
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: password,
-		DB:       db,
-	})
-
-	_, err := redisClient.Ping(context.Background()).Result()
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect redis")
-		return nil, err
-	}
-
-	return redisClient, nil
-}
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -89,15 +55,15 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		c.Set("phone_number", claims.PhoneNumber)
 		c.Set("role", claims.Role)
-		c.Set("name", claims.Role)
+		c.Set("name", claims.Name)
 		c.Next()
 	}
 }
 
 func OwnerOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		role, exists := c.Get("role")
-		if !exists || role != "owner" {
+		role := c.GetString("role")
+		if role != "owner" {
 			log.Error().Msg("Access denied: owner only")
 			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied: owner only"})
 			c.Abort()

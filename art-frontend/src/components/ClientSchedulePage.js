@@ -117,7 +117,6 @@ const handleDeleteSlot = (activity, slot) => {
       <h2>Розклад занять</h2>
       {error && <div className="error-message">{error}</div>}
 
-      {/* Добавлено: Навигация по неделям */}
       <div className="week-navigation mb-3 d-flex justify-content-center align-items-center gap-3">
         <button onClick={prevWeek} className="btn btn-outline-primary btn-sm">← Попередній тиждень</button>
         <span className="fw-bold">
@@ -130,52 +129,46 @@ const handleDeleteSlot = (activity, slot) => {
         {days.map((day) => (
           <div key={day.toDateString()} className="day-card">
             <h5>
-              {day.toLocaleDateString("uk-UA", {
-                weekday: "short",
-                day: "2-digit",
-                month: "2-digit",
-              })}
+              {day.toLocaleDateString("uk-UA", { weekday: "short", day: "2-digit", month: "2-digit" })}
             </h5>
             {activities.flatMap((a) =>
-  a.slots
-    ?.filter((s) => new Date(s.start_time).toDateString() === day.toDateString())
-    .map((slot) => (
-      <div
-        key={slot.id || slot.ID}  // Fallback для key
-        className="slot-item"
-        onClick={() => handleBookSlot(a, slot)}  // Клик для бронирования (клиент)
-        style={{ 
-          opacity: slot.capacity - slot.booked <= 0 ? 0.5 : 1, 
-          cursor: 'pointer',
-          position: 'relative',  // Обязательно: relative для absolute кнопки внутри
-          paddingBottom: '35px'  // Добавлено: Отступ снизу для места кнопки (не налезает на текст)
-        }}
-      >
-        <div className="slot-name">{a.name}</div>
-        <div className="slot-time">
-          {new Date(slot.start_time).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </div>
-        <div className="slot-places">
-          {slot.capacity - slot.booked}/{slot.capacity} місць
-        </div>
+              a.slots
+                ?.filter((s) => new Date(s.start_time).toDateString() === day.toDateString())
+                .map((slot) => {
+                  const slotTimeString = slot.start_time.slice(11, 16);
+                  return (
+                    <div
+                      key={slot.id || slot.ID}  
+                      className="slot-item"
+                      onClick={() => handleBookSlot(a, slot)}  
+                      style={{ 
+                        opacity: slot.capacity - slot.booked <= 0 ? 0.5 : 1, 
+                        cursor: 'pointer',
+                        position: 'relative',
+                        paddingBottom: '35px'
+                      }}
+                    >
+                      <div className="slot-name">{a.name}</div>
+                      <div className="slot-time">{slotTimeString}</div>
+                      <div className="slot-places">
+                        {slot.capacity - slot.booked}/{slot.capacity} місць
+                      </div>
 
-        {role === 'owner' && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();  
-              handleDeleteSlot(a, slot);  
-            }}
-            className="delete-slot-btn"
-          >
-            🗑️
-          </button>
-        )}
-      </div>
-    ))
-)}
+                      {role === 'owner' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();  
+                            handleDeleteSlot(a, slot);  
+                          }}
+                          className="delete-slot-btn"
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+            )}
           </div>
         ))}
       </div>

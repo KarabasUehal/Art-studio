@@ -10,8 +10,8 @@ h2 {
   font-family: 'Caveat', cursive !important;
   font-weight: 700; 
   font-size: 2em !important; 
-  color: #6fd32d !important;
-  text-shadow: 1px 1px 2px rgb(0, 0, 0);
+  color: #eeff00 !important;
+  text-shadow: 2px 2px 4px rgb(0, 0, 0);
 } 
 
 h6 {
@@ -28,10 +28,10 @@ h6 {
 
 .table-transparent th {
   background-color: transparent !important;
-  color: #0c0c0c !important;
-  text-shadow: 1px 1px 2px rgba(248, 244, 3, 0.877);
+  color: #ff9100 !important;
+  text-shadow: 1px 1px 2px rgba(92, 92, 80, 0.986);
   font-weight: 700;
-  font-size: 20px !important;
+  font-size: 30px !important;
   line-height: 1.0; /* Легкое увеличение */
 }
 
@@ -58,6 +58,16 @@ h6 {
   background-color: rgba(0, 0, 0, 0.7) !important;
   font-family: 'Caveat', cursive !important;
   color: #64ee08 !important;
+  border: 1px solid rgba(49, 109, 72, 0.932) !important;
+  font-size: 20px !important;
+  padding: 8px 18px !important;
+  border-radius: 10px !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+.btn-little-warning {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  font-family: 'Caveat', cursive !important;
+  color: #FFFF00 !important;
   border: 1px solid rgba(49, 109, 72, 0.932) !important;
   font-size: 20px !important;
   padding: 8px 18px !important;
@@ -269,11 +279,16 @@ textarea.form-control-lg {
 
 .my-card h2 {
   font-size: 1.6em !important;
-  color: #36e709 !important;
+  color: #f3f703 !important;
+  text-shadow: 2px 2px 4px rgb(0, 0, 0);
 }
 
 .my-card .btn-little-success {
   color: #64ee08 !important; 
+}
+
+.my-card .btn-little-warning {
+  color: #fffb01 !important; 
 }
 
 .my-card .btn-little-danger {
@@ -281,27 +296,27 @@ textarea.form-control-lg {
 }
 
 .my-card label {
-  color: #36e709 !important;
+  color: #f1f502 !important;
   font-weight: 600;
 }
 
 .my-card input,
 .my-card textarea,
 .my-card select {
-  color: #36e709 !important;
+  color: #e4fd01 !important;
   background-color: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
 }
 
 .my-card input::placeholder,
 .my-card textarea::placeholder {
-  color: rgba(165, 218, 130, 0.959) !important;
+  color: rgba(218, 231, 142, 0.959) !important;
 }
 
 .my-card .input-group-text {
   background-color: rgba(255, 255, 255, 0.15) !important;
   border: none !important;
-  color: #36e709 !important;
+  color: #eeff00 !important;
 }
 
 .my-card .form-text {

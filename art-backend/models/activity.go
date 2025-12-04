@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Activity struct {
@@ -18,8 +16,8 @@ type Activity struct {
 	Duration       uint           `json:"duration" gorm:"type:integer;not null"`
 	AvailableSlots int            `json:"available_slots" gorm:"not null"`
 	Slots          []ActivitySlot `json:"slots" gorm:"foreignKey:ActivityID;constraint:OnDelete:CASCADE;"`
-	Availability   *bool          `json:"availability" gorm:"not null;default:true"`
-	IsRegular      *bool          `json:"is_regular" gorm:"column:is_regular;not null;default:false"`
+	Availability   bool           `json:"availability" gorm:"not null;default:true"`
+	IsRegular      bool           `json:"is_regular" gorm:"column:is_regular;not null;default:false"`
 
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
@@ -36,15 +34,6 @@ type ActivityImage struct {
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-" gorm:"index"`
-}
-
-type ActivitySlot struct {
-	gorm.Model
-	ActivityID uint      `json:"activity_id" gorm:"index;not null"`
-	StartTime  time.Time `json:"start_time" gorm:"not null"`
-	EndTime    time.Time `json:"end_time"`
-	Capacity   int       `json:"capacity" gorm:"not null"`
-	Booked     int       `json:"booked" gorm:"not null;default:0"`
 }
 
 func (a ActivityImage) Value() (driver.Value, error) {

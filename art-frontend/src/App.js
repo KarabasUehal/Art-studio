@@ -10,11 +10,10 @@ import ClientRecords from './components/ClientRecords';
 import AdminSchedulePage from './components/AdminSchedulePage';
 import ClientSchedulePage from './components/ClientSchedulePage';
 import { AuthProvider, AuthContext } from './context/AuthContext';
-/*import backgroundImage from './assets_2/background.jpg';*/
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import AdminRegister from './components/AdminRegister';
-/*import logoImage from './assets_2/Dushka.jpg';*/
+import AdminTemplatesPage from './components/AdminTemplatesPage';
 
 const backgroundImage = 'https://i.postimg.cc/59R6pXsS/background.jpg';
 const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
@@ -30,10 +29,38 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
 }
 
    function AppContent() {
-    const { isAuthenticated, role, logout } = useContext(AuthContext);
+    const { isAuthenticated, role, loading, logout } = useContext(AuthContext);
     console.log('AppContent: isAuthenticated =', isAuthenticated);
 
-       return (
+    if (loading) {
+    return (
+      <div className="app-background" style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column'
+      }}>
+        <img 
+          src={logoImage} 
+          alt="Завантаження..." 
+          style={{ 
+            width: '120px', 
+            borderRadius: '50%', 
+            animation: 'spin 3s linear infinite',
+            boxShadow: '0 0 20px rgba(100, 238, 8, 0.6)'
+          }} 
+        />
+        <h3 className="mt-4 text-white" style={{ textShadow: '0 0 15px #00ff00' }}>
+          Завантаження...
+        </h3>
+      </div>
+    );
+  }
+
+    return (
     <div
       className="app-background"
       style={{ 
@@ -62,9 +89,8 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
               {role === 'owner' && (
                 <>
                   <Link to="/client/records" className="btn btn-sm btn-primary">Мої записи</Link>
-                  <Link to="/records" className="btn btn-sm btn-info">All records</Link>
-                  <Link to="/admin/slots" className="btn btn-sm btn-warning">Add Activity Slots</Link>
-                  <Link to="/admin/register" className="btn btn-sm btn-warning">Register New User</Link>
+                  <Link to="/records" className="btn btn-sm btn-info">Усi записи</Link>
+                  <Link to="/admin/register" className="btn btn-sm btn-warning">Зареєструвати новий акаунт</Link>
                 </>
               )}
               {role === 'client' && (
@@ -83,7 +109,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
         <div className="text-center mb-4" style={{ marginTop: '100px' }}> 
           <img
             src={logoImage}
-            alt="Логотип Арт-студии для юных талантов"
+            alt="Логотип Арт-студии"
             style={{
               width: '150px',
               height: 'auto',
@@ -100,7 +126,13 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
          <nav className="mb-3 d-flex flex-wrap gap-2 justify-content-center">
           <Link to="/" className="btn btn-sm btn-success">Майстер-класи</Link>
           <Link to="/schedule" className="btn btn-sm btn-success">Графік занять</Link>
-        </nav>
+          {role === 'owner' && (
+          <>
+          <Link to="/admin/templates" className="btn btn-sm btn-warning">Управління шаблонами</Link>
+          <Link to="/admin/slots" className="btn btn-sm btn-warning">Створити слот</Link>
+          </>
+          )}
+         </nav>
 
         <Routes>
           <Route path="/" element={<Activities isAuthenticated={isAuthenticated} />} /> {/* Замена на Activities */}
@@ -113,6 +145,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/client/records" element={<ClientRecords isAuthenticated={isAuthenticated} />} />
           <Route path="/record/:activityId/:slotId?" element={isAuthenticated ? <RecordForm /> : <Navigate to="/login" />} />
           <Route path="/admin/slots" element={isAuthenticated && role === 'owner' ? <AdminSchedulePage /> : <Navigate to="/login" />} />
+          <Route path="/admin/templates" element={isAuthenticated && role === 'owner' ? <AdminTemplatesPage /> : <Navigate to="/login" />} />
           <Route path="/schedule" element={<ClientSchedulePage />} />
         </Routes>
       </div>

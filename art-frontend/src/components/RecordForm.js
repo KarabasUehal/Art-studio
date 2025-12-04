@@ -1,67 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import SuccessModal from './SuccessModal';
 import api from '../utils/api';
+import './RecordForm.css';
 
 const RecordForm = () => {
-  const { activityId, slotId } = useParams();  // slotId может быть undefined
-  const navigate = useNavigate();
+  const { activityId, slotId } = useParams();
+
   const [activity, setActivity] = useState(null);
+  const [slots, setSlots] = useState([]);
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [formData, setFormData] = useState({
     numberOfKids: 1,
     kids: [{ name: '', age: 5, gender: '' }],
-    date: '',
-    slotId: slotId || '',  // Предзаполнение из params
+    slotId: slotId || '',
   });
   const [loading, setLoading] = useState(false);
-  const [slots, setSlots] = useState([]);
   const [error, setError] = useState('');
-  const [selectedSlot, setSelectedSlot] = useState(null);  // Для предзаполненного слота
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const availablePlaces = selectedSlot 
-    ? selectedSlot.capacity - selectedSlot.booked
-    : formData.slotId
-        ? (slots.find(s => (s.id || s.ID) === +formData.slotId)?.capacity || 0) -
-          (slots.find(s => (s.id || s.ID) === +formData.slotId)?.booked || 0)
-        : 0;
-
+  // Загрузка активности и слотов
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [activityRes, slotsRes] = await Promise.all([
           api.get(`/activities/${activityId}`),
-          api.get(`/activity/${activityId}/slots`),  
+          api.get(`/activity/${activityId}/slots`),
         ]);
 
         setActivity(activityRes.data);
         setSlots(slotsRes.data);
 
         if (slotId) {
-          console.log("Debug: Fetching slotId =", slotId);  
           const slotRes = await api.get(`/activity/${activityId}/slots/${slotId}`);
           const fetchedSlot = slotRes.data;
           setSelectedSlot(fetchedSlot);
-          setFormData(prev => ({ ...prev, slotId }));  // Предзаполнение
-
-          // Проверка доступности
-          if (fetchedSlot.booked >= fetchedSlot.capacity) {
-            setError('Вибраний слот вже заповнений!');
-            return;
-          }
+          setFormData(prev => ({ ...prev, slotId }));
         }
       } catch (err) {
-        console.error("Fetch error:", err);  // Лог для дебага
         setError('Не вдалося завантажити дані активності');
       }
     };
     fetchData();
   }, [activityId, slotId]);
 
-  const addKid = () => setFormData({
-    ...formData,
-    kids: [...formData.kids, { name: '', age: 5, gender: '' }],
-  });
+  // Форматирование времени
+  const formatSlotTime = (timeStr) => {
+    if (!timeStr) return 'Не вказано';
+    const date = new Date(timeStr);
+    return date.toLocaleString('uk-UA', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+      timeZone: 'Europe/Kiev',
+    });
+  };
+
+  // === ВСЕ НЕДОСТАЮЩИЕ ФУНКЦИИ ===
+  const addKid = () => {
+    setFormData({
+      ...formData,
+      kids: [...formData.kids, { name: '', age: 5, gender: '' }],
+    });
+  };
 
   const updateKid = (index, field, value) => {
     const kids = [...formData.kids];
@@ -69,20 +69,11 @@ const RecordForm = () => {
     setFormData({ ...formData, kids });
   };
 
-  const removeKid = (index) => setFormData({
-    ...formData,
-    kids: formData.kids.filter((_, i) => i !== index),
-  });
-
-  // Функция для форматирования времени слота без локального сдвига 
-  const formatSlotTime = (timeStr) => {
-    if (!timeStr) return 'Не указана';
-    const date = new Date(timeStr);
-    if (isNaN(date.getTime())) return 'Не указана';
-    return date.toLocaleString('uk-UA', { 
-      dateStyle: 'short', 
-      timeStyle: 'short', 
-      timeZone: 'UTC'  // Ключ: UTC, чтобы не добавлять +3ч локали (показывает "оригинальное" время)
+  const removeKid = (index) => {
+    setFormData({
+      ...formData,
+      kids: formData.kids.filter((_, i) => i !== index),
+      numberOfKids: formData.numberOfKids - 1,
     });
   };
 
@@ -90,36 +81,28 @@ const RecordForm = () => {
     e.preventDefault();
     setError('');
 
-    // Валидация слота (fallback на ID или id)
     const currentSlotId = formData.slotId || slotId;
     if (!currentSlotId) {
       setError('Виберіть час заняття!');
       return;
     }
 
-    // Поиск слота с fallback на s.ID (GORM uppercase)
-    const currentSlot = selectedSlot || slots.find(s => (s.id || s.ID) === +currentSlotId);
+    const currentSlot = selectedSlot || slots.find(s => (s.id || s.ID) == +currentSlotId);
     if (currentSlot && currentSlot.booked >= currentSlot.capacity) {
       setError('Вибраний слот вже заповнений!');
       return;
     }
 
-    // Валидация детей
-    if (formData.kids.length !== formData.numberOfKids) return alert('Додайте дані для всіх дітей!');
+    if (formData.kids.length !== formData.numberOfKids) {
+      setError('Додайте дані для всіх дітей!');
+      return;
+    }
+
     for (let i = 0; i < formData.kids.length; i++) {
       const kid = formData.kids[i];
-      if (!kid.name.trim()) {
-        setError(`Введіть ім'я для дитини ${i + 1}!`);
-        return;
-      }
-      if (kid.age < 3 || kid.age > 17) {
-        setError(`Вік дитини ${i + 1} має бути від 3 до 17 років!`);
-        return;
-      }
-      if (!kid.gender) {
-        setError(`Виберіть стать для дитини ${i + 1}!`);
-        return;
-      }
+      if (!kid.name.trim()) return setError(`Введіть ім'я для дитини ${i + 1}!`);
+      if (kid.age < 3 || kid.age > 17) return setError(`Вік дитини ${i + 1} має бути від 3 до 17 років!`);
+      if (!kid.gender) return setError(`Виберіть стать для дитини ${i + 1}!`);
     }
 
     setLoading(true);
@@ -132,142 +115,151 @@ const RecordForm = () => {
           kids: formData.kids,
         }],
       };
+
       await api.post('/record', req);
-
       setShowSuccess(true);
-
+      // Сброс формы
       setFormData({
         numberOfKids: 1,
         kids: [{ name: '', age: 5, gender: '' }],
-        date: '',
         slotId: '',
       });
     } catch (err) {
-      console.error("Submit error:", err);  // Лог для дебага
-      alert('Помилка запису: ' + (err.response?.data?.error || 'Спробуйте пізніше'));
+      setError('Помилка запису: ' + (err.response?.data?.error || 'Спробуйте пізніше'));
     } finally {
       setLoading(false);
     }
   };
 
-  if (!activity) return <div>Завантаження...</div>;
+  if (!activity) return <div className="record-loading">Завантаження...</div>;
+
+  const availablePlaces = selectedSlot
+    ? selectedSlot.capacity - selectedSlot.booked
+    : slots.find(s => (s.id || s.ID) == +formData.slotId)?.capacity -
+      slots.find(s => (s.id || s.ID) == +formData.slotId)?.booked || 0;
 
   return (
-    <div className="card p-4 mx-auto" style={{ maxWidth: '600px' }}>
-      <h2> Запис на "{activity.name}" ({activity.price} грн./дитина) </h2>
-      <form onSubmit={handleSubmit}>
-        {/* Select только если !slotId (для роута /record/:activityId без slotId) */}
+    <div className="record-page">
+      <div className="record-card">
+        <h2 className="record-title">
+          Запис на «{activity.name}»
+          <span className="record-price">{activity.price} грн / мiсце</span>
+        </h2>
+
+        {/* Предвыбранный слот */}
+        {slotId && selectedSlot && (
+          <div className="slot-info">
+            <strong>Обраний час:</strong> {formatSlotTime(selectedSlot.start_time)}
+            <span className="places-left">
+              — вільно {selectedSlot.capacity - selectedSlot.booked} місць
+            </span>
+          </div>
+        )}
+
+        {/* Выбор слота */}
         {!slotId && (
-          <>
-            <label>Час заняття:</label>
+          <div className="form-group">
+            <label className="record-label">Оберіть час заняття</label>
             <select
+              className="record-select"
               value={formData.slotId}
               onChange={(e) => setFormData({ ...formData, slotId: e.target.value })}
-              className="form-control mb-3"
               required
             >
-              <option value="">-- Оберіть час --</option>
-              {slots.length === 0 && <option disabled>Немає доступних слотів</option>}
+              <option value="">— Оберіть час —</option>
               {slots.map((slot) => {
-                const available = slot.capacity - slot.booked;
+                const free = slot.capacity - slot.booked;
                 return (
-                  <option key={slot.id || slot.ID} value={slot.id || slot.ID} disabled={available <= 0}>
-                    {formatSlotTime(slot.start_time)} — вільно місць: {available}  {/* Исправлено: formatSlotTime без +3ч */}
+                  <option key={slot.id || slot.ID} value={slot.id || slot.ID} disabled={free <= 0}>
+                    {formatSlotTime(slot.start_time)} — вільно {free} місць
                   </option>
                 );
               })}
             </select>
-          </>
-        )}
-
-        {/* Отображение предвыбранного слота (для /record/:activityId/:slotId) */}
-        {slotId && selectedSlot && (
-          <div className="alert alert-info mb-3">
-            <strong>Вибраний слот:</strong> {formatSlotTime(selectedSlot.start_time)} — вільно місць: {selectedSlot.capacity - selectedSlot.booked}  {/* Исправлено: formatSlotTime */}
           </div>
         )}
-        {slotId && !selectedSlot && (
-          <p className="text-warning">Слот не знайдено — виберіть заново</p>
-        )}
 
-        <div className="mb-3">
-        <label>Кiлькiсть дiтей:</label>
-        <input
-          type="number"
-          min="1"
-          max={availablePlaces}  
-          value={formData.numberOfKids}
-          onChange={(e) => {
-            let num = +e.target.value;
-            if (num > availablePlaces) num = availablePlaces;
-            setFormData({
-              ...formData,
-              numberOfKids: num,
-              kids: Array(num).fill().map((_, i) => formData.kids[i] || { name: '', age: 5, gender: '' }),
-            });
-          }}
-          className="form-control mb-3"
-          required
-        />
-        <div className="form-text">
-         Доступно {availablePlaces} місць
-        </div>
+        <div className="form-group">
+          <label className="record-label">Кількість дітей</label>
+          <input
+            type="number"
+            min="1"
+            max={availablePlaces}
+            className="record-input"
+            value={formData.numberOfKids}
+            onChange={(e) => {
+              let num = Math.max(1, Math.min(+e.target.value || 1, availablePlaces));
+              setFormData({
+                ...formData,
+                numberOfKids: num,
+                kids: Array.from({ length: num }, (_, i) => formData.kids[i] || { name: '', age: 5, gender: '' }),
+              });
+            }}
+          />
+          <div className="places-hint">Доступно місць: {availablePlaces}</div>
         </div>
 
-        <h5>Дані дітей:</h5>
-        {formData.kids.map((kid, index) => (
-          <div key={index} className="border p-3 mb-2 rounded">
+        <h3 className="kids-title">Дані дітей</h3>
+
+        {formData.kids.map((kid, i) => (
+          <div key={i} className="kid-card">
             <input
-              placeholder="Iм'я"
+              placeholder="Ім'я дитини"
+              className="record-input"
               value={kid.name}
-              onChange={(e) => updateKid(index, 'name', e.target.value)}
-              className="form-control mb-2"
+              onChange={(e) => updateKid(i, 'name', e.target.value)}
               required
             />
             <input
               type="number"
-              placeholder="Вiк"
-              value={kid.age}
-              onChange={(e) => updateKid(index, 'age', +e.target.value)}
-              className="form-control mb-2"
+              placeholder="Вік"
               min="3"
               max="17"
+              className="record-input"
+              value={kid.age}
+              onChange={(e) => updateKid(i, 'age', +e.target.value)}
               required
             />
             <select
+              className="record-select"
               value={kid.gender}
-              onChange={(e) => updateKid(index, 'gender', e.target.value)}
-              className="form-control mb-2"
+              onChange={(e) => updateKid(i, 'gender', e.target.value)}
               required
             >
-              <option value="">-- Оберіть стать --</option>
+              <option value="">Стать</option>
               <option value="male">Хлопчик</option>
               <option value="female">Дівчинка</option>
             </select>
+
             {formData.kids.length > 1 && (
-              <button type="button" onClick={() => removeKid(index)} className="btn btn-sm btn-outline-danger">
-                Видалити
+              <button type="button" className="btn-remove-kid" onClick={() => removeKid(i)}>
+                Видалити дитину
               </button>
             )}
           </div>
         ))}
 
         {formData.kids.length < formData.numberOfKids && (
-          <button type="button" onClick={addKid} className="btn btn-outline-secondary">
+          <button type="button" className="btn-add-kid" onClick={addKid}>
             + Додати дитину
           </button>
         )}
 
-        {error && <p className="text-danger mt-2">{error}</p>}
-        <button type="submit" disabled={loading} className="btn btn-success w-100 mt-3">
-          {loading ? 'Запис...' : `Записатися (${activity.price * formData.numberOfKids} грн.)`}
-        </button>
-      </form>
+        {error && <div className="record-error">{error}</div>}
 
-      <SuccessModal
-        show={showSuccess}
-        onHide={() => setShowSuccess(false)}
-      />
+      <div className="submit-wrapper">
+        <button
+          type="submit"
+          disabled={loading || !formData.slotId}
+          className="btn-record-submit"
+          onClick={handleSubmit}
+        >
+          {loading ? 'Записуємо...' : `Записатися (${activity.price * formData.numberOfKids} грн)`}
+        </button>
+        </div>
+      </div>
+
+      <SuccessModal show={showSuccess} onHide={() => setShowSuccess(false)} />
     </div>
   );
 };

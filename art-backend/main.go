@@ -53,6 +53,10 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	router.GET("/health", func(c *gin.Context) {
+		c.String(200, "OK")
+	})
+
 	router.POST("/register", handlers.Register)
 	router.POST("/login", handlers.Login)
 
@@ -65,25 +69,35 @@ func main() {
 	api := router.Group("/")
 	api.Use(middleware.AuthMiddleware())
 
-	api.POST("/activities", handlers.AddActivity())
-	api.PUT("/activities/:id", handlers.UpdateActivity())
-	api.DELETE("/activities/:id", handlers.DeleteActivity())
+	api.POST("/activities", middleware.OwnerOnly(), handlers.AddActivity())
+	api.PUT("/activities/:id", middleware.OwnerOnly(), handlers.UpdateActivity())
+	api.DELETE("/activities/:id", middleware.OwnerOnly(), handlers.DeleteActivity())
 
 	api.GET("/records", handlers.GetAllRecords())
 	api.GET("/records/:id", handlers.GetRecordByID())
-	api.DELETE("/records/:id", handlers.DeleteRecordByID())
+	api.DELETE("/records/:id", middleware.OwnerOnly(), handlers.DeleteRecordByID())
+
+	api.GET("/templates", handlers.GetAllTemplates())
+	api.GET("/templates/:id", handlers.GetTemplateByID())
+	api.GET("/templates/by-activity/:act_id", handlers.GetTemplatesByActID())
+	api.POST("/templates/by-activity/:act_id", middleware.OwnerOnly(), handlers.AddTemplate())
+
+	api.PUT("/templates/:id", middleware.OwnerOnly(), handlers.UpdateTemplate())
+	api.DELETE("/templates/:id", middleware.OwnerOnly(), handlers.DeleteTemplate())
+
+	api.POST("/schedule/extend", middleware.OwnerOnly(), handlers.ExtendSchedule()) // Для продления расписания на неделю
 
 	api.GET("/activity/:activity_id/slots/:slot_id", handlers.GetSlotByID())
-	api.POST("/activity/:activity_id/slots", handlers.AddSlot())
-	api.PUT("/activity/:activity_id/slots/:slot_id", handlers.UpdateSlot())
-	api.DELETE("/activity/:activity_id/slots/:slot_id", handlers.DeleteSlot())
+	api.POST("/activity/:activity_id/slots", middleware.OwnerOnly(), handlers.AddSlot())
+	api.PUT("/activity/:activity_id/slots/:slot_id", middleware.OwnerOnly(), handlers.UpdateSlot())
+	api.DELETE("/activity/:activity_id/slots/:slot_id", middleware.OwnerOnly(), handlers.DeleteSlot())
 
 	api.POST("/admin/register", middleware.OwnerOnly(), handlers.RegisterByOwner)
 
 	api.GET("/client/records", handlers.GetMyRecords())
 	api.POST("/record", handlers.MakeRecord())
 
-	go func() { // Запуск HTTP-сервера в горутине с использованием corsMiddleware для CORS и gwMux для маршрутизации REST-запросов
+	go func() { // Запуск HTTP-сервера в горутине с использованием corsMiddleware для CORS
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Err(err).Msg("Failed to serve REST")
 		}

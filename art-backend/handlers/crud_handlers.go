@@ -26,7 +26,7 @@ func GetActivities() gin.HandlerFunc {
 			return
 		}
 
-		sizeStr := c.DefaultQuery("size", "9")
+		sizeStr := c.DefaultQuery("size", "100")
 		size, err := strconv.Atoi(sizeStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid size"})
@@ -42,10 +42,10 @@ func GetActivities() gin.HandlerFunc {
 
 		offset := (page - 1) * size
 
-		filter := strings.ToLower(c.Query("filter"))
+		regularParam := strings.ToLower(c.Query("regular"))
 
 		redisClient, _ := database.GetRedis()
-		cacheKey := fmt.Sprintf("activities:page=%d:size=%d:filter=%s", page, size, filter)
+		cacheKey := fmt.Sprintf("activities:page=%d:size=%d:filter=%s", page, size, regularParam)
 
 		var resp gin.H
 
@@ -61,11 +61,12 @@ func GetActivities() gin.HandlerFunc {
 		query := db.Model(&models.Activity{})
 
 		// Применяем фильтр только если он валидный и не "all"
-		switch filter {
-		case "regular":
+		switch regularParam {
+		case "true", "1":
 			query = query.Where("is_regular = ?", true)
-		case "one-time", "onetime":
-			query = query.Where("is_regular IS NULL OR is_regular = ?", false)
+		case "false", "0", "one-time", "onetime":
+			query = query.Where("is_regular = ? OR is_regular IS NULL", false)
+			// если параметр не передан — отдаём ВСЁ (как сейчас делает фронт)
 		}
 
 		var totalCount int64
@@ -81,6 +82,7 @@ func GetActivities() gin.HandlerFunc {
 			Offset(offset).
 			Find(&acts).Error; err != nil {
 
+			log.Error().Err(err).Msg("Error finding activities")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load activities"})
 			return
 		}
