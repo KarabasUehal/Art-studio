@@ -1,0 +1,153 @@
+.list-page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #20201f, #474746);
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+.list-title {
+  text-align: center;
+  font-size: 2.0em;
+  color: #d3b614;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
+  font-weight: 600;
+}
+
+/* Сетка карточек — аналог row + col-md-6 col-lg-4 */
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.list-grid-item {
+  width: 100%;
+}
+
+/* Карточка записи */
+.list-card {
+  background: rgba(233, 196, 161, 0.979);
+  border: 2px solid #000000;
+  border-radius: 15px;
+  overflow: hidden;
+  height: 100%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(78, 205, 196, 0.2);
+  border-color: #eeec7f;
+}
+
+.list-card-body {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-card-title {
+  color: #000000;
+  font-size: 1.2em;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.list-text {
+  margin: 8px 0;
+  font-size: 1.05em;
+  line-height: 1.5;
+}
+
+.list-details {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.list-details-title {
+  color: #000000;
+  text-shadow: 0 0 5px rgba(255, 217, 0, 0.938);
+  font-size: 1.3em;
+  margin-bottom: 16px;
+}
+
+.list-item {
+  background: rgb(177, 179, 173) !important;
+  border: 2px solid #000000;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.list-item-elements {
+  margin: 10px 0 0 20px;
+  padding: 0;
+  font-size: 0.98em;
+}
+
+.list-item-elements li {
+  margin: 6px 0;
+}
+
+.list-strong {
+  color: #ff0000;
+}
+
+/* Кнопка удаления */
+.list-delete-btn {
+  background: #e98f8f;
+  color: #000000;
+  border: 2px solid #000000;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 12px;
+}
+
+.list-delete-btn:hover {
+  background: #f81a1a;
+  color: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+}
+
+/* Пагинация */
+.list-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 60px;
+  flex-wrap: wrap;
+}
+
+.list-page-link {
+  background: rgba(78, 205, 196, 0.15);
+  color: #4ecdc4;
+  border: 1.5px solid #4ecdc4;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.list-page-link:hover {
+  background: #4ecdc4;
+  color: #000;
+  transform: scale(1.08);
+}
+
+.list-pagination .active .list-page-link {
+  background: #4ecdc4;
+  color: #000;
+  box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+}

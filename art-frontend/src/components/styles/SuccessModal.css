@@ -1,0 +1,104 @@
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.success-modal-container {
+  background-color: #181414;
+  color: #c7e0bd;
+  border-radius: 12px;
+  padding: 25px 30px;
+  width: 600px;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgb(184, 181, 4);
+  border: 2px solid #e5e904;
+}
+
+.success-modal-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #e6d223 !important;
+  text-shadow: 1px 1px 3px #e9ec08, 0 0 10px #051d05 !important;
+  font-size: 1.4em !important;
+}
+
+.success-modal-label {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  display: block;
+  font-weight: 500;
+  color: #e6d223 !important;
+}
+
+.success-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.success-modal-body {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.success-modal-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.success-modal-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #e6d223;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.success-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-success-modal {
+  background-color: #8bd182;
+  color: #000000 !important;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgb(207, 243, 3);
+}
+
+.btn-success-modal:hover {
+  background-color: rgb(223, 238, 8) !important;
+  color: #000 !important;
+}
+
+.btn-cancel-modal {
+  background-color: #ec7272;
+  color: #000000 !important;
+  padding: 8px 18px;
+  border: 2px solid #000000;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgb(255, 30, 0);
+}
+
+.btn-cancel-modal:hover {
+  background-color: rgb(255, 30, 0) !important;
+  color: #000 !important;
+}

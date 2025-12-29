@@ -1,0 +1,63 @@
+/* ─────────────────────────────── */
+/* НА 100% РАБОЧИЙ КАЛЕНДАРЬ ДЛЯ datetime-local (Chrome/Edge) */
+/* ─────────────────────────────── */
+
+.admin-input[type="datetime-local"] {
+  color-scheme: dark;                                 /* ← КРИТИЧНО! */
+  -webkit-appearance: none;
+  background: #181414 !important;
+  color: #c7e0bd !important;
+  border: 2px solid #d9ff00 !important;
+}
+
+/* Делаем весь попап тёмным */
+.admin-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.9) brightness(2);
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.admin-input[type="datetime-local"]::-webkit-datetime-edit,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-text,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-minute-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
+  background-color: #181414 !important;
+  color: #c7e0bd !important;
+}
+
+/* Жёлтые цифры даты */
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-year-field {
+  color: #f0da17 !important;
+  font-weight: bold !important;
+}
+
+/* Зелёное время */
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+.admin-input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+  color: #7fdb7f !important;
+}
+
+/* Полоски и стрелки */
+.admin-input[type="datetime-local"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  background: #333 !important;
+}
+
+/* Сам календарь (когда открыт) */
+.admin-input[type="datetime-local"]::-webkit-date-and-time-wrapper,
+.admin-input[type="datetime-local"]::-webkit-datepicker {
+  background: #181414 !important;
+  color: #c7e0bd !important;
+}
+
+.admin-input[type="datetime-local"] {
+  color-scheme: dark !important;
+}
+

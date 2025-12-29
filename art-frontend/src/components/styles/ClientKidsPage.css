@@ -1,0 +1,115 @@
+/* src/styles/KidsPage.css */
+.kids-page {
+  min-height: 100vh;
+  background: #121212;
+  padding: 60px 20px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #f5f5f5;
+}
+
+.kids-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.kids-title {
+  text-align: center;
+  font-size: 2.5em;
+  color: #4ad420;
+  margin-bottom: 50px;
+  font-weight: 600;
+}
+
+.btn-add-kid {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 50px;
+  background: #e6c843;
+  color: rgb(0, 0, 0);
+  padding: 14px 40px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(231, 111, 81, 0.3);
+  transition: all 0.3s;
+}
+
+.btn-add-kid:hover {
+  background: #e6c843;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(231, 111, 81, 0.4);
+}
+
+.kid-card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 28px;
+  height: 100%;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.kid-card:hover {
+  transform: translateY(-8px);
+  border-color: #e6c843;
+  box-shadow: 0 12px 30px rgba(244, 162, 97, 0.15);
+}
+
+.kid-name {
+  font-size: 1.45em;
+  color: #e6c843;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.kid-info {
+  font-size: 1.1em;
+  color: #ddd;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+
+.admin-kid-buttons {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-kid {
+  display: inline-block;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  font-size: 0.95em !important;
+  transition: all 0.3s;
+  min-width: 100px;
+  text-align: center;
+}
+
+.btn-kid-edit {
+  background: #000000 !important;
+  color: #ff8c00 !important;
+  border: 2px solid #ff8c00 !important;
+}
+
+.btn-kid-edit:hover {
+  color: #ff8c00 !important;
+  background: #504e4e !important;
+  transform: translateY(-3px);
+}
+
+.btn-kid-delete {
+  background: #000000 !important;
+  color: #ff4444 !important;
+  border: 2px solid #ff4444 !important;
+}
+
+.btn-kid-delete:hover {
+  background: #504e4e !important;
+  color: #ff4444 !important;
+  transform: translateY(-3px);
+}

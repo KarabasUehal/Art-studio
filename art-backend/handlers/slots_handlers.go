@@ -78,11 +78,7 @@ func AddSlot() gin.HandlerFunc {
 			return
 		}
 
-		type SlotInput struct {
-			StartTimeStr string `json:"start_time" binding:"required"`
-			Capacity     int    `json:"capacity" binding:"required,min=1"`
-		}
-		var input SlotInput
+		var input models.SlotInput
 		if err := c.ShouldBindJSON(&input); err != nil {
 			log.Error().Err(err).Msg("Error binding json")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind json"})
@@ -112,6 +108,7 @@ func AddSlot() gin.HandlerFunc {
 		slot.ActivityID = uint(activityID)
 		slot.Capacity = input.Capacity
 		slot.Booked = 0
+		slot.Source = "manual"
 
 		tx := db.Begin()
 		defer func() {
@@ -210,11 +207,14 @@ func DeleteSlot() gin.HandlerFunc {
 			return
 		}
 
-		if err := db.Unscoped().Delete(&slot).Error; err != nil {
+		tx := db.Begin()
+		if err := tx.Unscoped().Delete(&slot).Error; err != nil {
+			tx.Rollback()
 			log.Error().Err(err).Msgf("Error deleting slot id: %d", id)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete slot"})
 			return
 		}
+		tx.Commit()
 
 		c.Status(http.StatusNoContent)
 	}

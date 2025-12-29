@@ -3,6 +3,7 @@ package handlers
 import (
 	"art/database"
 	"art/models"
+	"art/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -97,9 +98,9 @@ func MakeRecord() gin.HandlerFunc {
 				ActivityName: activity.Name,
 				NumberOfKids: item.NumberOfKids,
 				Kids:         item.Kids,
-				Date:         slot.StartTime,
-				SlotID:       item.SlotID,
+				Date:         slot.StartTime.UTC(),
 			})
+
 		}
 
 		var user models.User
@@ -113,50 +114,36 @@ func MakeRecord() gin.HandlerFunc {
 		if !ok {
 			log.Error().Msg("Failed to bring phone_number to string")
 		}
-		// Создаем заказ
-		record := models.Record{
-			UserID:      user.ID,
-			PhoneNumber: phoneNumber,
-			ParentName:  user.Name,
-			TotalPrice:  totalPrice,
-			Details:     recordItems,
-		}
 
-		// Логируем заказ перед сохранением
-		log.Info().Any("record", record).Msg("Creating record")
+		var record models.Record
 
-		tx := db.Begin()
-		if err := tx.Create(&record).Error; err != nil {
-			tx.Rollback()
-			log.Error().Err(err).Msg("Database error")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to create record: " + err.Error()})
-			return
-		}
-		tx.Commit()
+		for _, item := range req.Items { // Создаем заказ
 
-		// Очищаем кэш
-		pattern := []string{"/records*", "/client/records*" + phoneNumber}
-		for _, pattern := range pattern {
-			cursor := uint64(0)
-			for {
-				keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to scan records cache keys")
-					break
-				}
-				if len(keys) > 0 {
-					if err := redisClient.Del(c, keys...).Err(); err != nil {
-						log.Error().Err(err).Msg("Failed to delete records cache keys")
-					} else {
-						log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-					}
-				}
-				cursor = nextCursor
-				if cursor == 0 {
-					break
-				}
+			record.UserID = user.ID
+			record.PhoneNumber = phoneNumber
+			record.ParentName = user.Name
+			record.TotalPrice = totalPrice
+			record.Details = recordItems
+			record.SlotID = item.SlotID
+			record.CreatedAt = time.Now().UTC()
+
+			log.Info().Any("record", record).Msg("Creating record") // Логируем заказ перед сохранением
+
+			tx := db.Begin()
+			if err := tx.Create(&record).Error; err != nil {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Database error")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to create record: " + err.Error()})
+				return
 			}
+			tx.Commit()
 		}
+		// Очищаем кэш
+
+		if redisClient != nil {
+			utils.InvalidateCache(c, "/records*", "/client/records*"+phoneNumber)
+		}
+
 		c.JSON(http.StatusCreated, gin.H{
 			"record_id":    record.ID,
 			"created_at":   record.CreatedAt.Format(time.RFC3339),
@@ -429,10 +416,16 @@ func DeleteRecordByID() gin.HandlerFunc {
 		for _, detail := range record.Details {
 			var slot models.ActivitySlot
 
-			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&slot, detail.SlotID).Error; err != nil {
+			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&slot, record.SlotID).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					log.Warn().
+						Uint("slot_id", record.SlotID).
+						Msg("slot missing, deleting record without restoring places")
+					continue
+				}
 				tx.Rollback()
-				log.Error().Err(err).Uint("slot_id", detail.SlotID).Msg("Slot not found on record delete")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "slot not found"})
+				log.Error().Err(err).Uint("slot_id", record.SlotID).Msg("Error finding slot")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "slot lookup failed"})
 				return
 			}
 
@@ -448,13 +441,13 @@ func DeleteRecordByID() gin.HandlerFunc {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to restore places"})
 				return
 			}
+		}
 
-			if err := tx.Delete(&record, id).Error; err != nil {
-				tx.Rollback()
-				log.Error().Err(err).Int("id", id).Msg("Failed to delete record")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete record"})
-				return
-			}
+		if err := tx.Unscoped().Delete(&record, id).Error; err != nil {
+			tx.Rollback()
+			log.Error().Err(err).Int("id", id).Msg("Failed to delete record")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete record"})
+			return
 		}
 
 		if err := tx.Commit().Error; err != nil {

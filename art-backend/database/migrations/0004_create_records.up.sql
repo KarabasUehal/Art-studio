@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS "records" (
     "id" SERIAL PRIMARY KEY,
     "user_id" INTEGER NOT NULL,
+    "slot_id" INTEGER NOT NULL,
     "details" jsonb NOT NULL,
     "phone_number" VARCHAR(15) NOT NULL,
     "parent_name" TEXT,

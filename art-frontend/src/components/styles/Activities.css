@@ -1,0 +1,369 @@
+.activities-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a15, #1a1a2e);
+  padding: 50px 20px;
+  /*font-family: 'Segoe UI', sans-serif;*/
+  font-family: 'Caveat', cursive, sans-serif; 
+  border-radius: 10px;
+}
+
+.activities-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  background: rgb(55, 55, 56);
+  padding: 24px 16px;
+  border-radius: 10px;
+}
+
+.activities-wrapper {
+  text-align: center;        /* центрируем кнопку по горизонтали */
+  margin-bottom: 48px;       /* аналог Bootstrap mb-5 ≈ 3rem = 48px */
+  width: 100%;
+}
+
+.activities-wrapper .btn-add-activity {
+  display: inline-block;     /* чтобы кнопка не растягивалась на всю ширину */
+  /* Все остальные стили кнопки у вас уже есть в .btn-add-activity */
+}
+
+.activities-title {
+  text-align: center;
+  font-size: 2.4em;                  /* было 3.5em → -31% */
+  color: #ffeb3b;
+  text-shadow: 
+    0 0 8px rgba(255, 235, 59, 0.6),
+    0 0 16px rgba(255, 235, 59, 0.3);
+  margin-bottom: 40px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.activities-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: rgba(209, 198, 94, 0.08);
+  color: #ffeb3b;
+  border: 1.5px solid #ffeb3b;
+  padding: 10px 24px;             
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 1em;                    
+  min-width: 160px;                  
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  background: rgba(255,235,59,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(255,235,59,0.25);
+}
+
+.tab-btn.active {
+  background: #ffeb3b;
+  color: #000;
+  box-shadow: 0 0 0 8px rgba(255,235,59,0.6);
+  font-weight: 700;
+}
+
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 16px 12px;
+  width: 100%;
+  box-sizing: border-box;                            
+}
+
+.activity-grid-item {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+}
+
+/* Карточка мастер-класса */
+.activity-card {
+  background: rgba(54, 54, 54, 0.986);
+  border: 1.5px solid #ffeb3b;
+  border-radius: 18px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  height: 100%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 
+    0 16px 35px rgba(255,235,59,0.15),
+    0 0 30px rgba(255,235,59,0.25);
+  border-color: #ffff8d;
+}
+
+.activity-card img {
+  width: 100%;
+  height: 200px;                     
+  object-fit: cover;
+  border-bottom: 3px solid #ffeb3b;
+}
+
+.activity-badge {
+  display: inline-flex;         
+  align-items: center;            
+  justify-content: center;        
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 80px;                
+  text-align: center;
+}
+
+.activity-badge--regular {
+  background: #0a1601;        
+  color: #2beb05;             
+  border: 1px solid #86efac;
+}
+
+.activity-badge--one-time {
+  background: #000000;       
+  color: #d97706;             
+  border: 1px solid #fcd34d;
+}
+
+.activity-card-body {
+  padding: 6px 6px;  
+  flex-grow: 1;                 
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin: 0px !important;
+  padding: 18px !important;
+}
+
+.activity-card-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.activity-card-title {
+  width: 100%;
+  font-size: 1.35em;              
+  color: #ffeb3b;
+  text-shadow: 0 0 10px rgba(255,235,59,0.5);
+  margin: 2px 0 8px 0;
+  font-weight: 600;
+}
+
+.activity-card-text {
+  font-size: 0.7em;                 
+  line-height: 1.4;
+  color: #ddd;  
+  margin-bottom: 14px;
+  flex-grow: 1; 
+  padding: 0;                    
+  display: block;               
+  text-align: justify;
+  text-justify: inter-word;               
+  font-family: 'Segoe UI', sans-serif !important;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.activity-card-footer {
+  width: 100%;
+  padding: 12px 4px;        
+  margin-top: auto;                 
+  display: flex;
+  justify-content: flex-end;        
+}
+
+.activity-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 1.05em;                 
+  color: #ffff8d;
+  font-weight: 600;
+}
+
+.activity-admin-actions {
+  display: flex;
+  gap: 10px;          
+  margin-top: 6px;    
+  justify-content: center; 
+  padding-bottom: 4px;
+  border-radius: 14px;
+  width: auto;
+  flex-wrap: nowrap;
+
+  text-align: center !important;               
+  display: flex !important;                    
+  align-items: center !important;
+}
+
+.btn-signup {
+  background: #4eac19;
+  color: #000;
+  font-weight: 700;
+  padding: 12px 8px;
+  border-radius: 24px;
+  width: auto;          
+  min-width: 140px;
+  max-width: 200px;
+  border: none;
+  font-size: 1.05em;
+  transition: all 0.3s;
+  box-shadow: 0 6px 18px rgba(255,235,59,0.35);
+  text-transform: none;
+  letter-spacing: 0.8px;
+
+  font-family: 'Caveat', cursive !important;   
+  text-align: center !important;               
+  display: flex !important;                    
+  align-items: center !important;             
+  justify-content: center !important;          
+}
+
+.btn-signup:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(255,235,59,0.5);
+}
+
+.btn-lg {
+  background: linear-gradient(135deg, #699c83, #034706);
+  color: #ffeb3b;
+  padding: 14px 40px;
+  border-radius: 50px;
+  font-weight: 900;
+  box-shadow: 0 10px 30px rgba(51, 255, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-add-activity {
+  display: inline-block;
+  background: linear-gradient(135deg, #355345, #034706) !important;
+  color: #ffeb3b!important;
+  padding: 14px 40px !important;
+  border: 2px solid #045008 !important;
+  border-radius: 50px !important;
+  font-weight: 900 !important;
+  font-size: 1.1em !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none !important;
+  box-shadow: 0 10px 30px rgba(51, 255, 0, 0.4);
+  transition: all 0.3s;
+  margin: 0 auto;
+}
+
+.btn-add-activity:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(51, 255, 0, 0.6);
+  color: #ffeb3b !important;
+  text-decoration: none !important;
+}
+
+/* Общий стиль для админских кнопок в карточках */
+.btn-admin {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  font-size: 0.95em !important;
+  transition: all 0.3s;
+  min-width: unset;
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.btn-admin-edit {
+  background: #000000 !important;
+  color: #ff8c00 !important;          /* яркий оранжевый */
+  border: 2px solid #ff8c00 !important; 
+}
+
+.btn-admin-edit:hover {
+  color: #ff8c00 !important;
+  background: #504e4e !important;
+  transform: translateY(-3px);
+}
+
+/* Видалити — красный текст */
+.btn-admin-delete {
+  background: #000000 !important;
+  color: #ff4444 !important;
+  border: 2px solid #ff4444 !important;
+}
+
+.btn-admin-delete:hover {
+  background: #504e4e !important;
+  color: #ff4444 !important;
+  transform: translateY(-3px);
+}
+
+/* Убираем подчёркивание у всех ссылок внутри карточек */
+.activity-card a,
+.activity-card a:hover,
+.activity-card a:visited,
+.activity-card a:active {
+  text-decoration: none !important;
+}
+
+/* Пустое состояние и пагинация */
+.empty-state {
+  padding: 80px 20px;
+  font-size: 1.4em;                 
+  background: rgba(255,235,59,0.05);
+  border: 1.5px dashed #ffeb3b;
+  border-radius: 18px;
+}
+
+.pagination { margin-top: 50px; gap: 10px; }
+
+.page-link {
+  background: rgba(255,235,59,0.08);
+  color: #ffeb3b;
+  border: 1.5px solid #ffeb3b;
+  padding: 9px 16px;                 /* было 12px 20px */
+  border-radius: 40px;
+  font-size: 0.95em;
+}
+
+.page-link:hover {
+  background: #ffeb3b;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.page-item.active .page-link {
+  background: #ffeb3b;
+  color: #000;
+  box-shadow: 0 0 20px rgba(255,235,59,0.5);
+}
+
+@media (max-width: 992px) {
+  .activities-grid {
+    grid-template-columns: repeat(2, 1fr); /* как col-md-6 */
+  }
+}
+
+@media (max-width: 576px) {
+  .activities-grid {
+    grid-template-columns: 1fr; /* одна карточка */
+  }
+}

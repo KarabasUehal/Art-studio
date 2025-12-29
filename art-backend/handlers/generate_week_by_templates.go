@@ -162,7 +162,7 @@ func GetTemplateByID() gin.HandlerFunc {
 
 func AddTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var input models.SlotInput
+		var input models.SlotInputGenerate
 		db := database.GetGormDB()
 		redisClient, err := database.GetRedis()
 		if err != nil {
@@ -209,9 +209,37 @@ func AddTemplate() gin.HandlerFunc {
 			Capacity:   input.Capacity,
 		}
 
+		var existing models.ScheduleTemplate
+
+		err = db.Where(
+			"activity_id = ? AND day_of_week = ? AND start_time = ?",
+			activityID,
+			input.DayOfWeek,
+			input.StartTime,
+		).First(&existing).Error
+		if err == nil {
+			c.JSON(http.StatusConflict, gin.H{
+				"error": "Шаблон з таким днем та часом вже існує",
+			})
+			return
+		}
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			// Реальная ошибка БД
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Помилка перевірки шаблону",
+			})
+			return
+		}
+
 		tx := db.Begin()
 		if err := tx.Create(&template).Error; err != nil {
 			tx.Rollback()
+			if strings.Contains(err.Error(), "duplicate") {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": "Такий шаблон вже існує",
+				})
+				return
+			}
 			log.Error().Err(err).Msg("Error creating templates")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create templates"})
 			return
@@ -224,29 +252,7 @@ func AddTemplate() gin.HandlerFunc {
 		}
 
 		if redisClient != nil {
-			pattern := []string{"templates*"}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 1000).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan templates cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete templates cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
-			log.Info().Msgf("Cache deleted for %v", pattern)
+			utils.InvalidateCache(c, "templates*")
 		}
 
 		c.JSON(http.StatusCreated, template)
@@ -255,7 +261,7 @@ func AddTemplate() gin.HandlerFunc {
 
 func UpdateTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var input models.SlotInput
+		var input models.SlotInputGenerate
 		var template models.ScheduleTemplate
 		db := database.GetGormDB()
 		redisClient, err := database.GetRedis()
@@ -314,28 +320,7 @@ func UpdateTemplate() gin.HandlerFunc {
 		}
 
 		if redisClient != nil {
-			pattern := []string{"templates*", fmt.Sprintf("/tеmplate/%v", id)}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan template cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete template cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
+			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplate/%v", id))
 		}
 
 		c.JSON(http.StatusOK, template)
@@ -384,28 +369,7 @@ func DeleteTemplate() gin.HandlerFunc {
 		}
 
 		if redisClient != nil {
-			pattern := []string{"templates*", fmt.Sprintf("/template/%v", id)}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan templates cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete templates cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
+			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplate/%v", id))
 		}
 
 		c.Status(http.StatusNoContent)
@@ -431,6 +395,26 @@ func ExtendSchedule() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to extend schedule"})
 			return
 		}
+
+		redisClient, err := database.GetRedis()
+		if err != nil {
+			log.Error().Err(err).Msg("Error getting redis")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get redis"})
+			return
+		}
+
+		if redisClient != nil {
+			utils.InvalidateCache(
+				c,
+				"activity_slots*",
+				"records*",
+				"client_records*",
+				"templates*",
+				"/activity/*",
+				"schedule*",
+			)
+		}
+
 		c.JSON(http.StatusOK, gin.H{"message": "Schedule extended"})
 	}
 }
@@ -482,7 +466,7 @@ func GenerateRegularSlots(weeks int) error {
 					act.ID, slotStart, slotStart.Add(time.Minute)).First(&existing).Error; err == nil {
 					continue
 				} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-					return err
+					continue
 				}
 
 				slot := models.ActivitySlot{
@@ -492,13 +476,117 @@ func GenerateRegularSlots(weeks int) error {
 					Capacity:   tmpl.Capacity,
 					Booked:     0,
 					TemplateID: &tmpl.ID,
+					Source:     "template",
 				}
-				if err := db.Create(&slot).Error; err != nil {
-					return err
+
+				tx := db.Begin()
+				if res := tx.Create(&slot); res.Error != nil {
+					tx.Rollback()
+					log.Error().Err(res.Error).Msg("Error to create slot")
+					return fmt.Errorf("error: %e", res.Error)
 				}
+				tx.Commit()
+
 				log.Info().Msgf("Generated slots for activity %d: %s", act.ID, act.Name)
+
+				if err := autoEnrollSubscriptions(db, act.ID, &slot); err != nil {
+					log.Error().Err(err).Msg("Failed to auto-enroll subscriptions") // Логирование без прерывания генерации
+				}
+
 			}
 		}
 	}
+	return nil
+}
+
+func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.ActivitySlot) error {
+
+	var subscriptions []models.Subscription // Поиск всех активных абонементов на эту активность
+	err := db.
+		Joins("JOIN subscription_types st ON st.id = subscriptions.subscription_type_id").
+		Where(`
+        st.activity_id = ?
+        AND subscriptions.is_active = true
+        AND subscriptions.visits_used < subscriptions.visits_total
+    `, activityID).
+		Preload("SubKids").
+		Preload("User").
+		Preload("SubscriptionType").
+		Preload("SubscriptionType.Activity").
+		Find(&subscriptions).Error
+
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subscriptions {
+		if sub.VisitsUsed >= sub.VisitsTotal {
+			continue // Если все визиты использованы
+		}
+
+		var existingRecord models.Record // Проверка, не создана ли уже запись на этот слот
+		if err := db.Where("user_id = ? AND slot_id = ?", sub.UserID, slot.ID).First(&existingRecord).Error; err == nil {
+			continue // уже записан
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			continue
+		}
+
+		if len(sub.SubKids) == 0 {
+			continue
+		}
+
+		kids := make([]models.Kid, len(sub.SubKids))
+		for i, subKid := range sub.SubKids {
+			kids[i].Name = subKid.Name
+			kids[i].Age = subKid.Age
+			kids[i].Gender = subKid.Gender
+		}
+
+		record := models.Record{ // Создание записи
+			UserID:      sub.UserID,
+			PhoneNumber: sub.User.PhoneNumber,
+			ParentName:  sub.User.Name,
+			TotalPrice:  sub.SubscriptionType.Price,
+			SlotID:      slot.ID,
+			Details: []models.RecordDetail{
+				{
+					ActivityID:   activityID,
+					ActivityName: sub.SubscriptionType.Activity.Name,
+					Date:         slot.StartTime,
+					NumberOfKids: 1,
+					Kids:         kids,
+				},
+			},
+		}
+
+		tx := db.Begin()
+		if err := tx.Create(&record).Error; err != nil {
+			tx.Rollback()
+			log.Error().Err(err).Msg("Failed to create auto-record")
+			continue
+		}
+
+		// Увеличиваем счётчик посещений
+		if err := tx.Model(&models.Subscription{}).
+			Where("id = ?", sub.ID).
+			UpdateColumn("visits_used", gorm.Expr("visits_used + 1")).Error; err != nil {
+			tx.Rollback()
+			continue
+		}
+		// Увеличиваем Booked в слоте
+		if slot.Booked < slot.Capacity {
+			slot.Booked++
+			if err := tx.Save(&slot).Error; err != nil {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Failed to update slot booked")
+				continue
+			}
+		}
+
+		tx.Commit()
+
+		log.Info().Msgf("Auto-enrolled subscribed kids to slot %d", slot.ID)
+	}
+
 	return nil
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"art/database"
 	"art/models"
+	"art/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -44,7 +45,13 @@ func GetActivities() gin.HandlerFunc {
 
 		regularParam := strings.ToLower(c.Query("regular"))
 
-		redisClient, _ := database.GetRedis()
+		redisClient, err := database.GetRedis()
+		if err != nil {
+			log.Error().Err(err).Msg("Error getting redis")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get redis"})
+			return
+		}
+
 		cacheKey := fmt.Sprintf("activities:page=%d:size=%d:filter=%s", page, size, regularParam)
 
 		var resp gin.H
@@ -210,29 +217,7 @@ func AddActivity() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			pattern := []string{"activities*"}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 1000).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan activities cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete activities cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
-			log.Info().Msgf("Cache deleted for %v", pattern)
+			utils.InvalidateCache(c, "activities*")
 		}
 
 		c.JSON(http.StatusCreated, activity)
@@ -303,28 +288,7 @@ func UpdateActivity() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			pattern := []string{"activities*", fmt.Sprintf("/activity/%v", id)}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan activities cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete activities cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
+			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activity/%v", id))
 		}
 
 		c.JSON(http.StatusOK, updated_act)
@@ -366,28 +330,7 @@ func DeleteActivity() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			pattern := []string{"activities*", fmt.Sprintf("/activity/%v", id)}
-			for _, pattern := range pattern {
-				cursor := uint64(0)
-				for {
-					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-					if err != nil {
-						log.Error().Err(err).Msg("Failed to scan activities cache keys")
-						break
-					}
-					if len(keys) > 0 {
-						if err := redisClient.Del(c, keys...).Err(); err != nil {
-							log.Error().Err(err).Msg("Failed to delete activities cache keys")
-						} else {
-							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
-						}
-					}
-					cursor = nextCursor
-					if cursor == 0 {
-						break
-					}
-				}
-			}
+			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activity/%v", id))
 		}
 
 		c.Status(http.StatusNoContent)

@@ -14,10 +14,16 @@ type ActivitySlot struct {
 	Capacity   int       `json:"capacity" gorm:"not null"`
 	Booked     int       `json:"booked" gorm:"not null;default:0"`
 	TemplateID *uint     `json:"template_id" gorm:"index"`
+	Source     string    `json:"source" gorm:"type:varchar(20);not null;default:'template'"`
 }
 
-type SlotInput struct {
+type SlotInputGenerate struct {
 	DayOfWeek int    `json:"day_of_week" binding:"required"`
 	StartTime string `json:"start_time" binding:"required"`
 	Capacity  int    `json:"capacity"`
+}
+
+type SlotInput struct {
+	StartTimeStr string `json:"start_time" binding:"required"`
+	Capacity     int    `json:"capacity" binding:"required,min=1"`
 }

@@ -1,0 +1,116 @@
+.delete-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.delete-modal {
+  background: rgb(138, 138, 134);
+  color: #020201;
+  border: 1px solid #333;
+  border-radius: 16px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.delete-modal p,
+.delete-modal h5, 
+.delete-modal button {
+  color: #020201 !important;
+}
+
+.delete-modal strong {
+  color: #e6d223 !important;
+}
+
+.delete-modal-header {
+  background: #eeaba2; 
+  color: rgb(0, 0, 0);
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-modal-title {
+  margin: 0;
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+.delete-modal-close {
+  background: none;
+  border: none;
+  font-size: 2em;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 8px;
+  opacity: 0.9;
+}
+
+.delete-modal-close:hover {
+  opacity: 1;
+}
+
+.delete-modal-body {
+  padding: 28px 24px;
+  color: #020201;
+  font-size: 1.2em;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.delete-modal-footer {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  background: #1e1e1e;
+}
+
+.btn-modal-cancel {
+  background: #e0d864;
+  color: #000000 !important;
+  padding: 12px 36px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-modal-cancel:hover {
+  background: #ddcf11;
+}
+
+.btn-modal-delete {
+  background: #e97a76;
+  color: rgb(0, 0, 0) !important;
+  padding: 12px 36px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-modal-delete:hover {
+  background: #e62a2a;
+}

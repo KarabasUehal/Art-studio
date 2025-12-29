@@ -15,6 +15,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -52,6 +54,10 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
+	router.Use(gin.Logger())
+	router.Use(middleware.Recovery())
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/health", func(c *gin.Context) {
 		c.String(200, "OK")
@@ -60,26 +66,42 @@ func main() {
 	router.POST("/register", handlers.Register)
 	router.POST("/login", handlers.Login)
 
-	router.GET("/activities", handlers.GetActivities())
 	router.GET("/activities/:id", handlers.GetActivityByID())
+	router.GET("/activities", handlers.GetActivities())
 
 	router.GET("/activity/:activity_id/slots", handlers.GetActivitySlots())
+
+	router.GET("/subscriptions/types", handlers.GetAllSubTypes())
+	router.GET("/subscriptions/types/:id", handlers.GetSubTypeByID())
 
 	// Защищённые роуты с JWT
 	api := router.Group("/")
 	api.Use(middleware.AuthMiddleware())
 
+	api.GET("/admin/users", middleware.OwnerOnly(), handlers.GetAllUsers())
+
 	api.POST("/activities", middleware.OwnerOnly(), handlers.AddActivity())
 	api.PUT("/activities/:id", middleware.OwnerOnly(), handlers.UpdateActivity())
 	api.DELETE("/activities/:id", middleware.OwnerOnly(), handlers.DeleteActivity())
 
-	api.GET("/records", handlers.GetAllRecords())
 	api.GET("/records/:id", handlers.GetRecordByID())
+	api.GET("/records", handlers.GetAllRecords())
 	api.DELETE("/records/:id", middleware.OwnerOnly(), handlers.DeleteRecordByID())
 
-	api.GET("/templates", handlers.GetAllTemplates())
-	api.GET("/templates/:id", handlers.GetTemplateByID())
+	api.POST("/subscriptions/types", middleware.OwnerOnly(), handlers.AddSubType())
+	api.PUT("/subscriptions/types/:id", middleware.OwnerOnly(), handlers.UpdateSubType())
+	api.DELETE("/subscriptions/types/:id", middleware.OwnerOnly(), handlers.DeleteSubType())
+
+	api.GET("/subscriptions/:id", handlers.GetSubscriptionByID())
+	api.GET("/subscriptions", handlers.GetAllSubscriptions())
+	api.POST("/subscriptions", middleware.OwnerOnly(), handlers.AddSubscription())
+	api.PUT("/subscriptions/:id", middleware.OwnerOnly(), handlers.UpdateSubscription())
+	api.DELETE("/subscriptions/:id", middleware.OwnerOnly(), handlers.DeleteSubscription())
+	api.PATCH("/subscriptions/:id/extend", middleware.OwnerOnly(), handlers.ExtendSubscription())
+
 	api.GET("/templates/by-activity/:act_id", handlers.GetTemplatesByActID())
+	api.GET("/templates/:id", handlers.GetTemplateByID())
+	api.GET("/templates", handlers.GetAllTemplates())
 	api.POST("/templates/by-activity/:act_id", middleware.OwnerOnly(), handlers.AddTemplate())
 
 	api.PUT("/templates/:id", middleware.OwnerOnly(), handlers.UpdateTemplate())
@@ -96,6 +118,13 @@ func main() {
 
 	api.GET("/client/records", handlers.GetMyRecords())
 	api.POST("/record", handlers.MakeRecord())
+
+	api.GET("/client/kids/:id", handlers.GetKidByID())
+	api.GET("/client/kids", handlers.GetMyKids())
+	api.GET("/admin/kids", handlers.GetAllKids())
+	api.POST("/client/kids", handlers.AddKid())
+	api.PUT("/client/kids/:id", handlers.UpdateKid())
+	api.DELETE("/client/kids/:id", handlers.DeleteKid())
 
 	go func() { // Запуск HTTP-сервера в горутине с использованием corsMiddleware для CORS
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

@@ -16,12 +16,12 @@ type RecordDetail struct {
 	NumberOfKids uint      `json:"number_of_kids"`
 	Kids         []Kid     `json:"kids"`
 	Date         time.Time `json:"date"`
-	SlotID       uint      `json:"slot_id"`
 }
 
 type Record struct {
 	gorm.Model
 	UserID      uint          `json:"user_id" gorm:"not null;index"`
+	SlotID      uint          `json:"slot_id" gorm:"not null;index"`
 	Details     RecordDetails `json:"items" gorm:"type:jsonb;not null"`
 	PhoneNumber string        `json:"phone_number" gorm:"type:varchar(15);not null"`
 	ParentName  string        `json:"parent_name" gorm:"type:text"`
