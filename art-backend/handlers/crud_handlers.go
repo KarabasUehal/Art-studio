@@ -5,6 +5,7 @@ import (
 	"art/models"
 	"art/utils"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 func GetActivities() gin.HandlerFunc {
@@ -206,7 +208,25 @@ func AddActivity() gin.HandlerFunc {
 			act_image.Photo = make([]string, 0)
 		}
 
+		var existingAct models.Activity
+		if err := db.Where("name = ?", req.Name).First(&existingAct).Error; err == nil {
+			// Найден дубль
+			c.JSON(http.StatusConflict, gin.H{"error": "Activity with such name already exist"})
+			return
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			// Другая ошибка БД
+			log.Error().Err(err).Msg("Error checking duplicate activity")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error while checking duplicate"})
+			return
+		}
+
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if res := tx.Create(&activity); res.Error != nil {
 			tx.Rollback()
 			log.Error().Err(res.Error).Msg("Error to create activity")
@@ -252,20 +272,14 @@ func UpdateActivity() gin.HandlerFunc {
 			return
 		}
 
-		res := db.First(&act, id)
-		if res == nil {
-			tx := db.Begin()
-			err := tx.Create(&updated_act).Error
-			if err != nil {
-				tx.Rollback()
-				log.Error().Err(err).Msg("Failed to create activity")
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": "Error to create updated activity",
-				})
+		if err := db.First(&act, id).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				log.Error().Err(err).Msgf("Error finding activity by id: %d", id)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find activity for updating"})
 				return
 			}
-			tx.Commit()
-			c.JSON(http.StatusCreated, updated_act)
+			log.Error().Err(err).Msgf("Error finding activity by id: %d", id)
+			c.JSON(http.StatusNotFound, gin.H{"error": "Activity not found"})
 			return
 		}
 
@@ -278,6 +292,12 @@ func UpdateActivity() gin.HandlerFunc {
 		act.IsRegular = updated_act.IsRegular
 
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if err := tx.Save(act).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msg("Failed to save activity")
@@ -288,7 +308,7 @@ func UpdateActivity() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activity/%v", id))
+			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activities/%v", id))
 		}
 
 		c.JSON(http.StatusOK, updated_act)
@@ -321,16 +341,27 @@ func DeleteActivity() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
-		if err := db.Unscoped().Delete(&act, id).Error; err != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
+		if err := db.Delete(&act, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to delete avtivity by id: %d", id)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete activity"})
 			return
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for delete activity")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activity/%v", id))
+			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activities/%v", id))
 		}
 
 		c.Status(http.StatusNoContent)

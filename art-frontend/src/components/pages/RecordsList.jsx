@@ -10,27 +10,39 @@ const RecordsList = ({ isAuthenticated }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [size] = useState(10);
+  const [size] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const { role } = useContext(AuthContext);
+
+  const [selectedDate, setSelectedDate] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
 
   useEffect(() => {
-    if (isAuthenticated && role === 'owner') {
-      fetchRecords(page, size);
-    }
-  }, [page, size, isAuthenticated, role]);
+  if (isAuthenticated && role === 'owner') {
+    fetchRecords(page, size);
+  }
+}, [page, size, isAuthenticated, role, selectedDate]);
 
-  const fetchRecords = async (pageNum, sizeNum) => {
+  const fetchRecords = async (pageNum = page, sizeNum = size) => {
     setLoading(true);
     try {
-      const response = await api.get('/records', { params: { page: pageNum, size: sizeNum } });
-      setRecords(response.data.records || []);
+      const params = {
+      page: pageNum,
+      size: sizeNum,
+    };
+    if (selectedDate) {
+      params.date = selectedDate; // ← добавляем параметр date=2026-01-15
+    }
+
+      const response = await api.get('/records', { params });
+      const fetchedRecords = response.data.records || [];
+      setRecords(fetchedRecords);
       setTotalPages(response.data.total_pages || 1);
       setTotalCount(response.data.total_count || 0);
+      setPage(response.data.current_page || pageNum);
     } catch (error) {
       console.error('Помилка при завантаженні всіх записів:', error);
       setError('Неможливо завантажити записи. Спробуйте пізніше.');
@@ -79,14 +91,44 @@ const RecordsList = ({ isAuthenticated }) => {
   if (loading) return <div className="text-center mt-5">Завантаження записів...</div>;
   if (records.length === 0 && totalCount === 0) return <div className="text-center mt-5">Записів не знайдено</div>;
 
-  const handlePageChange = ({ selected }) => setPage(selected + 1);
+  const handlePageChange = ({ selected }) => {
+    const newPage = selected + 1;
+    setPage(newPage);
+    fetchRecords(newPage); 
+  };
 
   const getKidEmoji = (gender) => gender === 'male' ? '👦' : '👧';
 
   return (
-  <div className="list-page">
+  <div className="list-page" lang="uk">
     <h2 className="list-title">Усі записи до студії</h2>
+    
+    {/* ФИЛЬТР ПО ДАТЕ */}
+      <div className="list-filter">
+        <label className="list-filter-label">
+          Фільтр за датою заняття:
+        </label>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="list-filter-input"
+        />
+        {selectedDate && (
+          <button
+            onClick={() => setSelectedDate('')}
+            className="list-filter-clear-button"
+          >
+            Очистити
+          </button>
+        )}
+      </div>
 
+      {records.length === 0 ? (
+        <div className="text-center mt-5">
+          {selectedDate ? 'Записів на обрану дату не знайдено' : 'Записів не знайдено'}
+        </div>
+      ) : (
     <div className="list-grid">
       {records.map((rec) => (
         <div key={rec.id} className="list-grid-item">
@@ -102,20 +144,20 @@ const RecordsList = ({ isAuthenticated }) => {
               <div className="list-details">
                 <h5 className="list-details-title">Деталі:</h5>
                 
-                {rec.items.map((item, idx) => (
-                  <div key={idx} className="list-item">
-                    <p><strong>Майстер-клас:</strong> <strong className='list-strong'>{item.activity_name}</strong></p>
-                    <p><strong>Кількість дітей:</strong> {item.number_of_kids}</p>
-                    <p><strong>Дата заняття:</strong> {formatSlotTime(item.date)}</p>
+                
+                  <div className="list-item">
+                    <p><strong>Майстер-клас:</strong> <strong className='list-strong'>{rec.details.activity_name}</strong></p>
+                    <p><strong>Кількість дітей:</strong> {rec.details.number_of_kids}</p>
+                    <p><strong>Дата заняття:</strong> {formatSlotTime(rec.details.date)}</p>
                     <ul className="list-item-elements">
-                      {item.kids.map((kid, kIdx) => (
+                      {rec.details.kids.map((kid, kIdx) => (
                         <li key={kIdx}>
                           {getKidEmoji(kid.gender)} {kid.name}, {kid.age} років
                         </li>
                       ))}
                     </ul>
                   </div>
-                ))}
+                
                 
                 <button 
                   onClick={() => { setRecordToDelete(rec); setShowDeleteModal(true); }}
@@ -129,26 +171,33 @@ const RecordsList = ({ isAuthenticated }) => {
         </div>
       ))}
     </div>
+      )}
 
     {totalPages > 1 && (
-      <ReactPaginate
-        previousLabel="← Назад"
-        nextLabel="Вперед →"
-        pageCount={totalPages}
-        onPageChange={handlePageChange}
-        containerClassName="records-pagination"
-        pageLinkClassName="records-page-link"
-        activeClassName="active"
-        forcePage={page - 1}
-      />
-    )}
+        <ReactPaginate
+          previousLabel="← Назад"
+          nextLabel="Вперед →"
+          pageCount={totalPages}
+          onPageChange={handlePageChange}
+          forcePage={page - 1}
+          containerClassName="pagination justify-content-center"
+          pageClassName="list-page-item"
+          pageLinkClassName="list-page-link"
+          previousClassName="list-page-item"
+          nextClassName="list-page-item"
+          previousLinkClassName="list-page-link"
+          nextLinkClassName="list-page-link"
+          activeClassName="active"
+          disabledClassName="disabled"
+        />
+      )}
 
     <DeleteRecordModal
       show={showDeleteModal}
       onHide={() => setShowDeleteModal(false)}
       onDelete={handleDeleteConfirm}
       recordId={recordToDelete?.id}
-      recordName={`${recordToDelete?.items?.[0]?.activity_name || 'запис'}`}
+      recordName={`${recordToDelete?.details?.activity_name || 'запис'}`}
     />
   </div>
  );

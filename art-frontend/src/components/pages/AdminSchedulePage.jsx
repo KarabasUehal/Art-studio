@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 import DeleteSlotModal from './DeleteSlotModal';
-import "@styles/AdminSchedulePage.css";  
+import "@styles//AdminSchedulePage.css";  
 import "@styles/Calendar.css";  
 
 const AdminSchedulePage = () => {

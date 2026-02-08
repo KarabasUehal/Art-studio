@@ -217,25 +217,27 @@ const Activities = ({ isAuthenticated }) => {
                   <span>{act.duration} хв</span>
                 </div>
 
-                {/* Кнопка записи */}
                 <div className="activity-card-footer">
-                <button onClick={() => handleSignUp(act.id)} className="btn-signup mb-3">
-                  Записатись!
+                <button onClick={() => handleSignUp(act.id)} className="btn-signup">
+                  Записатись
                 </button>
                 </div>
 
-                {/* Кнопки Edit / Delete — только для owner */}
+                {/* Кнопки Edit / Delete — только для owner-аккаунтов */}
                 {isAuthenticated && role === 'owner' && (
                   <div className="activity-admin-actions">
-                    <Link to={`/edit/${act.id}`} className="btn-admin btn-admin-edit">
-                      Редагувати
-                          </Link>
+                    <button
+                      onClick={() => navigate(`/edit/${act.id}`)}
+                        className="admin-btn admin-btn-edit"
+                      >
+                        Редагувати
+                    </button>
                     <button
                       onClick={() => {
                         setActivityToDelete(act);
                         setShowDeleteModal(true);
                       }}
-                      className="btn-admin btn-admin-delete">
+                      className="admin-btn admin-btn-delete">
                       Видалити
                     </button>
                   </div>
@@ -249,14 +251,20 @@ const Activities = ({ isAuthenticated }) => {
       {/* Пагинация */}
       {totalPages > 1 && (
         <ReactPaginate
-          previousLabel="←"
-          nextLabel="→"
+          previousLabel="← Назад"
+          nextLabel="Вперед →"
           pageCount={totalPages}
           onPageChange={handlePageChange}
-          containerClassName="pagination"
-          pageLinkClassName="page-link"
-          activeClassName="active"
           forcePage={page - 1}
+          containerClassName="pagination justify-content-center"
+          pageClassName="list-page-item"
+          pageLinkClassName="list-page-link"
+          previousClassName="list-page-item"
+          nextClassName="list-page-item"
+          previousLinkClassName="list-page-link"
+          nextLinkClassName="list-page-link"
+          activeClassName="active"
+          disabledClassName="disabled"
         />
       )}
 

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import api from '../utils/api'; 
 import { emitter } from './events';
 
 export const AuthContext = createContext();
@@ -9,51 +9,64 @@ export const AuthProvider = ({ children }) => {
     const [role, setRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const checkToken = () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const decoded = jwtDecode(token);
-                    if (decoded.exp * 1000 > Date.now()) {
-                        setIsAuthenticated(true);
-                        setRole(decoded.role);
-                    } else {
-                        localStorage.removeItem('token');
-                    }
-                } catch (error) {
-                    console.error('Invalid token', error);
-                    localStorage.removeItem('token');
-                }
-            }
-            setLoading(false); 
-        };
-        checkToken();
-    }, []);
-
-    const login = (token) => {
-        localStorage.setItem('token', token);
+    const checkAuth = async () => {
         try {
-            const decoded = jwtDecode(token);
+            const response = await api.get('/me'); 
             setIsAuthenticated(true);
-            setRole(decoded.role);
-        } catch (e) {
-            console.error('Failed to decode token on login');
+            setRole(response.data.role || 'client');
+        } catch (err) {
+            if (err.response?.status !== 401) {
+                console.error('Auth check error:', err);
+            }
+            setIsAuthenticated(false);
+            setRole(null);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-        emitter.emit('authChange', { isAuthenticated: true });
     };
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setRole(null);
-        setLoading(false);
-        emitter.emit('authChange', { isAuthenticated: false });
+    useEffect(() => {
+        let isMounted = true;
+
+        checkAuth();
+
+        // Слушаем событие изменения авторизации
+        const handleAuthChange = () => {
+            if (isMounted) checkAuth();
+        };
+        emitter.on('authChange', handleAuthChange);
+
+        return () => {
+            isMounted = false;
+            emitter.off('authChange', handleAuthChange);
+        };
+    }, []); 
+
+    const login = async () => {
+        setIsAuthenticated(true);
+        emitter.emit('authChange');
     };
+
+    const logout = async () => {
+  try {
+    await api.post('/logout'); // или GET — как у тебя
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setIsAuthenticated(false);
+    setRole(null);
+  }
+};
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, role, loading, login, logout }}>
+        <AuthContext.Provider value={{ 
+            isAuthenticated, 
+            role, 
+            loading, 
+            login, 
+            logout,
+            checkAuth // полезно для ручной проверки
+        }}>
             {children}
         </AuthContext.Provider>
     );

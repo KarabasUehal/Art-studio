@@ -21,6 +21,8 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_DB=${REDIS_DB}
       - JWT_SECRET=${JWT_SECRET}
+      - PASSWORD1=${PASSWORD1}
+      - PASSWORD2=${PASSWORD2}
     networks:
       - app-network
     healthcheck:

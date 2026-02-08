@@ -52,7 +52,7 @@ func GetAllSubTypes() gin.HandlerFunc {
 
 		offset := (page - 1) * size
 
-		cacheKey := fmt.Sprintf("subscriptions_types:page=%d:size=%d", page, size)
+		cacheKey := fmt.Sprintf("/subscriptions/types:page=%d:size=%d", page, size)
 
 		var resp gin.H
 
@@ -191,6 +191,12 @@ func AddSubType() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if res := tx.Create(&sub_type); res.Error != nil {
 			tx.Rollback()
 			log.Error().Err(res.Error).Msg("Error to create subscriptions_type")
@@ -202,7 +208,7 @@ func AddSubType() gin.HandlerFunc {
 
 		db.Preload("Activity").First(&sub_type, sub_type.ID)
 
-		utils.InvalidateCache(c, "subscriptions_types*")
+		utils.InvalidateCache(c, "/subscriptions/types*", "/subscriptions/types:*")
 
 		c.JSON(http.StatusCreated, sub_type)
 	}
@@ -247,6 +253,12 @@ func UpdateSubType() gin.HandlerFunc {
 		sub_type.IsActive = updated_sub_type.IsActive
 
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if err := tx.Save(sub_type).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msg("Failed to save subscriptions_type")
@@ -259,7 +271,7 @@ func UpdateSubType() gin.HandlerFunc {
 
 		db.Preload("Activity").First(&sub_type, sub_type.ID)
 
-		utils.InvalidateCache(c, "subscriptions_types*", "/subscriptions/types*") // Инвалидация кэша
+		utils.InvalidateCache(c, "/subscriptions/types*", fmt.Sprintf("/subscriptions/types/%v", id))
 
 		c.JSON(http.StatusOK, sub_type)
 	}
@@ -298,16 +310,27 @@ func DeleteSubType() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
-		if err := db.Unscoped().Delete(&sub_type, id).Error; err != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
+		if err := db.Delete(&sub_type, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to delete subscriptions_type by id: %d", id)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete subscriptions_type"})
 			return
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for delete sub type")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "subscriptions_types*", fmt.Sprintf("/subscriptions/types/%v", id))
+			utils.InvalidateCache(c, "/subscriptions/types*", fmt.Sprintf("/subscriptions/types/%v", id))
 		}
 
 		c.Status(http.StatusNoContent)

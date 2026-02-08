@@ -15,12 +15,13 @@ import './App.css';
 import AdminRegister from './components/pages/AdminRegister';
 import AdminTemplatesPage from './components/pages/AdminTemplatesPage';
 import SubscriptionTypesPage from './components/pages/SubscriptionTypesPage';
-import AdminSubscriptionsPage from './components/pages/AdminSubscriptionsPage';
+import SubscriptionsPage from './components/pages/SubscriptionsPage';
 import SubTypeForm from './components/pages/SubTypeForm';
 import SubscriptionForm from './components/pages/SubscriptionForm';
 import KidForm from './components/pages/KidForm';
 import KidsPage from './components/pages/ClientKidsPage';
 import KidsList from './components/pages/KidsList';
+import UsersList from './components/pages/UsersList';
 
 
 const backgroundImage = 'https://i.postimg.cc/59R6pXsS/background.jpg';
@@ -96,26 +97,20 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
             <>
               {role === 'owner' && (
                 <>
-                  <Link to="/client/records" className="btn btn-sm btn-primary">Мої записи</Link>
-                  <Link to="/records" className="btn btn-sm btn-info">Усi записи</Link>
-                  <Link to="/client/kids" className="btn btn-sm btn-success">Мої діти</Link>
-                  <Link to="admin/kids" className="btn btn-sm btn-success">Усi діти</Link>
-                  <Link to="/admin/register" className="btn btn-sm btn-warning">Зареєструвати новий акаунт</Link>
+                  <Link to="/admin/register" className="nav-btn-warning">Створити акаунт</Link>
+                  <Link to="/records" className="nav-btn-warning">Усi записи</Link>
+                  <Link to="admin/kids" className="nav-btn-warning">Усi діти</Link>
+                  <Link to="/admin/users" className="nav-btn-warning">Користувачi</Link>
                 </>
               )}
-              {role === 'client' && (
-                <>
-                <Link to="/client/records" className="btn btn-sm btn-primary">Мої записи</Link>
-                <Link to="/client/kids" className="btn btn-sm btn-success">Мої діти</Link>
-                <Link to="/client/kids/add" className="btn btn-sm btn-success">Додати дитину</Link>
-                </>
-              )}
-              <button onClick={logout} className="btn btn-sm btn-outline-danger">Вийти</button>
+                <Link to="/client/records" className="nav-btn-info">Мої записи</Link>
+                <Link to="/client/kids" className="nav-btn-info">Мої діти</Link>
+              <button onClick={logout} className="nav-btn-danger">Вийти</button>
             </>
           ) : (
             <>
-              <Link to="/register" className="btn btn-sm btn-warning">Зареєструватись</Link>
-              <Link to="/login" className="btn btn-sm btn-outline-primary">Увiйти</Link>
+              <Link to="/register" className="nav-btn-warning">Зареєструватись</Link>
+              <Link to="/login" className="nav-btn-primary">Увiйти</Link>
             </>
           )}
         </nav>
@@ -138,25 +133,25 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
         </div>
 
          <nav className="mb-3 d-flex flex-wrap gap-2 justify-content-center">
-          <Link to="/" className="btn btn-sm btn-success">Майстер-класи</Link>
-          <Link to="/schedule" className="btn btn-sm btn-success">Графік занять</Link>
-          <Link to="/subscriptions/types" className="btn btn-sm btn-success">Абонементи напрямiв</Link>
+          <Link to="/" className="nav-btn-success-menu">Напрямки</Link>
+          <Link to="/schedule" className="nav-btn-success-menu">Графік занять</Link>
+          <Link to="/subscriptions/types" className="nav-btn-success-menu">Абонементи напрямкiв</Link>
           {role === 'owner' && (
           <>
-          <Link to="/admin/subscriptions" className="btn btn-sm btn-warning">Куплені абонементи</Link>
-          <Link to="/admin/templates" className="btn btn-sm btn-warning">Управління шаблонами</Link>
-          <Link to="/admin/slots" className="btn btn-sm btn-warning">Створити слот</Link>
+          <Link to="/admin/subscriptions" className="nav-btn-warning-menu">Куплені абонементи</Link>
+          <Link to="/admin/templates" className="nav-btn-warning-menu">Управління шаблонами</Link>
+          <Link to="/admin/slots" className="nav-btn-warning-menu">Створити слот</Link>
           </>
           )}
          </nav>
 
         <Routes>
-          <Route path="/" element={<Activities isAuthenticated={isAuthenticated} />} /> {/* Замена на Activities */}
+          <Route path="/" element={<Activities isAuthenticated={isAuthenticated} />} /> 
           <Route path="/add" element={isAuthenticated && role === 'owner' ? <ActivityForm mode="add" /> : <Navigate to="/login" />} />
           <Route path="/edit/:id" element={isAuthenticated && role === 'owner' ? <EditActivityForm /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/admin/register" element={isAuthenticated && role === 'owner' ? <AdminRegister /> : <Navigate to="/login" />} />
+          <Route path="/admin/register" element={isAuthenticated && role === 'owner' ? <Register adminMode={true} /> : <Navigate to="/login" />} />
           <Route path="/records" element={<RecordsList isAuthenticated={isAuthenticated} />} />
           <Route path="/client/records" element={<ClientRecords isAuthenticated={isAuthenticated} />} />
           <Route path="/record/:activityId/:slotId?" element={isAuthenticated ? <RecordForm /> : <Navigate to="/login" />} />
@@ -164,7 +159,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/admin/templates" element={isAuthenticated && role === 'owner' ? <AdminTemplatesPage /> : <Navigate to="/login" />} />
           <Route path="/schedule" element={<ClientSchedulePage />} />
           <Route path="/subscriptions/types" element={<SubscriptionTypesPage />} />
-          <Route path="/admin/subscriptions" element={role === 'owner' ? <AdminSubscriptionsPage /> : <Navigate to="/" />} />
+          <Route path="/admin/subscriptions" element={role === 'owner' ? <SubscriptionsPage /> : <Navigate to="/" />} />
           <Route path="/admin/subscriptions/types/add" element={role === 'owner' ? <SubTypeForm mode="add" /> : <Navigate to="/" />} />
           <Route path="/admin/subscriptions/types/edit/:id" element={role === 'owner' ? <SubTypeForm mode="edit" /> : <Navigate to="/" />} />
           <Route path="/admin/subscriptions/add" element={role === 'owner' ? <SubscriptionForm /> : <Navigate to="/" />} />
@@ -173,7 +168,97 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/client/kids/add" element={isAuthenticated ? <KidForm /> : <Navigate to="/login" />} />
           <Route path="/client/kids/edit/:id" element={isAuthenticated ? <KidForm /> : <Navigate to="/login" />} />
           <Route path="/admin/kids" element={<KidsList isAuthenticated={isAuthenticated} />} />
+          <Route path="/admin/users" element={<UsersList isAuthenticated={isAuthenticated} />} />
         </Routes>
+
+        <div className="faq-section mt-5 mb-5">
+  <h2 className="faq-tittle">
+    Часті запитання:
+  </h2>
+
+  <div className="faq-list">
+    {/* Вопрос 1 */}
+    <details className="faq-item">
+      <summary className="faq-question">
+        З якого віку можна записувати дитину?
+      </summary>
+      <div className="faq-answer">
+        З 5 років, залежно від напрямку. Є "Вільні ранки" для дітей від 3 років!
+      </div>
+    </details>
+
+    {/* Вопрос 2 */}
+    <details className="faq-item">
+      <summary className="faq-question">
+        Чи потрібно щось приносити із собою на заняття?
+      </summary>
+      <div className="faq-answer">
+        Нічого! Все необхідне (фарби, пензлі, фартухи, папір) надаємо. 
+        Беріть тільки гарний настрій та змінний одяг про всяк випадок.
+      </div>
+    </details>
+
+    {/* Вопрос 3 */}
+    <details className="faq-item">
+      <summary className="faq-question">
+        Чи є сертифікати/ліцензія у викладачів?
+      </summary>
+      <div className="faq-answer">
+        Так, студія працює офіційно, всі викладачі мають педагогічну освіту та досвід роботи з дітьми.
+      </div>
+    </details>
+
+    {/* Вопрос 4 */}
+    <details className="faq-item">
+      <summary className="faq-question">
+        Чи можна прийти на пробне заняття?
+      </summary>
+      <div className="faq-answer">
+        Так, перше заняття є пробним і на нього можна записатися безкоштовно або з 50% знижкою - залежно від напрямку.
+      </div>
+    </details>
+
+    {/* Вопрос 5 */}
+    <details className="faq-item">
+      <summary className="faq-question">
+        Що буде, якщо дитина пропустить заняття?
+      </summary>
+      <div className="faq-answer">
+        Пропущені з хвороби заняття можна перенести на наступний тиждень – за наявності довідки. 
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<div className="social-footer">
+  <p className="text-white mb-3" style={{ fontSize: '1.4em', opacity: 0.9 }}>
+    Ми в соцмережах:
+  </p>
+  
+  <div className="social-links">
+    <a 
+      href="https://www.instagram.com" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="social-icon instagram"
+      aria-label="Instagram арт-студии"
+    >
+      <i className="fab fa-instagram"></i>
+    </a>
+
+    <a 
+      href="https://t.me/@KarabasUehal" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="social-icon telegram"
+      aria-label="Telegram арт-студии"
+    >
+      <i className="fab fa-telegram-plane"></i>
+    </a>
+  </div>
+</div>
+
       </div>
     </div>
   );

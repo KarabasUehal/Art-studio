@@ -43,13 +43,16 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
     <div className="modal-overlay">
       <div className="modal-container">
         <h3 className="modal-title">{template ? 'Редагувати шаблон' : 'Додати шаблон'}</h3>
+
+        <form onSubmit={handleSubmit} className="template-form">
+        <div className='template-form-group'></div>
         
         <label className="modal-label">Напрям:</label>
         <select
           name="activity_id"
           value={formData.activity_id}
           onChange={handleChange}
-          className="modal-input"
+          className="template-form-input"
         >
           <option value={0}>Оберіть...</option>
           {activities.map((act) => (
@@ -62,7 +65,7 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           name="day_of_week"
           value={formData.day_of_week}
             onChange={handleChange}
-            className="modal-input"
+            className="template-form-input"
           >
             <option value={1}>Понеділок</option>
             <option value={2}>Вівторок</option>
@@ -77,7 +80,7 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           name="start_time"
           value={formData.start_time}
           onChange={handleChange}
-          className="modal-input"
+          className="template-form-input"
         />
 
         <label className="modal-label">Місткість:</label>
@@ -87,13 +90,16 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           min="1"
           value={formData.capacity}
           onChange={handleChange}
-          className="modal-input"
+          className="template-form-input"
         />
 
         <div className="modal-buttons">
           <button onClick={onHide} className="btn btn-cancel-modal">Скасування</button>
           <button onClick={handleSubmit} className="btn btn-success-modal">Зберегти</button>
         </div>
+        
+        </form>
+
       </div>
     </div>
   );

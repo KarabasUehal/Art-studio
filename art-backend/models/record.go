@@ -10,7 +10,7 @@ import (
 )
 
 type RecordDetail struct {
-	gorm.Model
+	ID           uint      `json:"id"`
 	ActivityID   uint      `json:"activity_id"`
 	ActivityName string    `json:"activity_name"`
 	NumberOfKids uint      `json:"number_of_kids"`
@@ -20,15 +20,17 @@ type RecordDetail struct {
 
 type Record struct {
 	gorm.Model
-	UserID      uint          `json:"user_id" gorm:"not null;index"`
-	SlotID      uint          `json:"slot_id" gorm:"not null;index"`
-	Details     RecordDetails `json:"items" gorm:"type:jsonb;not null"`
-	PhoneNumber string        `json:"phone_number" gorm:"type:varchar(15);not null"`
-	ParentName  string        `json:"parent_name" gorm:"type:text"`
-	TotalPrice  uint          `json:"total_price" gorm:"type:real;not null"`
+	UserID         uint         `json:"user_id" gorm:"not null;index"`
+	SubKidID       *uint        `json:"sub_kid_id"`
+	SubscriptionID *uint        `json:"subscription_id"`
+	SlotID         uint         `json:"slot_id" gorm:"not null;index"`
+	Details        RecordDetail `json:"details" gorm:"type:jsonb;not null"`
+	PhoneNumber    string       `json:"phone_number" gorm:"type:varchar(15);not null"`
+	ParentName     string       `json:"parent_name" gorm:"type:text"`
+	TotalPrice     uint         `json:"total_price" gorm:"type:real;not null"`
 }
 
-type RecordDetails []RecordDetail
+// type RecordDetails []RecordDetail
 
 type Kid struct {
 	Name   string `json:"name"`
@@ -37,21 +39,19 @@ type Kid struct {
 }
 
 type RecordRequest struct {
-	Items []struct {
-		ActivityID   uint  `json:"activity_id" binding:"required"`
-		NumberOfKids uint  `json:"number_of_kids" binding:"required,gte=1"`
-		Kids         []Kid `json:"kids" binding:"required,dive"`
-		SlotID       uint  `json:"slot_id" binding:"required"`
-	} `json:"items" binding:"required,dive"`
+	ActivityID   uint  `json:"activity_id" binding:"required"`
+	NumberOfKids uint  `json:"number_of_kids" binding:"required,gte=1"`
+	Kids         []Kid `json:"kids" binding:"required,dive"`
+	SlotID       uint  `json:"slot_id" binding:"required"`
 }
 
 type RecordResponse struct {
-	ID          uint          `json:"id"`
-	CreatedAt   time.Time     `json:"created_at"`
-	Details     RecordDetails `json:"items"`
-	PhoneNumber string        `json:"phone_number"`
-	ParentName  string        `json:"parent_name"`
-	TotalPrice  uint          `json:"total_price"`
+	ID          uint         `json:"id"`
+	CreatedAt   time.Time    `json:"created_at"`
+	Details     RecordDetail `json:"details"`
+	PhoneNumber string       `json:"phone_number"`
+	ParentName  string       `json:"parent_name"`
+	TotalPrice  uint         `json:"total_price"`
 }
 
 func ToRecordResponse(record Record) RecordResponse {
@@ -67,12 +67,12 @@ func ToRecordResponse(record Record) RecordResponse {
 }
 
 // Реализация driver.Valuer (для записи)
-func (r RecordDetails) Value() (driver.Value, error) {
+func (r RecordDetail) Value() (driver.Value, error) {
 	return json.Marshal(r)
 }
 
 // Реализация sql.Scanner (для чтения)
-func (r *RecordDetails) Scan(value interface{}) error {
+func (r *RecordDetail) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
 		return fmt.Errorf("failed to scan RecordDetails: %v", value)

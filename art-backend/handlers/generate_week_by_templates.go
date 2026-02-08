@@ -16,6 +16,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func GetAllTemplates() gin.HandlerFunc {
@@ -232,11 +233,17 @@ func AddTemplate() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if err := tx.Create(&template).Error; err != nil {
 			tx.Rollback()
 			if strings.Contains(err.Error(), "duplicate") {
 				c.JSON(http.StatusConflict, gin.H{
-					"error": "Такий шаблон вже існує",
+					"error": "Template already exist",
 				})
 				return
 			}
@@ -320,7 +327,7 @@ func UpdateTemplate() gin.HandlerFunc {
 		}
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplate/%v", id))
+			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplates/%v", id))
 		}
 
 		c.JSON(http.StatusOK, template)
@@ -355,7 +362,7 @@ func DeleteTemplate() gin.HandlerFunc {
 			})
 			return
 		}
-		if err := tx.Unscoped().Delete(&template, id).Error; err != nil {
+		if err := tx.Delete(&template, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to delete template by id: %d", id)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete template"})
@@ -369,7 +376,7 @@ func DeleteTemplate() gin.HandlerFunc {
 		}
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplate/%v", id))
+			utils.InvalidateCache(c, "templates*", fmt.Sprintf("/tеmplates/%v", id))
 		}
 
 		c.Status(http.StatusNoContent)
@@ -407,10 +414,12 @@ func ExtendSchedule() gin.HandlerFunc {
 			utils.InvalidateCache(
 				c,
 				"activity_slots*",
-				"records*",
-				"client_records*",
-				"templates*",
-				"/activity/*",
+				"/records*",
+				"records:all:*",
+				"/client/records*",
+				"client:records:*",
+				"/subscriptions",
+				"subscriptions:all:*",
 				"schedule*",
 			)
 		}
@@ -501,12 +510,13 @@ func GenerateRegularSlots(weeks int) error {
 
 func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.ActivitySlot) error {
 
+	log.Info().Msgf("Starting auto-enroll for activity %d, slot %d", activityID, slot.ID)
+
 	var subscriptions []models.Subscription // Поиск всех активных абонементов на эту активность
 	err := db.
 		Joins("JOIN subscription_types st ON st.id = subscriptions.subscription_type_id").
 		Where(`
         st.activity_id = ?
-        AND subscriptions.is_active = true
         AND subscriptions.visits_used < subscriptions.visits_total
     `, activityID).
 		Preload("SubKids").
@@ -516,77 +526,139 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 		Find(&subscriptions).Error
 
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to find subscriptions")
 		return err
 	}
 
-	for _, sub := range subscriptions {
-		if sub.VisitsUsed >= sub.VisitsTotal {
-			continue // Если все визиты использованы
-		}
+	log.Info().Int("subscriptions_count", len(subscriptions)).Msg("Found subscriptions")
 
-		var existingRecord models.Record // Проверка, не создана ли уже запись на этот слот
-		if err := db.Where("user_id = ? AND slot_id = ?", sub.UserID, slot.ID).First(&existingRecord).Error; err == nil {
-			continue // уже записан
-		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-			continue
-		}
+	for _, sub := range subscriptions {
+		log.Info().Uint("sub_id", sub.ID).Msg("Processing subscription")
 
 		if len(sub.SubKids) == 0 {
+			log.Warn().Uint("sub_id", sub.ID).Msg("No kids in subscription, skipping")
 			continue
 		}
 
-		kids := make([]models.Kid, len(sub.SubKids))
-		for i, subKid := range sub.SubKids {
-			kids[i].Name = subKid.Name
-			kids[i].Age = subKid.Age
-			kids[i].Gender = subKid.Gender
-		}
-
-		record := models.Record{ // Создание записи
-			UserID:      sub.UserID,
-			PhoneNumber: sub.User.PhoneNumber,
-			ParentName:  sub.User.Name,
-			TotalPrice:  sub.SubscriptionType.Price,
-			SlotID:      slot.ID,
-			Details: []models.RecordDetail{
-				{
-					ActivityID:   activityID,
-					ActivityName: sub.SubscriptionType.Activity.Name,
-					Date:         slot.StartTime,
-					NumberOfKids: 1,
-					Kids:         kids,
-				},
-			},
-		}
-
-		tx := db.Begin()
-		if err := tx.Create(&record).Error; err != nil {
-			tx.Rollback()
-			log.Error().Err(err).Msg("Failed to create auto-record")
+		lockedSub := sub
+		err := db.Clauses(clause.Locking{Strength: "UPDATE"}).
+			First(&lockedSub, sub.ID).Error
+		if err != nil {
+			log.Warn().Uint("sub_id", sub.ID).Err(err).Msg("Failed to lock subscription")
 			continue
 		}
 
-		// Увеличиваем счётчик посещений
-		if err := tx.Model(&models.Subscription{}).
-			Where("id = ?", sub.ID).
-			UpdateColumn("visits_used", gorm.Expr("visits_used + 1")).Error; err != nil {
-			tx.Rollback()
+		if lockedSub.VisitsUsed >= lockedSub.VisitsTotal {
+			log.Info().Uint("sub_id", lockedSub.ID).Msg("Subscription exhausted after lock")
 			continue
 		}
-		// Увеличиваем Booked в слоте
-		if slot.Booked < slot.Capacity {
-			slot.Booked++
-			if err := tx.Save(&slot).Error; err != nil {
-				tx.Rollback()
-				log.Error().Err(err).Msg("Failed to update slot booked")
+
+		for _, subKid := range lockedSub.SubKids {
+			log.Info().Uint("sub_id", sub.ID).Str("kid_name", subKid.Name).Msg("Processing kid")
+
+			// Проверка существующих записей
+			can, err := canEnrollKid(db, &lockedSub, &subKid, slot)
+			if err != nil {
+				log.Error().Err(err).Msg("Ошибка проверки возможности записи")
 				continue
 			}
+			if !can {
+				log.Info().Uint("sub_kid_id", subKid.ID).Msg("Ребёнок уже записан или абонемент исчерпан")
+				continue
+			}
+
+			tx := db.Begin()
+
+			var lockedSlot models.ActivitySlot
+			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+				First(&lockedSlot, slot.ID).Error; err != nil {
+				tx.Rollback()
+				log.Warn().Uint("slot_id", slot.ID).Err(err).Msg("Failed to lock slot")
+				continue
+			}
+
+			if lockedSlot.Booked >= lockedSlot.Capacity {
+				tx.Rollback()
+				log.Info().Uint("slot_id", slot.ID).Msg("Slot is full after lock")
+				continue
+			}
+
+			record := models.Record{
+				UserID:         lockedSub.UserID,
+				SubKidID:       &subKid.ID,
+				SubscriptionID: &lockedSub.ID,
+				PhoneNumber:    lockedSub.User.PhoneNumber,
+				ParentName:     lockedSub.User.Name,
+				TotalPrice:     sub.PricePaid / uint(sub.VisitsTotal),
+				SlotID:         slot.ID,
+				Details: models.RecordDetail{
+					ActivityID:   activityID,
+					ActivityName: lockedSub.SubscriptionType.Activity.Name,
+					Date:         slot.StartTime,
+					NumberOfKids: 1,
+					Kids: []models.Kid{
+						{
+							Name:   subKid.Name,
+							Age:    subKid.Age,
+							Gender: subKid.Gender,
+						},
+					},
+				},
+			}
+
+			if err := tx.Create(&record).Error; err != nil {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Failed to create auto-record")
+				continue
+			}
+
+			// Увеличиваем счётчик посещений в абонементе
+			if err := tx.Model(&models.Subscription{}).
+				Where("id = ?", lockedSub.ID).
+				UpdateColumn("visits_used", gorm.Expr("visits_used + 1")).Error; err != nil {
+				tx.Rollback()
+				log.Error().Err(err).Msgf("Failed to update subscription visits_used for id %d", sub.ID)
+				continue
+			}
+
+			// Увеличиваем Booked в слоте
+			if lockedSlot.Booked < lockedSlot.Capacity {
+				lockedSlot.Booked++
+				if err := tx.Save(lockedSlot).Error; err != nil {
+					tx.Rollback()
+					log.Error().Err(err).Msgf("Failed to update slot booked for id %d", slot.ID)
+					continue
+				}
+			}
+
+			if err := tx.Commit().Error; err != nil {
+				log.Error().Err(err).Msg("Transaction commit failed for auto enroll subscriptions")
+				continue
+			}
+
+			log.Info().Uint("record_id", record.ID).Msg("Auto-record created successfully")
 		}
-
-		tx.Commit()
-
-		log.Info().Msgf("Auto-enrolled subscribed kids to slot %d", slot.ID)
 	}
 
+	log.Info().Msgf("Auto-enroll completed for slot %d", slot.ID)
 	return nil
+}
+
+func canEnrollKid(db *gorm.DB, sub *models.Subscription, subKid *models.SubKid, slot *models.ActivitySlot) (bool, error) {
+	var count int64
+	err := db.Model(&models.Record{}).
+		Where("sub_kid_id = ? AND slot_id = ?", subKid.ID, slot.ID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	if count > 0 {
+		return false, nil // уже записан на этот слот
+	}
+
+	if sub.VisitsUsed >= sub.VisitsTotal { // Дополнительно: проверяем, что абонемент ещё не исчерпан
+		return false, fmt.Errorf("абонемент исчерпан")
+	}
+
+	return true, nil
 }

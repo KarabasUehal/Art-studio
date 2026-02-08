@@ -15,7 +15,7 @@
 .subscription-types-title {
   text-align: center;
   font-size: 2.5em;
-  color: #4ad420;
+  color: #e6c843;
   margin-bottom: 50px;
   font-weight: 600;
 }
@@ -42,7 +42,7 @@
 }
 
 .subscription-type-card {
-  background: #1e1e1e;
+  background: #355345;
   border: 1px solid #333;
   border-radius: 16px;
   padding: 28px;
@@ -85,7 +85,8 @@
   flex-wrap: wrap;
 }
 
-.btn-subtype {
+.btn-subtype-edit,
+.btn-subtype-delete {
   display: inline-block;
   padding: 10px 20px !important;
   border-radius: 12px !important;
@@ -98,25 +99,25 @@
 }
 
 .btn-subtype-edit {
-  background: #000000 !important;
+  background: #504e4e !important;
   color: #ff8c00 !important;          
   border: 2px solid #ff8c00 !important; 
 }
 
 .btn-subtype-edit:hover {
   color: #ff8c00 !important;
-  background: #504e4e !important;
+  background: #000000 !important;
   transform: translateY(-3px);
 }
 
 .btn-subtype-delete {
-  background: #000000 !important;
+  background: #504e4e !important;
   color: #ff4444 !important;
   border: 2px solid #ff4444 !important;
 }
 
 .btn-subtype-delete:hover {
-  background: #504e4e !important;
+  background: #000000 !important;
   color: #ff4444 !important;
   transform: translateY(-3px);
 }

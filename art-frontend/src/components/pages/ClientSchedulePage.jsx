@@ -44,14 +44,7 @@ useEffect(() => {
   if (!inner) return;
 
   requestAnimationFrame(() => {
-    inner.style.width = `${main.scrollWidth}px`;  // ключ: делаем inner равным ширине контента
-
-    // Опционально: если хотите скрывать, когда не нужен скролл
-    // if (main.scrollWidth > main.clientWidth) {
-    //   top.style.opacity = '1';
-    // } else {
-    //   top.style.opacity = '0';
-    // }
+    inner.style.width = `${main.scrollWidth}px`;  
   });
 }, [days, activities]);
 
@@ -66,10 +59,9 @@ useEffect(() => {
     if (isSyncing) return;
     isSyncing = true;
 
-    // Ключ: используем scrollTo вместо прямого scrollLeft — браузер лучше анимирует
     main.scrollTo({
       left: top.scrollLeft,
-      behavior: 'auto'  // 'auto' — мгновенно, но с нативной оптимизацией
+      behavior: 'auto'  
     });
 
     requestAnimationFrame(() => {
@@ -192,12 +184,12 @@ const handleDeleteSlot = (activity, slot) => {
       <h2>Розклад занять</h2>
       {error && <div className="error-message">{error}</div>}
 
-      <div className="week-navigation mb-3 d-flex justify-content-center align-items-center gap-3">
-        <button onClick={prevWeek} className="btn btn-outline-primary btn-sm">← Попередній тиждень</button>
+      <div className="week-navigation">
+        <button onClick={prevWeek} className="week-button">← Попередній тиждень</button>
         <span className="fw-bold">
           {days[0]?.toLocaleDateString("uk-UA", { weekday: "long", day: "2-digit", month: "2-digit" })} — {days[6]?.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit" })}
         </span>
-        <button onClick={nextWeek} className="btn btn-outline-primary btn-sm">Наступний тиждень →</button>
+        <button onClick={nextWeek} className="week-button">Наступний тиждень →</button>
       </div>
 
         <div ref={topScrollRef} className="top-scroll">

@@ -106,16 +106,6 @@ const formatTime = (iso) => {
     setShowAddEditModal(true);
   };
 
- const handleDeleteTemplate = (template) => {
-    const activity = activities.find(a => a.id === template.activity_id);
-    setSelectedTemplate({
-      id: template.id,
-      activityName: activity?.name || 'Невідома активність',
-      time: formatTime(template.start_time),
-    });
-    setShowDeleteTemplateModal(true);
-  };
-
   const handleSaveTemplate = async (templateData) => {
     try {
       templateData.activity_id = Number(templateData.activity_id);
@@ -137,6 +127,16 @@ const formatTime = (iso) => {
     }
   }
 };
+
+const handleDeleteTemplate = (template) => {
+    const activity = activities.find(a => a.id === template.activity_id);
+    setSelectedTemplate({
+      id: template.id,
+      activityName: activity?.name || 'Невідома активність',
+      time: formatTime(template.start_time),
+    });
+    setShowDeleteTemplateModal(true);
+  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -179,73 +179,99 @@ const formatTime = (iso) => {
   if (loading) return <div>Завантаження...</div>;
 
   return (
-    <div className="container my-card">
-      <h2>Управління шаблонами розкладу</h2>
-      <input
-        type="text"
-        placeholder="Поиск по имени активности..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="form-control mb-3"
-      />
-      <button onClick={handleAddTemplate} className="btn btn-little-success mb-3">Додати шаблон</button>
-      <button onClick={handleExtendSchedule} className="btn btn-little-success mb-3 ml-2">Продовжити розклад</button>
+  <div className="templates-page">
+    <h2>Управління шаблонами розкладу</h2>
 
-      {/* Схема недели */}
-      <div className="table-container">
-        <table className="table table-transparent table-striped mb-0">
-          <thead>
-            <tr>
-              {Object.entries(daysOfWeek).map(([num, name]) => (
-                <th key={num} className="text-center align-middle">
-                  {name}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {Object.keys(daysOfWeek).map(dayNum => (
-                <td key={dayNum} className="align-top p-3">
-                  {groupedByDay[dayNum].length === 0 ? (
-                    <p className="no-templates text-center my-4">Немає шаблонів</p>
-                  ) : (
-                    groupedByDay[dayNum].map(tmpl => {
-                      const act = activities.find(a => a.id === tmpl.activity_id);
-                      return (
-                        <div key={tmpl.id} className="template-card mb-4">
-                          <div className="template-card-inner">
-                            <h5 className="template-card-title">{act?.name || 'Неизвестно'}</h5>
-                            <p className="template-card-time mb-1">Час: {formatTime(tmpl.start_time)}</p>
-                            <p className="template-card-capacity mb-2">Місткість: {tmpl.capacity}</p>
-                            <div className="template-card-buttons">
-                              <button
-                                onClick={() => handleEditTemplate(tmpl)}
-                                className="btn-little-success btn-sm me-2"
-                              >
-                                Редагувати
-                              </button>
-                              <button
-                                onClick={() => handleDeleteTemplate(tmpl)}
-                                className="btn-little-danger btn-sm"
-                              >
-                                Видалити
-                              </button>
-                            </div>
+    <input
+      type="text"
+      placeholder="Пошук за назвою активності..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="templates-search"
+    />
+
+    <div className="templates-actions">
+      <button
+        onClick={handleAddTemplate}
+        className="btn-template-add"
+      >
+        Додати шаблон
+      </button>
+
+      <button
+        onClick={handleExtendSchedule}
+        className="btn-template-extend"
+      >
+        Продовжити розклад
+      </button>
+    </div>
+
+    <div className="table-container">
+      <table className="templates-table">
+        <thead>
+          <tr>
+            {Object.entries(daysOfWeek).map(([num, name]) => (
+              <th key={num}>{name}</th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            {Object.keys(daysOfWeek).map((dayNum) => (
+              <td key={dayNum}>
+                {groupedByDay[dayNum].length === 0 ? (
+                  <p className="no-templates">Немає шаблонів</p>
+                ) : (
+                  groupedByDay[dayNum].map((tmpl) => {
+                    const act = activities.find(
+                      (a) => a.id === tmpl.activity_id
+                    );
+
+                    return (
+                      <div key={tmpl.id} className="template-card">
+                        <div className="template-card-inner">
+                          <div className="template-card-title">
+                            {act?.name || "—"}
+                          </div>
+
+                          <div className="template-card-time">
+                            Час: {formatTime(tmpl.start_time)}
+                          </div>
+
+                          <div className="template-card-capacity">
+                            Місткість: {tmpl.capacity}
+                          </div>
+
+                          <div className="template-card-buttons">
+                            <button
+                              onClick={() => handleEditTemplate(tmpl)}
+                              className="btn-template-edit"
+                            >
+                              🖊️
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteTemplate(tmpl)}
+                              className="btn-template-delete"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
-                      );
-                    })
-                  )}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                      </div>
+                    );
+                  })
+                )}
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      {/* Модалки */}
-      <AddEditTemplateModal
+    {/* МОДАЛКИ — БЕЗ ИЗМЕНЕНИЙ */}
+    <AddEditTemplateModal
         show={showAddEditModal}
         onHide={() => setShowAddEditModal(false)}
         onSave={handleSaveTemplate}

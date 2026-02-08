@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
   "visits_used" INTEGER NOT NULL DEFAULT 0,
   
   "price_paid" INTEGER NOT NULL,              
-  "is_active" BOOLEAN DEFAULT TRUE,
   
   "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -33,4 +32,4 @@ CREATE TABLE "subscription_kids" (
 );
 
 CREATE INDEX IF NOT EXISTS "idx_subscriptions_user_id" ON "subscriptions" ("user_id");
-CREATE INDEX IF NOT EXISTS "idx_subscriptions_active" ON "subscriptions" ("is_active");
+

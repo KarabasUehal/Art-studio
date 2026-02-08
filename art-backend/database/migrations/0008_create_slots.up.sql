@@ -18,4 +18,4 @@ CREATE INDEX IF NOT EXISTS "idx_activity_slots_deleted" ON "activity_slots" ("de
 
 CREATE INDEX IF NOT EXISTS "idx_activity_slots_template_id"  ON "activity_slots" ("template_id");
 
-CREATE UNIQUE INDEX "idx_activity_slots_unique" ON "activity_slots" ("activity_id", "start_time");
+CREATE UNIQUE INDEX "idx_activity_slots_unique" ON "activity_slots" ("activity_id", "start_time") WHERE deleted_at IS NULL;

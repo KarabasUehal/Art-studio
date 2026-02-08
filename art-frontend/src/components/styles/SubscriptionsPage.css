@@ -1,0 +1,227 @@
+.admin-subscriptions-page {
+  min-height: 100vh;
+  background: #121212;
+  padding: 60px 20px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #f5f5f5;
+}
+
+.admin-subscriptions-container {
+  max-width: 1600px !important;
+  margin: 0 auto;
+}
+
+.sub-wrapper {
+  text-align: center;        
+  margin-bottom: 48px;      
+  width: 100%;
+}
+
+.admin-subscriptions-title {
+  text-align: center;
+  font-size: 2.8em;
+  color: #e6c843;
+  margin-bottom: 50px;
+  font-weight: 600;
+}
+
+.btn-issue-sub {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 50px;
+  background: #e6c843;
+  color: rgb(0, 0, 0);
+  padding: 16px 50px;
+  border-radius: 12px;
+  font-size: 1.3em;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(231, 111, 81, 0.3);
+}
+
+.btn-issue-sub:hover {
+  background: #e6c843;
+  transform: translateY(-3px);
+}
+
+.has-selection-block {
+  text-align: center;
+  margin: 0 auto 2.5rem;
+  padding: 1.25rem 2rem;
+  background: #1e1e1e;
+  border-radius: 12px;
+  border: 2px solid #e6c843;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  max-width: 720px;
+}
+
+.has-selection-block strong {
+  color: #e6c843;
+  font-size: 1.35em;
+}
+
+.has-selection-block .actions {
+  display: inline-flex;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.admin-subscriptions-table {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.admin-subscriptions-table th {
+  background: #2a2a2a;
+  color: #e6c843;
+  padding: 16px;
+  font-size: 1em;
+  text-align: center;
+}
+
+.admin-subscriptions-table td {
+  padding: 16px;
+  text-align: center;
+  color: #ddd;
+  font-size: 1.1em;
+}
+
+.admin-subscriptions-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #e6c843;
+  cursor: pointer;
+}
+
+.btn-sub-group {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  border: none !important;
+}
+
+.pagination { margin-top: 50px; gap: 10px; }
+
+.page-link {
+  background: rgba(255,235,59,0.08);
+  color: #e6d223;
+  border: 1.5px solid #000000;
+  padding: 9px 16px;                 
+  border-radius: 40px;
+  font-size: 0.95em;
+}
+
+.page-link:hover {
+  background: #ffeb3b;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.page-item.active .page-link {
+  background: #ffeb3b;
+  color: #000;
+  box-shadow: 0 0 20px rgba(255,235,59,0.5);
+}
+
+.btn-admin {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  font-size: 0.7em !important;
+  transition: all 0.3s;
+  min-width: unset;
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+  font-family: 'Caveat', cursive !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-admin:focus,
+.btn-admin:active,
+.btn-admin:focus-visible {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.btn-admin-extend {
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #6ddd23 !important;           
+}
+
+.btn-admin-extend:hover {
+  color: #6ddd23 !important;
+  background: #000000 !important;
+  transform: translateY(-3px);
+}
+
+.btn-admin-delete {
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #ff0000 !important;
+}
+
+.btn-admin-delete:hover {
+  background: #000000 !important;
+  color: #ff0000 !important;
+  transform: translateY(-3px);
+}
+
+.empty-message {
+  text-align: center;
+  color: #888;
+  font-size: 1.6em;
+  margin: 80px 0;
+  font-weight: 300;
+}
+
+@media (max-width: 992px) {
+  .admin-subscriptions-title {
+    font-size: 2.3em;
+    margin-bottom: 40px;
+  }
+
+  .btn-issue-sub {
+    padding: 14px 40px;
+    font-size: 1.15em;
+  }
+
+  .admin-subscriptions-table th,
+  .admin-subscriptions-table td {
+    padding: 12px 8px;
+    font-size: 0.97em;
+  }
+
+  .btn-admin {
+    padding: 7px 12px;
+    font-size: 0.9em;
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-subscriptions-page {
+    padding: 40px 15px;
+  }
+
+  .btn-group-sm {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-admin {
+    width: 100%;
+  }
+
+  .has-selection-block {
+    padding: 1rem;
+  }
+}

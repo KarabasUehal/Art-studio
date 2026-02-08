@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
-import '@styles/Develop.css';
+import '@styles/KidForm.css';
 
 const KidForm = () => {
   const { id } = useParams();  // Для редактирования ребенка, если ID присутствует
@@ -67,86 +67,94 @@ const KidForm = () => {
   };
 
   return (
-    <div className="container py-5">
-      <div className="card shadow-lg border-0 my-card" style={{ maxWidth: '650px', margin: '0 auto', borderRadius: '20px' }}>
-        <div className="card-body p-5">
-          <h2 className="text-center mb-5 fw-bold text-primary">
-            {id ? 'Редагувати дитину' : 'Додати нову дитину'}
-          </h2>
+  <div className="kid-form-page">
+    <div className="kid-form-container">
+      <h2 className="kid-form-title">
+        {id ? 'Редагувати дитину' : 'Додати нову дитину'}
+      </h2>
 
-          <form onSubmit={handleSubmit}>
+      <form className="kid-form" onSubmit={handleSubmit}>
 
-            {/* Имя ребенка */}
-            <div className="mb-4">
-              <label htmlFor="name" className="form-label fw-bold text-dark">
-                Ім'я дитини
-              </label>
-              <input
-                type="text"
-                id="name"
-                className="form-control form-control-lg"
-                placeholder="Наприклад: Марія"
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
-                required
-              />
-            </div>
-
-            {/* Возраст ребенка */}
-            <div className="mb-4">
-              <label htmlFor="age" className="form-label fw-bold text-dark">
-                Вік
-              </label>
-              <input
-                type="number"
-                id="age"
-                className="form-control form-control-lg"
-                value={formData.age}
-                onChange={e => setFormData({...formData, age: +e.target.value})}
-                required
-                min="1"
-              />
-            </div>
-
-            {/* Пол ребенка */}
-            <div className="mb-4">
-              <label htmlFor="gender" className="form-label fw-bold text-dark">
-                Стать
-              </label>
-              <select
-                id="gender"
-                className="form-control form-control-lg"
-                value={formData.gender}
-                onChange={e => setFormData({...formData, gender: e.target.value})}
-                required
-              >
-                <option value="male">Хлопець</option>
-                <option value="female">Дівчина</option>
-              </select>
-            </div>
-
-             {error && <div className="kid-error">{error}</div>}
-
-            <div className="d-grid mt-5">
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-success btn-lg fw-bold shadow"
-                style={{ borderRadius: '15px', padding: '14px' }}
-              >
-                {loading ? (
-                  <>Зберігаємо...</>
-                ) : (
-                  <>Зберегти дитину</>
-                )}
-              </button>
-            </div>
-
-          </form>
+        {/* Ім'я дитини */}
+        <div className="form-group">
+          <label htmlFor="name" className="form-label">
+            Ім'я дитини
+          </label>
+          <input
+            type="text"
+            id="name"
+            className="form-input"
+            placeholder="Наприклад: Марія"
+            value={formData.name}
+            onChange={(e) =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+            required
+          />
         </div>
-      </div>
+
+        {/* Вік */}
+        <div className="form-group">
+          <label htmlFor="age" className="form-label">
+            Вік
+          </label>
+          <input
+            type="number"
+            id="age"
+            className="form-age-input"
+            value={formData.age}
+            onChange={(e) =>
+              setFormData({ ...formData, age: +e.target.value })
+            }
+            min="1"
+            required
+          />
+        </div>
+
+        {/* Стать */}
+        <div className="form-group">
+          <label htmlFor="gender" className="form-label">
+            Стать
+          </label>
+          <select
+            id="gender"
+            className="form-input"
+            value={formData.gender}
+            onChange={(e) =>
+              setFormData({ ...formData, gender: e.target.value })
+            }
+            required
+          >
+            <option value="">Оберіть стать</option>
+            <option value="male">Хлопець</option>
+            <option value="female">Дівчина</option>
+          </select>
+        </div>
+
+        {error && <div className="kid-error">{error}</div>}
+
+        <div className="form-actions">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="btn-cancel"
+          >
+            Скасувати
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-save"
+          >
+            {loading ? 'Збереження...' : 'Зберегти'}
+          </button>
+        </div>
+
+      </form>
     </div>
-  );
+  </div>
+ );
 };
 
 export default KidForm;

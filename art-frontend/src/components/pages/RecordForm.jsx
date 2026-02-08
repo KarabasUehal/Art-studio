@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import SuccessRecordModal from './SuccessRecordModal.jsx';
 import api from '../../utils/api.jsx';
 import '@styles/RecordForm.css';
+import '@styles/Checkbox.css';
 
 const RecordForm = () => {
   const { activityId, slotId } = useParams();
@@ -72,7 +73,6 @@ const RecordForm = () => {
     });
   };
 
-  // === ВСЕ НЕДОСТАЮЩИЕ ФУНКЦИИ ===
   const addKid = () => {
     setFormData({
       ...formData,
@@ -138,12 +138,10 @@ const RecordForm = () => {
     setLoading(true);
     try {
       const req = {
-        items: [{
           activity_id: +activityId,
           slot_id: +currentSlotId,
           number_of_kids: allKids.length,
           kids: allKids,
-        }],
       };
 
       await api.post('/record', req);
@@ -156,8 +154,12 @@ const RecordForm = () => {
       });
       setSelectedKidIds([]);
     } catch (err) {
-      setError('Помилка запису: ' + (err.response?.data?.error || 'Спробуйте пізніше'));
-    } finally {
+  if (err.response?.status === 409) {
+    setError('Запис вже існує для дитини ' + err.response?.data.kid_name);
+  } else {
+    setError('Помилка запису: Спробуйте пізніше');
+  }
+} finally {
       setLoading(false);
     }
   };
@@ -219,7 +221,7 @@ const RecordForm = () => {
         {userKids.length > 0 && (
           <>
             {userKids.map(kid => (
-              <label className="record-label" key={kid.id} style={{ display: 'block' }}>
+              <label className="custom-checkbox" key={kid.id}>
                 <input
                  type="checkbox"
                  checked={selectedKidIds.includes(kid.id)}
@@ -231,10 +233,13 @@ const RecordForm = () => {
                       );
                     }}
                   />
-                  {kid.name} ({kid.age} років)
+                  <span className="checkmark"></span>
+                  <span className="checkbox-text">{kid.name} ({kid.age} років</span>
+                  )
               </label>
             ))}
           </>
+          
         )}
 
         <h3 className="record-else-label">{userKids.length ? 'Або додайте дитину вручну' : 'Дані дитини'}</h3>
@@ -287,6 +292,7 @@ const RecordForm = () => {
               onChange={(e) => updateKid(i, 'gender', e.target.value)}
               required
             >
+              <option value="" disabled>Оберіть стать</option>
               <option value="male">Хлопчик</option>
               <option value="female">Дівчинка</option>
             </select>

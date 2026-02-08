@@ -1,9 +1,6 @@
-/* ─────────────────────────────── */
-/* НА 100% РАБОЧИЙ КАЛЕНДАРЬ ДЛЯ datetime-local (Chrome/Edge) */
-/* ─────────────────────────────── */
 
 .admin-input[type="datetime-local"] {
-  color-scheme: dark;                                 /* ← КРИТИЧНО! */
+  color-scheme: dark;                                 
   -webkit-appearance: none;
   background: #181414 !important;
   color: #c7e0bd !important;

@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import DeleteKidModal from './DeleteKidModal';
-import '@styles/ClientKidsPage.css';
+import '@styles/List.css';
 
 const ClientKidsPage = () => {
   const { role } = useContext(AuthContext);
@@ -56,56 +56,53 @@ const ClientKidsPage = () => {
   if (loading) return <div className="text-center py-5 text-white">Завантаження...</div>;
 
   return (
-    <div className="kids-page">
-      <div className="kids-container">
-        <h1 className="kids-title">Діти користувача</h1>
+    <div className="list-page">
+        <h1 className="list-title">Мої діти</h1>
 
         {(role === 'owner' ||  role === 'client') && (
           <div className="text-center mb-5">
-            <Link to="/client/kids/add" className="btn-add-kid">
+            <Link to="/client/kids/add" className="list-btn-add">
               Додати дитину
             </Link>
           </div>
         )}
 
-        <div className="row g-4">
-          {kids.length === 0 ? (
-            <p className="text-center text-white fs-3">Поки немає дітей</p>
-          ) : (
-            kids.map((kid) => (
-              <div key={kid.ID} className="col-md-6 col-lg-4">
-                <div className="kid-card">
-                  <h4 className="kid-name">{kid.name}</h4>
-                  <p className="kid-info">
+        <div className="list-grid">
+        {kids.map((kid) => (
+              <div key={kid.ID} className="list-grid-item">
+                <div className="list-card">
+                <div className="list-card-body">
+                  <h4 className="list-name">{kid.name}</h4>
+                  <p className="list-info">
                     <strong>Вік:</strong> {kid.age} років
                   </p>
-                 <p className="kid-info">
+                 <p className="list-info">
                  <strong>Стать:</strong> {kid.gender === 'male' ? 'Хлопчик' : kid.gender === 'female' ? 'Дівчинка' : 'Неизвестно'}
                  </p>
 
                   {role === 'owner' && (
-                    <div className="admin-kid-buttons">
-                      <Link
-                        to={`/client/kids/edit/${kid.ID}`}
-                        className="btn-kid btn-kid-edit"
-                      >
-                        Редагувати
-                      </Link>
+                    <div className="admin-list-buttons">
+                      <button
+                        onClick={() => navigate(`/client/kids/edit/${kid.ID}`)}
+                          className="list-edit-btn"
+                        >
+                          Редагувати
+                      </button>
                       <button
                       onClick={() => {
                         setKidToDelete(kid);
                         setShowDeleteModal(true);
                       }}
-                      className="btn-admin btn-admin-delete">
+                      className="list-delete-btn">
                       Видалити
                     </button>
                     </div>
                   )}
                 </div>
+                </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+            </div>
 
         <DeleteKidModal
         show={showDeleteModal}
@@ -115,7 +112,6 @@ const ClientKidsPage = () => {
         kidName={kidToDelete?.name || 'дитину'}
       />
       </div>
-    </div>
   );
 };
 

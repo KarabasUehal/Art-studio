@@ -1,17 +1,21 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
 	ID          uint      `json:"id" gorm:"primaryKey;autoIncrement"`
+	CreatedAt   time.Time `json:"created_at"`
 	Username    string    `json:"username" gorm:"type:varchar(50);unique;not null;size:50"`
 	Password    string    `json:"-" gorm:"type:varchar(255);not null"`
 	PhoneNumber string    `json:"phone_number" gorm:"type:varchar(15);unique;not null;size:15"`
 	Role        string    `json:"role" gorm:"type:varchar(20);not null;default:'client';size:20"`
 	Name        string    `json:"name" gorm:"type:varchar(100);size:100"`
+	Surname     string    `json:"surname" gorm:"type:varchar(100);size:100"`
 	UserKids    []UserKid `json:"user_kids" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
@@ -21,6 +25,7 @@ type UserKid struct {
 	Age    int    `json:"age" gorm:"not null"`
 	Gender string `json:"gender" gorm:"type:varchar(20);not null"`
 
-	ParentName string `json:"parent_name" gorm:"type:varchar(100);size:100"`
-	UserID     uint   `json:"user_id"  gorm:"not null;index"`
+	ParentName    string `json:"parent_name" gorm:"type:varchar(100);size:100"`
+	ParentSurname string `json:"parent_surname" gorm:"type:varchar(100);size:100"`
+	UserID        uint   `json:"user_id"  gorm:"not null;index"`
 }

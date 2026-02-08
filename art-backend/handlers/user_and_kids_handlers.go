@@ -66,7 +66,7 @@ func GetAllUsers() gin.HandlerFunc {
 			}
 		}
 
-		query := db.Model(&models.User{})
+		query := db.Model(&models.User{}).Preload("UserKids")
 
 		var totalCount int64
 		if err := query.Count(&totalCount).Error; err != nil {
@@ -394,11 +394,12 @@ func AddKid() gin.HandlerFunc {
 		}
 
 		newKid := models.UserKid{
-			Name:       reqKid.Name,
-			Age:        reqKid.Age,
-			Gender:     reqKid.Gender,
-			UserID:     user.ID,
-			ParentName: user.Name,
+			Name:          reqKid.Name,
+			Age:           reqKid.Age,
+			Gender:        reqKid.Gender,
+			UserID:        user.ID,
+			ParentName:    user.Name,
+			ParentSurname: user.Surname,
 		}
 
 		tx := db.Begin()
@@ -413,7 +414,7 @@ func AddKid() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, fmt.Sprintf("kids:list:user:%v", phone_number))
+			utils.InvalidateCache(c, fmt.Sprintf("kids:list:user:%v", phone_number), "kids:*")
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -487,6 +488,7 @@ func UpdateKid() gin.HandlerFunc {
 				c,
 				fmt.Sprintf("kid:%d:user:%d", id, user.ID),
 				fmt.Sprintf("kids:list:user:%v", phoneNumber),
+				"kids:*",
 			)
 		}
 
@@ -538,19 +540,31 @@ func DeleteKid() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
-		if err := tx.Unscoped().Delete(&kid).Error; err != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
+		if err := tx.Delete(&kid, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to delete kid by id: %d", id)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete kid"})
 			return
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for delete kid")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
 			utils.InvalidateCache(
 				c,
 				fmt.Sprintf("kid:%d:user:%d", id, user.ID),
 				"kids:list:user:"+fmt.Sprint(user.ID),
+				"kids:*",
 			)
 		}
 

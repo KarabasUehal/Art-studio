@@ -103,11 +103,12 @@ func InitDB() error {
 	}
 
 	version, dirty, err := m.Version() // Проверка версии миграций
-	if err == nil {
+	switch err {
+	case nil:
 		log.Info().Str("component", "postgres").Msgf("Current migration version: %d, dirty: %t", version, dirty)
-	} else if err == migrate.ErrNoChange {
+	case migrate.ErrNoChange:
 		log.Info().Str("component", "postgres").Msg("No migration version (fresh DB)")
-	} else {
+	default:
 		log.Warn().Str("component", "postgres").Err(err).Msg("Could not get migration version")
 	}
 

@@ -52,7 +52,7 @@ func GetAllSubscriptions() gin.HandlerFunc {
 
 		offset := (page - 1) * size
 
-		cacheKey := fmt.Sprintf("subscriptions:page=%d:size=%d", page, size)
+		cacheKey := fmt.Sprintf("subscriptions:all:page=%d:size=%d", page, size)
 
 		var resp gin.H
 
@@ -194,10 +194,20 @@ func AddSubscription() gin.HandlerFunc {
 			return
 		}
 
+		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		var createdKids []models.SubKid
 		for _, kid := range req.SubKids {
 			if kid.Name == "" {
-				continue
+				tx.Rollback()
+				log.Error().Err(err).Msg("Invalid kid name input")
+				c.JSON(400, gin.H{"error": "У дитини повинно бути ім'я"})
+				return
 			}
 
 			if err := db.Create(&kid).Error; err != nil {
@@ -216,13 +226,10 @@ func AddSubscription() gin.HandlerFunc {
 			StartDate:          startDate,
 			EndDate:            endDate,
 			VisitsTotal:        sub_type.VisitsCount,
-			VisitsUsed:         req.VisitsUsed,
+			VisitsUsed:         0,
 			PricePaid:          req.PricePaid,
-			IsActive:           true,
-			SubKids:            createdKids,
 		}
 
-		tx := db.Begin()
 		if res := tx.Create(&sub); res.Error != nil {
 			tx.Rollback()
 			log.Error().Err(res.Error).Msg("Error to create subscription")
@@ -230,10 +237,21 @@ func AddSubscription() gin.HandlerFunc {
 				"Failed to create subscription": res.Error})
 			return
 		}
+
+		if err := tx.Model(&sub).Association("SubKids").Append(createdKids); err != nil {
+			tx.Rollback()
+			log.Error().Err(err).Msg("Error to create subscription")
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Failed to create subscription": err})
+			return
+		}
+
 		tx.Commit()
 
+		db.Preload("SubKids").First(&sub, sub.ID)
+
 		if redisClient != nil {
-			utils.InvalidateCache(c, "subscriptions*", "subscription_types*")
+			utils.InvalidateCache(c, "/subscriptions*", "subscriptions:all:*")
 		}
 
 		c.JSON(http.StatusCreated, sub)
@@ -286,9 +304,14 @@ func UpdateSubscription() gin.HandlerFunc {
 		sub.VisitsTotal = updated_sub.VisitsTotal
 		sub.VisitsUsed = updated_sub.VisitsUsed
 		sub.PricePaid = updated_sub.PricePaid
-		sub.IsActive = updated_sub.IsActive
 
 		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
 		if err := tx.Save(sub).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msg("Failed to save subscription")
@@ -300,7 +323,7 @@ func UpdateSubscription() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "subscriptions*", fmt.Sprintf("/subscription/%v", id))
+			utils.InvalidateCache(c, "/subscriptions*", "subscriptions:all:*", fmt.Sprintf("/subscriptions/%v", id))
 		}
 
 		c.JSON(http.StatusOK, sub)
@@ -333,16 +356,84 @@ func DeleteSubscription() gin.HandlerFunc {
 		}
 
 		tx := db.Begin()
-		if err := tx.Unscoped().Delete(&sub, id).Error; err != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+
+		var records []models.Record
+		if err := tx.Where("subscription_id = ?", sub.ID).Find(&records).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				tx.Rollback()
+				log.Error().Err(err).Msgf("Error finding records by subscription id: %d", sub.ID)
+				c.JSON(http.StatusInternalServerError, gin.H{"error:": "Failed to find records"})
+				return
+			}
+			log.Warn().
+				Msg("records missing, deleting record without restoring places")
+		} else {
+			for _, record := range records {
+				var slot models.ActivitySlot
+				if err := tx.First(&slot, record.SlotID).Error; err != nil {
+					if !errors.Is(err, gorm.ErrRecordNotFound) {
+						tx.Rollback()
+						log.Error().Err(err).Uint("slot_id", record.SlotID).Msg("Error finding slot")
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "slot lookup failed"})
+						return
+					}
+					log.Warn().
+						Uint("slot_id", record.SlotID).
+						Msg("slot missing, deleting record without restoring places")
+				} else {
+					if err := tx.Delete(&record).Error; err != nil {
+						tx.Rollback()
+						log.Error().Err(err).Msgf("Error deliting record by id: %d", record.ID)
+						c.JSON(http.StatusInternalServerError, gin.H{"error:": "Failed to delete record"})
+						return
+					}
+
+					if record.Details.NumberOfKids > uint(slot.Booked) {
+						slot.Booked = 0
+					} else {
+						slot.Booked -= int(record.Details.NumberOfKids)
+					}
+
+					if err := tx.Save(&slot).Error; err != nil {
+						tx.Rollback()
+						log.Error().Err(err).Msg("Failed to restore slot places")
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to restore places"})
+						return
+					}
+				}
+			}
+		}
+
+		if err := tx.Delete(&sub, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to delete subscription by id: %d", id)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete subscription"})
 			return
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for delete subscription")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "subscriptions*", fmt.Sprintf("/subscription/%v", id))
+			utils.InvalidateCache(c,
+				"/subscriptions*",
+				"subscriptions:all:*",
+				fmt.Sprintf("/subscriptions/%v", id),
+				"activity_slots*",
+				"/records*",
+				"records:all:*",
+				"/client/records*",
+				"client:records:*",
+				"schedule*",
+			)
 		}
 
 		c.Status(http.StatusNoContent)
@@ -389,7 +480,7 @@ func ExtendSubscription() gin.HandlerFunc {
 		sub.EndDate = subEnd
 
 		tx := db.Begin()
-		if err := db.Save(&sub).Error; err != nil {
+		if err := tx.Save(&sub).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Msgf("Error to save extended subscription by id: %d", id)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to save extended subscription"})
@@ -398,7 +489,7 @@ func ExtendSubscription() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, "subscriptions*", fmt.Sprintf("/subscription/%v", id))
+			utils.InvalidateCache(c, "/subscriptions*", "subscriptions:all:*", fmt.Sprintf("/subscriptions/%v", id))
 		}
 
 		c.JSON(http.StatusOK, sub)

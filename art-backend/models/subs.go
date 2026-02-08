@@ -9,7 +9,7 @@ import (
 type Subscription struct {
 	gorm.Model
 	UserID  uint     `json:"user_id" gorm:"not null;index"`
-	User    User     `json:"-" gorm:"foreignKey:UserID"`
+	User    User     `json:"user" gorm:"foreignKey:UserID"`
 	SubKids []SubKid `json:"sub_kids" gorm:"many2many:subscription_kids;"`
 
 	SubscriptionTypeID uint             `json:"subscription_type_id" gorm:"not null"`
@@ -22,7 +22,6 @@ type Subscription struct {
 	VisitsUsed  int `json:"visits_used" gorm:"not null;default:0"`
 
 	PricePaid uint `json:"price_paid" gorm:"not null"`
-	IsActive  bool `json:"is_active" gorm:"default:true"`
 }
 
 type SubscriptionType struct {

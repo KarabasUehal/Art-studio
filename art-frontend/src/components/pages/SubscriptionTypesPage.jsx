@@ -99,7 +99,7 @@ const SubscriptionTypesPage = () => {
                     <div className="admin-subtype-buttons">
                       <Link
                         to={`/admin/subscriptions/types/edit/${type.id}`}
-                        className="btn-subtype btn-subtype-edit"
+                        className="btn-subtype-edit"
                       >
                         Редагувати
                       </Link>
@@ -108,7 +108,7 @@ const SubscriptionTypesPage = () => {
                         setSubTypeToDelete(type);
                         setShowDeleteModal(true);
                       }}
-                      className="btn-admin btn-admin-delete">
+                      className="btn-subtype-delete">
                       Видалити
                     </button>
                     </div>

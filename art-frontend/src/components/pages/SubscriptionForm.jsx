@@ -10,10 +10,18 @@ const SubscriptionForm = () => {
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState('');
+
   const [form, setForm] = useState({
     user_id: '',
     subscription_type_id: '',  // ← строка!
-    sub_kids: [''],
+    sub_kids: [
+    {
+      name: '',
+      age: '',
+      gender: ''
+    }
+  ],
     price_paid: '',
     start_date: new Date().toISOString().split('T')[0],
   });
@@ -57,8 +65,9 @@ const SubscriptionForm = () => {
     if (
       !form.user_id ||
       !form.subscription_type_id ||
-      !form.kid_name.trim() ||
-      !form.kid_age ||
+      !form.sub_kids[0].name.trim() ||
+      !form.sub_kids[0].age ||
+      !form.sub_kids[0].gender ||
       !form.price_paid ||
       !form.start_date
     ) {
@@ -71,9 +80,9 @@ const SubscriptionForm = () => {
       subscription_type_id: Number(form.subscription_type_id) || 0, 
       sub_kids: [
     {
-      name: form.kid_name.trim(),
-      age: Number(form.kid_age),
-      gender: form.kid_gender,
+      name: form.sub_kids[0].name.trim(),
+      age: Number(form.sub_kids[0].age),
+      gender: form.sub_kids[0].gender,
     }
   ],
       price_paid: Number(form.price_paid),
@@ -85,9 +94,21 @@ const SubscriptionForm = () => {
     return;
     }
 
+  if (!payload.sub_kids[0].name) {
+    setError('Введіть ім\'я дитини');
+    return;
+  }
+    if (!payload.sub_kids[0].age || payload.sub_kids[0].age < 3 || payload.sub_kids[0].age > 17) {
+    setError('Вік дитини має бути від 3 до 17 років');
+    return;
+  }
+    if (!['male', 'female'].includes(payload.sub_kids[0].gender)) {
+    setError('Оберіть стать дитини');
+    return;
+  }
+
     try {
       await api.post('/subscriptions', payload);
-      alert('Абонемент видано!');
       navigate('/admin/subscriptions');
     } catch (err) {
       console.error(err);
@@ -151,8 +172,27 @@ const SubscriptionForm = () => {
             <label className="form-label">Ім'я дитини</label>
             <input
               type="text"
-              value={form.kid_name}
-              onChange={(e) => setForm({ ...form, kid_name: e.target.value })}
+              value={form.sub_kids[0].name}
+              onKeyDown={(e) => {
+              // Разрешаем только буквы, пробел, апостроф, дефис и Backspace/Delete
+              const allowed = /[A-Za-zА-Яа-яіїєґІЇЄҐ\s'-]/.test(e.key) ||
+                      e.key === 'Backspace' ||
+                      e.key === 'Delete' ||
+                      e.key === 'ArrowLeft' ||
+                      e.key === 'ArrowRight' ||
+                      e.key === 'Tab';
+
+                if (!allowed) {
+                 e.preventDefault(); // блокируем ввод нежелательного символа
+                }
+              }}
+              onChange={(e) => {
+              const newSubKids = [...form.sub_kids];
+              newSubKids[0] = { ...newSubKids[0], name: e.target.value };
+              setForm({ ...form, sub_kids: newSubKids });
+              }}
+              pattern="[A-Za-zА-Яа-яіїєґІЇЄҐ\s'-]+"
+              title="Ім'я може містити тільки літери, пробіли, апостроф або дефіс"
               required
               className="form-input"
             />
@@ -163,9 +203,13 @@ const SubscriptionForm = () => {
             <input
               type="number"
               min="3"
-              max="18"
-              value={form.kid_age}
-              onChange={(e) => setForm({ ...form, kid_age: e.target.value })}
+              max="17"
+              value={form.sub_kids[0].age}
+              onChange={(e) => {
+              const newSubKids = [...form.sub_kids];
+              newSubKids[0] = { ...newSubKids[0], age: e.target.value };
+              setForm({ ...form, sub_kids: newSubKids });
+              }}
               required
               className="form-input"
             />
@@ -174,10 +218,16 @@ const SubscriptionForm = () => {
           <div className="form-group">
             <label className="form-label">Стать</label>
             <select
-              value={form.kid_gender}
-              onChange={(e) => setForm({ ...form, kid_gender: e.target.value })}
+              value={form.sub_kids[0].gender}
+              onChange={(e) => {
+              const newSubKids = [...form.sub_kids];
+              newSubKids[0] = { ...newSubKids[0], gender: e.target.value };
+              setForm({ ...form, sub_kids: newSubKids });
+              }}
+              required
               className="form-input"
             >
+              <option value="" disabled>Оберіть стать</option>
               <option value="male">Хлопчик</option>
               <option value="female">Дівчинка</option>
             </select>
@@ -205,6 +255,8 @@ const SubscriptionForm = () => {
               className="form-input"
             />
           </div>
+
+          {error && <div className="record-error">{error}</div>}
 
           <div className="form-actions">
             <button type="button" onClick={() => navigate(-1)} className="btn-cancel">

@@ -250,9 +250,25 @@ textarea.form-textarea {
 }
 
 .submit-btn {
-  width: 100%;
-  font-size: 1.6rem;
-  padding: 0.9rem;
-  border-radius: 0.9rem;
-  box-shadow: 0 0.5rem 1rem rgba(25, 135, 84, 0.35);
+  display: inline-block;
+  background: #355345 !important;
+  color: #ffeb3b!important;
+  padding: 14px 40px !important;
+  border: 2px solid #000000 !important;
+  border-radius: 50px !important;
+  font-weight: 900 !important;
+  font-size: 1.1em !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
+  transition: all 0.3s;
+  margin: 0 auto;
+}
+
+.submit-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #ffeb3b;
+  color: #ffeb3b !important;
+  text-decoration: none !important;
 }

@@ -1,34 +1,40 @@
 import React, { useState } from 'react';
 import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
+import '@styles/Register.css';
 
 function AdminRegister() {
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        phone_number: '',
-        name: '',
-        role: 'client',
-    });
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-      const navigate = useNavigate();
+   const [username, setUsername] = useState('');
+       const [password, setPassword] = useState('');
+       const [phone_number, setPhoneNumber] = useState('');
+       const [name, setName] = useState('');
+       const [surname, setSurname] = useState('');
+       const [role, setRole] = useState('');
+       const [error, setError] = useState('');
+       const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setSuccess('');
+   const handleSubmit = async (e) => {
+           e.preventDefault();
+           setError('');
+           console.log('Register form data:', { username, password, phone_number, name, surname, role });
+   
+           if (!username || username.length < 6) 
+           return setError('Логiн повинен бути не менше 6 символів');
+           if (!password || password.length < 6) 
+           return setError('Пароль повинен бути не менше 6 символів');
+           if (!phone_number || phone_number.length < 13) 
+           return setError('У номерi повинно бути 13 символів');
+           if (!name)
+           return setError(`Введіть ім'я`);
+           if (!role)
+           return setError(`Оберіть роль`);
+           
         try {
             const token = localStorage.getItem('token');
-            const response = await api.post('/admin/register', formData, {
+            const response = await api.post('/admin/register', { username, password, phone_number, name, surname, role}, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setSuccess(response.data.message);
-            setFormData({ username: '', password: '', phone_number: '', name: '', role: 'client' });
+            navigate('/login');
         } catch (err) {
             setError(err.response?.data?.error || 'Registration failed');
         }
@@ -39,86 +45,55 @@ function AdminRegister() {
   };
 
     return (
-        <div className="container mt-4">
-            <h2>Register New User (Admin)</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
+         <div className="register-form-page">
+      <div className="register-form-container">
+        <h2 className="register-form-title">
+            Реєстрація (адмiнicтратор)
+        </h2>
             <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                        minLength="3"
-                        maxLength="50"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input
-                        type="password"
-                        className="form-control"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        minLength="6"
-                    />
-                </div>
-            <div className="mb-3">
-                  <label htmlFor="phone_number" className="form-label">Phone number:</label>
-                  <input 
-                    type="tel" 
-                    className="form-label"
-                    id="phone_number"
-                    name="phone_number"
-                    value={formData.phone_number} 
-                    style={{
-                      width: '200px',
-                      backgroundColor: 'transparent',
-                      color: '#FFFF00',
-                      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                      marginTop: '5px',
-                          }}
-                    placeholder="+7 (978) 123-45-67" 
-                    onChange={handleChange}
-                    required />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Name</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        minLength="2"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="role" className="form-label">Role</label>
+            <div className="register-form-group">
+                <label className="register-form-label">Логiн:</label>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="register-form-input" required />
+            </div>
+            <div className="register-form-group">
+                <label className="register-form-label">Пароль:</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="register-form-input" minLength="6" required />
+            </div>
+            <div className="register-form-group">
+                <label className="register-form-label">Номер телефону:</label>
+                <input type="tel" value={phone_number} onChange={(e) => setPhoneNumber(e.target.value)} className="register-form-input" placeholder="+380 (XX) XXX-XX-XX" required />
+            </div>
+            <div className="register-form-group">
+                <label className="register-form-label">Iм'я:</label>
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="register-form-input" />
+            </div>
+            <div className="register-form-group">
+                <label className="register-form-label">Прізвище:</label>
+                <input type="text" value={surname} onChange={(e) => setSurname(e.target.value)} className="register-form-input" />
+            </div>
+            <div className="register-form-group">
+                    <label htmlFor="role" className="register-form-label">Роль</label>
                     <select
-                        className="form-control"
+                        className="register-form-input"
                         id="role"
                         name="role"
-                        value={formData.role}
-                        onChange={handleChange}
+                        value={role} 
+                        onChange={(e) => setRole(e.target.value)}
                     >
-                        <option value="client">Client</option>
-                        <option value="owner">Owner</option>
+                        <option value="">Оберіть роль</option>
+                        <option value="client">Клієнт</option>
+                        <option value="owner">Адмiнicтратор</option>
                     </select>
                 </div>
-                <button onClick={Back} className="btn btn-primary">Back</button>
-                <button type="submit" className="btn btn-primary">Register</button>
-            </form>
-        </div>
+            {error && <div className="alert alert-danger">{error}</div>}
+
+            <div className="form-actions">
+            <button type="button" onClick={Back} className="btn-register-cancel">Назад</button>
+            <button type="submit" className="btn-register-submit">Створити профіль</button>
+            </div>
+        </form>
+       </div>
+     </div>        
     );
 }
 

@@ -2,14 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import ReactPaginate from 'react-paginate';
-import '@styles/Develop.css'; 
+import '@styles/List.css'; 
 
 const ClientRecords = ({ isAuthenticated }) => {
   const [records, setRecords] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [size] = useState(10);
+  const [size] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -68,51 +68,72 @@ const ClientRecords = ({ isAuthenticated }) => {
   const getKidEmoji = (gender) => gender === 'male' ? '👦' : '👧';
 
   return (
-    <div>
-      <h2 className="text-center mb-4" style={{ color: '#ff9ff3' }}>Мої записи на майстер-класи ✨</h2>
-      <div className="row">
-        {records.map((rec) => (
-          <div key={rec.id} className="col-md-6 col-lg-4 mb-4">
-            <div className="card h-100 shadow-sm" style={{ borderRadius: '15px', overflow: 'hidden', border: '2px solid #ff6b6b' }}>
-              <div className="card-body d-flex flex-column">
-                <h5 className="card-title text-primary">Запис #{rec.id}</h5>
-                <p className="card-text"><strong>Дата створення:</strong> {formatStartTime(rec.created_at)}</p>
-                <p className="card-text"><strong>Загальна сума:</strong> {rec.total_price} грн.</p>
-                <div className="mt-auto">
-                  <h6 className="card-title text-primary">Деталі:</h6>
-                  {rec.items.map((item, idx) => (
-                    <div key={idx} className="mb-2 p-2 bg-light rounded">
-                      <p><strong>Майстер-клас:</strong> {item.activity_name} </p>
-                      <p><strong>Кiлькiсть дiтей:</strong> {item.number_of_kids}</p>
-                      <p><strong>Дата заняття:</strong> {formatSlotTime(item.date)}</p>
-                      <ul className="list-unstyled small">
-                        {item.kids.map((kid, kIdx) => (
-                          <li key={kIdx}>
-                            {getKidEmoji(kid.gender)} {kid.name}, {kid.age} років 
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+  <div className="list-page">
+    <h2 className="list-title">
+      Мої записи 
+    </h2>
+
+    <div className="list-grid">
+      {records.map((rec) => (
+        <div key={rec.id} className="list-grid-item">
+         <div className="list-card">
+          <div className="list-card-body">
+            <h5 className="list-card-title">
+              Запис #{rec.id}
+            </h5>
+
+            <p className="list-text">
+              <strong>Дата створення:</strong> {formatStartTime(rec.created_at)}
+            </p>
+
+            <p className="list-text">
+              <strong>Загальна сума:</strong> {rec.total_price} грн.
+            </p>
+
+            <div className="list-details">
+              <h5 className="list-details-title">Деталі:</h5>
+
+              <div className="list-item">
+                <p>
+                  <strong >Майстер-клас:</strong > <strong className='list-strong'>{rec.details.activity_name}</strong>
+                </p>
+                <p>
+                  <strong>Кiлькiсть дiтей:</strong> {rec.details.number_of_kids}
+                </p>
+                <p>
+                  <strong>Дата заняття:</strong> {formatSlotTime(rec.details.date)}
+                </p>
+
+                <ul className="list-item-elements">
+                  {rec.details.kids.map((kid, kIdx) => (
+                    <li key={kIdx}>
+                      {getKidEmoji(kid.gender)} {kid.name}, {kid.age} років
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          
+          </div> 
+         </div>
+        </div>
+      ))}
+    </div>
+
       {totalPages > 1 && (
         <ReactPaginate
           previousLabel="← Назад"
-          nextLabel="Вперёд →"
+          nextLabel="Вперед →"
           pageCount={totalPages}
           onPageChange={handlePageChange}
+          forcePage={page - 1}
           containerClassName="pagination justify-content-center"
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          previousClassName="page-item"
-          nextClassName="page-item"
-          previousLinkClassName="page-link"
-          nextLinkClassName="page-link"
+          pageClassName="list-page-item"
+          pageLinkClassName="list-page-link"
+          previousClassName="list-page-item"
+          nextClassName="list-page-item"
+          previousLinkClassName="list-page-link"
+          nextLinkClassName="list-page-link"
           activeClassName="active"
           disabledClassName="disabled"
         />

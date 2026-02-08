@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -16,31 +15,32 @@ var JwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token abscent"})
+
+		// Взятие токена из cookie
+		tokenString, err := c.Cookie("auth_token")
+		if err != nil {
+			log.Error().Err(err).Msg("Error to get token")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if len(tokenString) > 1000 { // Ограничиваем, чтобы не проверять слишком длинные токены
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Too long token"})
-			c.Abort()
-			return
-		}
-
-		token, err := jwt.ParseWithClaims(tokenString, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				log.Error().Msg("Unexpected signing method")
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return JwtKey, nil
-		})
+		// Парсинг JWT
+		token, err := jwt.ParseWithClaims(
+			tokenString,
+			&models.Claims{},
+			func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					log.Error().Msg("Unexpected signing method")
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
+				return JwtKey, nil
+			},
+		)
 
 		if err != nil || !token.Valid {
 			log.Error().Err(err).Msg("Token is not allow")
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Wrong token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
@@ -54,8 +54,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("phone_number", claims.PhoneNumber)
+		c.Set("claims", claims)
 		c.Set("role", claims.Role)
-		c.Set("name", claims.Name)
+
 		c.Next()
 	}
 }

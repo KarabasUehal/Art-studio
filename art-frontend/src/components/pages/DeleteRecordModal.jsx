@@ -20,7 +20,7 @@ const DeleteRecordModal = ({ show, onHide, onDelete, recordId, recordName }) => 
           </div>
           <div className="delete-modal-body">
             <p>Ви впевнені, що хочете видалити запис на <strong>"{recordName}"</strong>?<br />
-             Пiсля видалення цю дію буде неможливо скасувати.</p>
+             Ця дія також поверне відвідування за підпискою, витрачені на нього.</p>
           </div>
           <div className="delete-modal-footer">
           <button

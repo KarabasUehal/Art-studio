@@ -38,14 +38,22 @@
   color: #e6d223 !important;
 }
 
-.delete-modal-header {
-  background: #eeaba2; 
+.delete-modal-header,
+.extend-modal-header {
   color: rgb(0, 0, 0);
   padding: 18px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
+.delete-modal-header {
+  background: #eeaba2;
+} 
+
+.extend-modal-header {
+  background: #a5eea2;
+} 
 
 .delete-modal-title {
   margin: 0;
@@ -99,8 +107,8 @@
   background: #ddcf11;
 }
 
-.btn-modal-delete {
-  background: #e97a76;
+.btn-modal-delete,
+.btn-modal-extend {
   color: rgb(0, 0, 0) !important;
   padding: 12px 36px;
   border-radius: 12px;
@@ -109,6 +117,14 @@
   border: none;
   cursor: pointer;
   transition: background 0.3s;
+}
+
+.btn-modal-delete {
+  background: #e97a76;
+}
+
+.btn-modal-extend {
+  background: #a5eea2;
 }
 
 .btn-modal-delete:hover {

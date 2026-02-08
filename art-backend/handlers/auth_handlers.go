@@ -5,6 +5,7 @@ import (
 	"art/middleware"
 	"art/models"
 	"context"
+	"regexp"
 
 	"net/http"
 	"strings"
@@ -14,6 +15,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	latinRegex    = regexp.MustCompile(`^[a-zA-Z0-9]+$`) // Для валидации
+	cyrillicRegex = regexp.MustCompile(`^[а-яА-ЯёЁіІїЇєЄґҐ\s-]+$`)
 )
 
 // Это для регистрации обычных пользователей
@@ -33,9 +39,35 @@ func Register(c *gin.Context) {
 	user.Password = strings.TrimSpace(input.Password)
 	user.PhoneNumber = strings.TrimSpace(input.PhoneNumber)
 	user.Name = strings.TrimSpace(input.Name)
+	user.Surname = strings.TrimSpace(input.Surname)
 
 	if strings.ContainsAny(user.Username, "<>\"';&") {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input of username"})
+		return
+	}
+
+	if len(user.Username) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username too short"})
+		return
+	}
+
+	if !latinRegex.MatchString(user.Username) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username must be latin only"})
+		return
+	}
+
+	if len(user.Password) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password too short"})
+		return
+	}
+
+	if !latinRegex.MatchString(user.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be latin only"})
+		return
+	}
+
+	if user.Name != "" && !cyrillicRegex.MatchString(user.Name) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name must be cyrillic"})
 		return
 	}
 
@@ -50,7 +82,14 @@ func Register(c *gin.Context) {
 
 	user.Password = string(hashedPassword) // Устанавливаем для пароля пользователя хешированное значение
 	user.Role = "client"                   // По умолчанию регистрируется аккаунт только на правах клиента
+
 	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
 		log.Error().Err(err).Msg("Failed to create user")
@@ -79,7 +118,22 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign token"})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User registered", "token": tokenString})
+	secure := false                  // true для продакшена
+	sameSite := http.SameSiteLaxMode // http.SameSiteNoneMode для продакшена
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "auth_token",
+		Value:    tokenString,
+		Path:     "/",
+		Domain:   "", // текущий домен
+		MaxAge:   3600 * 24,
+		Secure:   secure,
+		HttpOnly: true,
+		SameSite: sameSite,
+	})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Registered successfuly"})
+
 }
 
 // Регистрация пользователя владельцем (с выбором роли)
@@ -103,6 +157,31 @@ func RegisterByOwner(c *gin.Context) {
 		return
 	}
 
+	if len(input.Username) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username too short"})
+		return
+	}
+
+	if len(input.Password) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password too short"})
+		return
+	}
+
+	if !latinRegex.MatchString(input.Username) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username must be latin"})
+		return
+	}
+
+	if !latinRegex.MatchString(input.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must be latin"})
+		return
+	}
+
+	if input.Name != "" && !cyrillicRegex.MatchString(input.Name) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name must be cyrillic"})
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to hash password")
@@ -116,9 +195,16 @@ func RegisterByOwner(c *gin.Context) {
 		Role:        input.Role,
 		PhoneNumber: input.PhoneNumber,
 		Name:        input.Name,
+		Surname:     input.Surname,
 	}
 
 	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
 		log.Error().Err(err).Msg("Failed to create user")
@@ -192,6 +278,7 @@ func Login(c *gin.Context) {
 		Role:        user.Role,
 		PhoneNumber: user.PhoneNumber,
 		Name:        user.Name,
+		Surname:     user.Surname,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -205,5 +292,66 @@ func Login(c *gin.Context) {
 	}
 
 	redisClient.Del(ctx, attemptsKey)
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+
+	secure := false                  // true для продакшена
+	sameSite := http.SameSiteLaxMode // http.SameSiteNoneMode для продакшена
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "auth_token",
+		Value:    tokenString,
+		Path:     "/",
+		Domain:   "", // текущий домен
+		MaxAge:   3600 * 24,
+		Secure:   secure, // ОБЯЗАТЕЛЬНО при SameSite=None
+		HttpOnly: true,
+		SameSite: sameSite,
+	})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Успешный вход"})
 }
+
+func Logout(c *gin.Context) {
+	secure := false
+	sameSite := http.SameSiteLaxMode
+	//secure, sameSite := cookieConfig()
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: sameSite,
+	})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Вы вышли"})
+}
+
+func GetCurrentUser(c *gin.Context) {
+	// Предполагаем, что у тебя есть middleware, который парсит JWT из куки
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Не авторизован"})
+		return
+	}
+
+	userClaims := claims.(*models.Claims)
+
+	c.JSON(http.StatusOK, gin.H{
+		"username":     userClaims.Username,
+		"role":         userClaims.Role,
+		"phone_number": userClaims.PhoneNumber,
+		"name":         userClaims.Name,
+		"surname":      userClaims.Surname,
+	})
+}
+
+/* Для определния среды : разработка или прод. Оставил на всякий
+func cookieConfig() (bool, http.SameSite) {
+	if os.Getenv("ENV") == "tunnel" || os.Getenv("ENV") == "prod" {
+		return true, http.SameSiteNoneMode
+	}
+	return false, http.SameSiteLaxMode
+}
+*/

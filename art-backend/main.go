@@ -19,9 +19,13 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+var JwtK = []byte(os.Getenv("JWT_SECRET"))
+
 func main() {
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // Настройка глобального логгера на стандартный поток ошибок
+
+	log.Info().Msgf("JWT_SECRET length: %d", len(JwtK))
 
 	if err := database.InitDB(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize PostgreSQL")
@@ -49,10 +53,17 @@ func main() {
 	}
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8080", "http://localhost"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowOrigins: []string{
+			"http://localhost",
+			"http://localhost:3000",
+			"http://localhost:8080",
+			"http://127.0.0.1:3000",
+		},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 	router.Use(gin.Logger())
 	router.Use(middleware.Recovery())
@@ -63,8 +74,11 @@ func main() {
 		c.String(200, "OK")
 	})
 
-	router.POST("/register", handlers.Register)
 	router.POST("/login", handlers.Login)
+	router.POST("/register", handlers.Register)
+	router.POST("/logout", handlers.Logout)
+
+	router.GET("/me", middleware.AuthMiddleware(), handlers.GetCurrentUser)
 
 	router.GET("/activities/:id", handlers.GetActivityByID())
 	router.GET("/activities", handlers.GetActivities())

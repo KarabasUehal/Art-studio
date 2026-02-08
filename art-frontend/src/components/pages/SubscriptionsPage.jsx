@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
-import '../styles/AdminSubscriptionsPage.css';
+import SuccessExtendSubModal from './SuccessExtendSubModal';
+import DeleteSubscriptionModal from './DeleteSubscriptionModal';
+import '@styles//SubscriptionsPage.css';
+import '@styles//Checkbox.css';
 
-const AdminSubscriptionsPage = () => {
+
+const SubscriptionsPage = () => {
   const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedSub, setSelectedSub] = useState(null); // Для модалки продления
+  const [showSuccessExtendSubModal, setShowSuccessExtendSubModal] = useState(false); // Модалка продления
+  const [showDeleteSubscriptionModal, setShowDeleteSubscriptionModal] = useState(false); // Модалка удаления
+  const [bulk, setBulk] = useState(false);
 
   useEffect(() => {
     fetchSubscriptions();
@@ -38,15 +46,34 @@ const AdminSubscriptionsPage = () => {
     }
   };
 
-  const handleBulkExtend = async () => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`Продовжити ${selectedIds.length} абонементів?`)) return;
+  const handleBulkExtend = () => {
+  if (selectedIds.length === 0) return;
+  setSelectedSub(null); 
+  setBulk(true);
+  setShowSuccessExtendSubModal(true);
+};
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    setSelectedSub(null); 
+    setBulk(true);
+    setShowDeleteSubscriptionModal(true);
+  };
+
+   const handleExtendSub = (sub) => {
+  setSelectedIds([sub.ID]);
+  setSelectedSub(sub);
+  setBulk(false);
+  setShowSuccessExtendSubModal(true);
+};
+
+  const handleConfirmExtend= async () => {
+    console.log('Продовжуємо абонементи з ID:', selectedIds);
+    
     try {
       await Promise.all(
         selectedIds.map(id => api.patch(`/subscriptions/${id}/extend`))
       );
-      alert('Абонементи продовжено!');
       setSelectedIds([]);
       fetchSubscriptions();
     } catch (err) {
@@ -54,43 +81,23 @@ const AdminSubscriptionsPage = () => {
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`Видалити ${selectedIds.length} абонементів назавжди?`)) return;
+  const handleDelete = (sub) => {
+    setSelectedIds([sub.ID]);
+    setSelectedSub(sub);
+    setBulk(false);
+    setShowDeleteSubscriptionModal(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    console.log('Видаляємо абонементи з ID:', selectedIds);
     try {
       await Promise.all(
         selectedIds.map(id => api.delete(`/subscriptions/${id}`))
       );
-      alert('Абонементи видалено!');
       setSelectedIds([]);
       fetchSubscriptions();
     } catch (err) {
       alert('Помилка видалення');
-    }
-  };
-
-  const handleExtend = async (id) => {
-    console.log('Продовжуємо абонемент з ID:', id);
-    if (!window.confirm('Продовжити цей абонемент?')) return;
-    try {
-      await api.patch(`/subscriptions/${id}/extend`);
-      alert('Продовжено!');
-      fetchSubscriptions();
-    } catch (err) {
-      alert('Помилка');
-    }
-  };
-
-  const handleDelete = async (id) => {
-    console.log('Видаляємо абонемент з ID:', id);
-    if (!window.confirm('Видалити назавжди?')) return;
-    try {
-      await api.delete(`/subscriptions/${id}`);
-      alert('Видалено!');
-      fetchSubscriptions();
-    } catch (err) {
-      alert('Помилка');
     }
   };
 
@@ -105,60 +112,63 @@ const AdminSubscriptionsPage = () => {
       <div className="admin-subscriptions-container">
         <h1 className="admin-subscriptions-title">Усі абонементи</h1>
 
-        <div className="text-center mb-4">
+        <div className="sub-wrapper">
           <Link to="/admin/subscriptions/add" className="btn-issue-sub">
             Оформити абонемент
           </Link>
         </div>
 
         {hasSelection && (
-          <div className="text-center mb-4 p-3 bg-dark rounded border border-warning">
+          <div className="has-selection-block">
             <strong className="text-warning">
               Вибрано: {selectedIds.length}
             </strong>
-            <div className="d-inline-block ms-4">
+            <div className="actions">
               <button
                 onClick={handleBulkExtend}
-                className="btn btn-success me-3"
+                className="btn-admin btn-admin-extend"
               >
-                Продовжити всі
+                Продовжити усі
               </button>
               <button
                 onClick={handleBulkDelete}
-                className="btn btn-danger"
+                className="btn-admin btn-admin-delete"
               >
-                Видалити всі
+                Видалити усі
               </button>
             </div>
           </div>
         )}
 
         {subs.length === 0 ? (
-          <p className="text-center text-white fs-3">
+          <p className="empty-message">
             Поки немає виданих абонементів
           </p>
         ) : (
           <div className="table-responsive">
-            <table className="admin-subscriptions-table table table-dark table-striped">
+            <table className="admin-subscriptions-table">
               <thead>
                 <tr>
                   <th>
-                    <input
-                      type="checkbox"
-                      checked={
-                        subs.length > 0 &&
-                        selectedIds.length === subs.length
-                      }
-                      onChange={toggleSelectAll}
-                    />
+                    <label className="custom-checkbox">
+                        <input
+                        type="checkbox"
+                        checked={
+                             subs.length > 0 &&
+                             selectedIds.length === subs.length
+                                }
+                        onChange={toggleSelectAll}
+                        />
+                        <span className="checkmark"></span>
+                        <span className="checkbox-text">Усі</span>
+                    </label>
                   </th>
                   <th>Користувач</th>
                   <th>Тип</th>
                   <th>Дитина</th>
                   <th>Занять</th>
-                  <th>Початок</th>
-                  <th>Діє до</th>
-                  <th>Статус</th>
+                  <th>Почався</th>
+                  <th>Спливає</th>
                   <th>Дії</th>
                 </tr>
               </thead>
@@ -169,11 +179,14 @@ const AdminSubscriptionsPage = () => {
                   return (
                     <tr key={sub.ID}>
                       <td onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSelect(sub.ID)}
-                        />
+                        <label className="custom-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelect(sub.ID)}
+                          />
+                          <span className="checkmark"></span>
+                        </label>
                       </td>
                       <td>{sub.user?.name || sub.user_id}</td>
                       <td>{sub.subscription_type?.name || '—'}</td>
@@ -191,34 +204,24 @@ const AdminSubscriptionsPage = () => {
                       <td>
                         {new Date(sub.end_date).toLocaleDateString('uk-UA')}
                       </td>
+
                       <td>
-                        <span
-                          className={
-                            sub.is_active
-                              ? 'status-active'
-                              : 'status-inactive'
-                          }
-                        >
-                          {sub.is_active ? 'Активний' : 'Неактивний'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="btn-group btn-group-sm">
+                        <div className="btn-sub-group">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleExtend(sub.ID);
+                              handleExtendSub(sub);
                             }}
-                            className="btn btn-outline-success me-2"
+                            className="btn-admin btn-admin-extend"
                           >
                             Продовжити
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(sub.ID);
+                              handleDelete(sub);
                             }}
-                            className="btn btn-outline-danger"
+                            className="btn-admin btn-admin-delete"
                           >
                             Видалити
                           </button>
@@ -231,9 +234,45 @@ const AdminSubscriptionsPage = () => {
             </table>
           </div>
         )}
+
+        <SuccessExtendSubModal
+        show={showSuccessExtendSubModal}
+        onHide={() => {
+          setShowSuccessExtendSubModal(false);
+          setSelectedSub(null);
+        }}
+        bulk={bulk}
+        onExtend={handleConfirmExtend}
+        subscriptionIds={selectedIds}
+        subInfo={{
+          subName: selectedSub?.subscription_type?.name || '—',
+          kidName: selectedSub?.sub_kids && selectedSub.sub_kids.length > 0
+          ? selectedSub.sub_kids.map(k => k.name).join(', ')
+          : 'Дитина не вказана'
+        }}
+        />
+
+        <DeleteSubscriptionModal
+        show={showDeleteSubscriptionModal}
+        onHide={() => {
+          setShowDeleteSubscriptionModal(false);
+          setSelectedSub(null);
+        }}
+        bulk={bulk}
+        onDelete={handleConfirmDelete}
+        subIds={selectedIds}
+        subInfo={{
+          subName: selectedSub?.subscription_type?.name || '—',
+          kidName: selectedSub?.sub_kids && selectedSub.sub_kids.length > 0
+          ? selectedSub.sub_kids.map(k => k.name).join(', ')
+          : 'Дитина не вказана'
+        }}
+        />
+
       </div>
     </div>
   );
+
 };
 
-export default AdminSubscriptionsPage;
+export default SubscriptionsPage;

@@ -55,92 +55,113 @@ body, .App {
   padding: 20px;
 }
 
-.btn-success, .btn-primary, .btn-info, .btn-outline-primary, .btn-outline-danger {
+.nav-btn-success, .nav-btn-success-menu, 
+.nav-btn-warning, .nav-btn-warning-menu,
+.nav-btn-primary, .nav-btn-info, 
+.nav-btn-danger,
+.nav-btn-outline-danger, .nav-btn-outline-primary {
+  text-decoration: none;
   background-color: rgba(0, 0, 0, 0.7) !important;
   font-family: 'Caveat', cursive !important;
   font-weight: 400; 
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-color: rgba(49, 109, 72, 0.932) !important;
+  border-radius: 10px;
+  line-height: 1.1; 
+  transition: all 0.3s;
+}
+
+.nav-btn-success, .nav-btn-primary, .nav-btn-info, .nav-btn-outline-primary, .nav-btn-outline-danger {
   color: #6ddd23 !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  border-color: rgba(49, 109, 72, 0.932) !important;
-  padding: 12px 28px !important;
-  font-size: 24px !important;
-  line-height: 1.1; 
+  padding: 5px 12px !important;
+  font-size: 20px !important;
 }
 
-.btn-warning {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  font-family: 'Caveat', cursive !important;
-  font-weight: 400; 
+.nav-btn-success-menu {
+  color: #6ddd23 !important;
+  padding: 10px 24px !important;
+  font-size: 24px !important;
+}
+
+.nav-btn-warning {
   color: #ffa600 !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  border-color: rgba(49, 109, 72, 0.932) !important;
-  padding: 12px 28px !important;
+  padding: 5px 12px !important;
+  font-size: 20px !important; 
+}
+
+.nav-btn-warning-menu {
+  color: #ffa600 !important;
+  padding: 10px 24px !important;
   font-size: 24px !important;
-  line-height: 1.1; 
 }
 
-.btn-danger {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  font-family: 'Caveat', cursive !important;
-  font-weight: 400; 
+.nav-btn-danger {
   color: #ff0000 !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  border-color: rgba(49, 109, 72, 0.932) !important;
-  padding: 12px 28px !important;
-  font-size: 28px !important; 
-  line-height: 1.1; 
+  padding: 5px 12px !important;
+  font-size: 20px !important; 
 }
 
-.btn-outline-primary,
-.btn-outline-success,
-.btn-outline-warning,
-.btn-outline-danger {
+.nav-btn-danger:hover, 
+.nav-btn-success:hover, 
+.nav-btn-warning:hover, 
+.nav-btn-primary:hover, 
+.nav-btn-info:hover {
+  transform: translateY(-2px);
+  text-decoration: none !important;
+}
+
+.nav-btn-outline-primary,
+.nav-btn-outline-success,
+.nav-btn-outline-warning,
+.nav-btn-outline-danger {
+  text-decoration: none;
   background-color: rgba(0, 0, 0, 0.35) !important; 
+  border-radius: 10px;
   font-family: 'Caveat', cursive !important;
   font-weight: 400;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   border-color: rgba(49,109,72,0.6) !important;
 }
 
-.btn-outline-warning {
+.nav-btn-outline-warning {
   color: #ffa600 !important;
 }
-.btn-outline-success,
-.btn-outline-primary {
+.nav-btn-outline-success,
+.nav-btn-outline-primary {
   color: #6ddd23 !important;
 }
-.btn-outline-danger {
+.nav-btn-outline-danger {
   color: #ff0000 !important;
 }
 
-.btn-success.active,
-.btn-primary.active,
-.btn-warning.active {
+.nav-btn-success.active,
+.nav-btn-primary.active,
+.nav-btn-warning.active {
   background-color: rgba(0, 0, 0, 0.85) !important;
 }
 
 .form-control, .form-select, select option {
-  font-family: 'Caveat', cursive !important;
+  font-family: 'Caveat', cursive;
   font-weight: 400;
-  background-color: transparent !important;
-  color: #6ddd23 !important;
+  background-color: transparent;
+  color: #6ddd23;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  font-size: 22px !important;
+  font-size: 22px;
   line-height: 1.1;
 }
 
 h1 {
-  font-family: 'Caveat', cursive !important;
+  font-family: 'Caveat', cursive;
   font-weight: 700; 
-  font-size: 2.4em !important; 
-  color: #ffeb3b !important;
+  font-size: 1.8em; 
+  color: #ffeb3b;
   text-shadow: 1px 1px 2px rgb(0, 0, 0);
   text-align: center;
 } 
 
 h2, h4 {
-  font-family: 'Caveat', cursive !important;
+  font-family: 'Caveat', cursive;
   font-weight: 700; 
   font-size: 2em; 
   color: #6ddd23;
@@ -148,15 +169,128 @@ h2, h4 {
 }
 
 h3 {
-  font-family: 'Caveat', cursive !important;
+  font-family: 'Caveat', cursive;
   font-weight: 700; 
-  font-size: 2em !important; 
-  color: #ffe600 !important;
+  font-size: 2em; 
+  color: #ffe600;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .badge-right {
   text-align: right;
+}
+
+.faq-tittle {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ffe600;
+  font-size: 2.2rem; 
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.faq-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.faq-question {
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: rgb(0, 0, 0);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  list-style: none; 
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.faq-question::marker {
+  display: none; 
+}
+
+.faq-question:hover {
+  background: transparent;
+}
+
+.faq-answer {
+  font-family: 'Segoe UI', sans-serif;
+  background: transparent;
+  padding: 0 24px 20px;
+  font-size: 1.45rem;
+  color: #ffe600;
+  line-height: 1.6;
+}
+
+.social-footer {
+  padding: 40px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 10px; 
+  margin-bottom: 10px; 
+  text-align: center;
+}
+
+.social-links {
+  gap: 60px !important; 
+  justify-content: center;
+  display: flex;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  font-size: 2.2rem;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-icon:hover {
+  transform: translateY(-8px) scale(1.15);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Цвета для каждой сети (по желанию можно сделать градиент) */
+.social-icon.instagram:hover {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.social-icon.telegram:hover {
+  background: linear-gradient(45deg, #0088cc, #00aaff);
 }
 
 /* Responsive для nav */

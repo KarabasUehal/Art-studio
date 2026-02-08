@@ -47,64 +47,65 @@ func MakeRecord() gin.HandlerFunc {
 
 		// Рассчитываем общую сумму
 		var totalPrice uint
-		recordItems := make(models.RecordDetails, 0, len(req.Items))
-		for _, item := range req.Items {
-			var activity models.Activity
-			tx := db.Begin()
-			if err := tx.First(&activity, item.ActivityID).Error; err != nil {
+		var recordDetail models.RecordDetail
+		var activity models.Activity
+		if err := db.First(&activity, req.ActivityID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				log.Error().Err(err).Msg("Activity not found")
+				c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Activity with ID %d not found", req.ActivityID)})
+				return
+			}
+			log.Error().Err(err).Msg("Error of database")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error: " + err.Error()})
+			return
+		}
+
+		var slot models.ActivitySlot
+		if err := db.First(&slot, req.SlotID).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Слот не найден"})
+			return
+		}
+		if slot.Booked >= slot.Capacity {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Места закончились"})
+			return
+		}
+		if slot.StartTime.IsZero() {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Дата занятия обязательна и должна быть в будущем"})
+			return
+		}
+		if slot.StartTime.Before(time.Now()) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Дата занятия должна быть в будущем"})
+			return
+		}
+
+		slot.Booked += int(req.NumberOfKids)
+
+		tx := db.Begin()
+		defer func() {
+			if r := recover(); r != nil {
 				tx.Rollback()
-				if err == gorm.ErrRecordNotFound {
-					log.Error().Err(err).Msg("Activity not found")
-					c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Activity with ID %d not found", item.ActivityID)})
-					return
-				}
-				log.Error().Err(err).Msg("Error of database")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error: " + err.Error()})
-				return
 			}
-			tx.Commit()
+		}()
 
-			var slot models.ActivitySlot
-			if err := db.First(&slot, item.SlotID).Error; err != nil {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Слот не найден"})
-				return
-			}
-			if slot.Booked >= slot.Capacity {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Места закончились"})
-				return
-			}
-			if slot.StartTime.IsZero() {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Дата занятия обязательна и должна быть в будущем"})
-				return
-			}
-			if slot.StartTime.Before(time.Now()) {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Дата занятия должна быть в будущем"})
-				return
-			}
+		if err := tx.Save(&slot).Error; err != nil {
+			tx.Rollback()
+			log.Error().Err(err).Msg("Error saving activity slots")
+			c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Failed to save slot: %v", slot)})
+			return
+		}
 
-			slot.Booked += int(item.NumberOfKids)
-			tx2 := db.Begin()
-			if err := tx2.Save(&slot).Error; err != nil {
-				tx2.Rollback()
-				log.Error().Err(err).Msg("Error saving activity slots")
-				c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Failed to save slot: %v", slot)})
-				return
-			}
-			tx2.Commit()
-
-			totalPrice += activity.Price * item.NumberOfKids
-			recordItems = append(recordItems, models.RecordDetail{
-				ActivityID:   item.ActivityID,
-				ActivityName: activity.Name,
-				NumberOfKids: item.NumberOfKids,
-				Kids:         item.Kids,
-				Date:         slot.StartTime.UTC(),
-			})
-
+		totalPrice += activity.Price * req.NumberOfKids
+		recordDetail = models.RecordDetail{
+			ActivityID:   req.ActivityID,
+			ActivityName: activity.Name,
+			NumberOfKids: req.NumberOfKids,
+			Kids:         req.Kids,
+			Date:         slot.StartTime.UTC(),
 		}
 
 		var user models.User
-		if err := db.Where("phone_number = ?", phone_number).Find(&user).Error; err != nil {
+		if err := tx.Where("phone_number = ?", phone_number).Find(&user).Error; err != nil {
+			tx.Rollback()
 			log.Error().Err(err).Msg("Error to find user by phone number")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
 			return
@@ -115,33 +116,53 @@ func MakeRecord() gin.HandlerFunc {
 			log.Error().Msg("Failed to bring phone_number to string")
 		}
 
-		var record models.Record
+		var record models.Record // Создаем заказ
 
-		for _, item := range req.Items { // Создаем заказ
+		record.UserID = user.ID
+		record.PhoneNumber = phoneNumber
+		record.ParentName = user.Name + " " + user.Surname
+		record.TotalPrice = totalPrice
+		record.Details = recordDetail
+		record.SlotID = req.SlotID
+		record.CreatedAt = time.Now().UTC()
 
-			record.UserID = user.ID
-			record.PhoneNumber = phoneNumber
-			record.ParentName = user.Name
-			record.TotalPrice = totalPrice
-			record.Details = recordItems
-			record.SlotID = item.SlotID
-			record.CreatedAt = time.Now().UTC()
+		log.Info().Any("record", record).Msg("Creating record") // Логируем заказ перед сохранением
 
-			log.Info().Any("record", record).Msg("Creating record") // Логируем заказ перед сохранением
-
-			tx := db.Begin()
-			if err := tx.Create(&record).Error; err != nil {
+		for _, kid := range req.Kids {
+			var existingRecord models.Record
+			if err := tx.Where("slot_id = ? AND details->'kids'->0->>'name' = ? AND details->'kids'->0->>'age' = ? AND details->'kids'->0->>'gender' = ?",
+				req.SlotID,
+				kid.Name,
+				strconv.Itoa(kid.Age),
+				kid.Gender,
+			).First(&existingRecord).Error; err == nil {
+				tx.Rollback() // Дубль найден
+				log.Warn().Msgf("Find duplicate of record for kid: %s", kid.Name)
+				c.JSON(http.StatusConflict, gin.H{
+					"error":    "Record for this kid on this slot already exist",
+					"kid_name": kid.Name,
+				})
+				return
+			} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+				// Другая ошибка БД
 				tx.Rollback()
-				log.Error().Err(err).Msg("Database error")
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to create record: " + err.Error()})
+				log.Error().Err(err).Msg("Ошибка проверки дубля записи")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка сервера при проверке дубля"})
 				return
 			}
-			tx.Commit()
 		}
-		// Очищаем кэш
 
+		if err := tx.Create(&record).Error; err != nil {
+			tx.Rollback()
+			log.Error().Err(err).Msg("Database error")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to create record: " + err.Error()})
+			return
+		}
+		tx.Commit()
+
+		// Очиcтка кэша
 		if redisClient != nil {
-			utils.InvalidateCache(c, "/records*", "/client/records*"+phoneNumber)
+			utils.InvalidateCache(c, "/records", "records:all:*", fmt.Sprintf("client:records:%s:*", phoneNumber))
 		}
 
 		c.JSON(http.StatusCreated, gin.H{
@@ -174,7 +195,7 @@ func GetMyRecords() gin.HandlerFunc {
 			return
 		}
 
-		sizeStr := c.DefaultQuery("size", "10")
+		sizeStr := c.DefaultQuery("size", "9")
 		size, err := strconv.Atoi(sizeStr)
 		if err != nil || size < 1 || size > 100 { // Добавьте лимит на размер, если нужно
 			log.Warn().Str("size", sizeStr).Msg("Invalid size parameter")
@@ -189,7 +210,9 @@ func GetMyRecords() gin.HandlerFunc {
 
 		log.Info().Any("phone_number", phone_number).Msg("Got phone number")
 
-		cacheKey := c.Request.URL.String() + phone_number.(string)
+		phoneStr := phone_number.(string)
+		cacheKey := fmt.Sprintf("client:records:%s:page:%d:size:%d", phoneStr, page, size)
+
 		cached, err := redisClient.Get(c, cacheKey).Result()
 		if err == nil {
 			var resp map[string]interface{}
@@ -220,7 +243,11 @@ func GetMyRecords() gin.HandlerFunc {
 
 		// Выборка заказов с пагинацией
 		var records []models.Record
-		if err := db.Limit(size).Offset((page-1)*size).Where("phone_number = ?", phone_number).Find(&records).Error; err != nil {
+		if err := db.
+			Limit(size).
+			Offset((page-1)*size).
+			Where("phone_number = ?", phone_number).
+			Find(&records).Error; err != nil {
 			log.Error().Err(err).Msg("Failed to find order by phone number")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch records"})
 			return
@@ -280,15 +307,16 @@ func GetAllRecords() gin.HandlerFunc {
 			return
 		}
 
-		sizeStr := c.DefaultQuery("size", "10")
+		sizeStr := c.DefaultQuery("size", "9")
 		size, err := strconv.Atoi(sizeStr)
-		if err != nil || size < 1 || size > 100 { // Добавьте лимит на размер, если нужно
+		if err != nil || size < 1 || size > 100 {
 			log.Warn().Str("size", sizeStr).Msg("Invalid size parameter")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid size"})
 			return
 		}
 
-		cacheKey := c.Request.URL.String()
+		cacheKey := fmt.Sprintf("records:all:page:%d:size:%d", page, size)
+
 		cached, err := redisClient.Get(c, cacheKey).Result()
 		if err == nil {
 			var resp map[string]interface{}
@@ -300,12 +328,22 @@ func GetAllRecords() gin.HandlerFunc {
 				return
 			}
 		} else if err != redis.Nil {
-			log.Error().Err(err).Msg("Failed to hit cache")
+			log.Error().Err(err).Msg("Failed to hit cache for all records")
+		}
+
+		dateFilter := c.Query("date")
+
+		query := db.Model(&models.Record{})
+
+		if dateFilter != "" {
+			// Фильтр по полю Details->date (jsonb)
+			// PostgreSQL позволяет обращаться к jsonb-полям через ->
+			query = query.Where("details->>'date' LIKE ?", dateFilter+"%")
 		}
 
 		// Подсчёт общего количества заказов
 		var totalCount int64
-		if err := db.Model(&models.Record{}).Count(&totalCount).Error; err != nil {
+		if err := query.Count(&totalCount).Error; err != nil {
 			log.Error().Err(err).Msg("Failed to count records")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to count records"})
 			return
@@ -313,7 +351,11 @@ func GetAllRecords() gin.HandlerFunc {
 
 		// Выборка заказов с пагинацией
 		var records []models.Record
-		if err := db.Limit(size).Offset((page - 1) * size).Find(&records).Error; err != nil {
+		if err := query.
+			Order("created_at DESC").
+			Offset((page - 1) * size).
+			Limit(size).
+			Find(&records).Error; err != nil {
 			log.Error().Err(err).Msg("Failed to get records list")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to find records"})
 			return
@@ -413,26 +455,23 @@ func DeleteRecordByID() gin.HandlerFunc {
 
 		tx := db.Begin()
 
-		for _, detail := range record.Details {
-			var slot models.ActivitySlot
+		var slot models.ActivitySlot
 
-			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&slot, record.SlotID).Error; err != nil {
-				if errors.Is(err, gorm.ErrRecordNotFound) {
-					log.Warn().
-						Uint("slot_id", record.SlotID).
-						Msg("slot missing, deleting record without restoring places")
-					continue
-				}
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&slot, record.SlotID).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				tx.Rollback()
 				log.Error().Err(err).Uint("slot_id", record.SlotID).Msg("Error finding slot")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "slot lookup failed"})
 				return
 			}
-
-			if detail.NumberOfKids > uint(slot.Booked) {
+			log.Warn().
+				Uint("slot_id", record.SlotID).
+				Msg("slot missing, deleting record without restoring places")
+		} else {
+			if record.Details.NumberOfKids > uint(slot.Booked) {
 				slot.Booked = 0
 			} else {
-				slot.Booked -= int(detail.NumberOfKids)
+				slot.Booked -= int(record.Details.NumberOfKids)
 			}
 
 			if err := tx.Save(&slot).Error; err != nil {
@@ -443,7 +482,50 @@ func DeleteRecordByID() gin.HandlerFunc {
 			}
 		}
 
-		if err := tx.Unscoped().Delete(&record, id).Error; err != nil {
+		var subType models.SubscriptionType
+		if err := tx.Where("activity_id = ?", slot.ActivityID).First(&subType).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Error finding subscription type")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to find subscription type"})
+				return
+			}
+			log.Warn().
+				Uint("activity_id", slot.ActivityID).
+				Msg("sub type missing, deleting record without restoring sub visits")
+		}
+
+		var subscription models.Subscription
+		if err := tx.Joins("JOIN subscription_kids sk ON sk.subscription_id = subscriptions.id").
+			Joins("JOIN sub_kids kids ON kids.id = sk.sub_kid_id").
+			Where("kids.id = ?", record.SubKidID).
+			Preload("SubKids").First(&subscription).First(&subscription).Error; err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Error finding subscription")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to find subscription"})
+				return
+			}
+			log.Warn().
+				Uint("subscription", subscription.ID).
+				Msg("subscription missing, deleting record without restoring sub visits")
+		} else {
+
+			if subscription.VisitsUsed > 0 {
+				subscription.VisitsUsed -= 1
+			} else {
+				log.Warn().Uint("subscription_id", subscription.ID).Msg("VisitsUsed already 0, skipping decrement")
+			}
+
+			if err := tx.Save(&subscription).Error; err != nil {
+				tx.Rollback()
+				log.Error().Err(err).Msg("Failed to restore subscription visits")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to restore subscription visits"})
+				return
+			}
+		}
+
+		if err := tx.Delete(&record, id).Error; err != nil {
 			tx.Rollback()
 			log.Error().Err(err).Int("id", id).Msg("Failed to delete record")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete record"})
@@ -451,41 +533,42 @@ func DeleteRecordByID() gin.HandlerFunc {
 		}
 
 		if err := tx.Commit().Error; err != nil {
-			log.Error().Err(err).Msg("Commit failed for delete")
+			log.Error().Err(err).Msg("Commit failed for delete record")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
 			return
 		}
 
 		log.Info().Int("id", id).Str("phone", record.PhoneNumber).Msg("Record deleted successfully")
 
-		activityIDs := map[uint]bool{}
-		for _, d := range record.Details {
-			activityIDs[d.ActivityID] = true
-		}
+		if redisClient != nil {
+			patterns := []string{
+				fmt.Sprintf("client:records:%s:*", record.PhoneNumber),
+				fmt.Sprintf("/activity/%d/slots*", record.Details.ActivityID),
+				"/subscriptions*",
+				"subscriptions:all:*",
+				"/records",
+				"records:all:*",
+			}
 
-		patterns := []string{"/records*", "/client/records*" + record.PhoneNumber}
-		for actID := range activityIDs {
-			patterns = append(patterns, fmt.Sprintf("/activity/%d/slots*", actID))
-		}
-
-		for _, pattern := range patterns {
-			cursor := uint64(0)
-			for {
-				keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
-				if err != nil {
-					log.Error().Err(err).Msg("Failed to scan records cache keys")
-					break
-				}
-				if len(keys) > 0 {
-					if err := redisClient.Del(c, keys...).Err(); err != nil {
-						log.Error().Err(err).Msg("Failed to delete records cache keys")
-					} else {
-						log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
+			for _, pattern := range patterns {
+				cursor := uint64(0)
+				for {
+					keys, nextCursor, err := redisClient.Scan(c, cursor, pattern, 100).Result()
+					if err != nil {
+						log.Error().Err(err).Msg("Failed to scan records cache keys")
+						break
 					}
-				}
-				cursor = nextCursor
-				if cursor == 0 {
-					break
+					if len(keys) > 0 {
+						if err := redisClient.Del(c, keys...).Err(); err != nil {
+							log.Error().Err(err).Msg("Failed to delete records cache keys")
+						} else {
+							log.Info().Str("pattern", pattern).Int("keys_deleted", len(keys)).Msg("Cache keys deleted")
+						}
+					}
+					cursor = nextCursor
+					if cursor == 0 {
+						break
+					}
 				}
 			}
 		}

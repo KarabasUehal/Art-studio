@@ -3,6 +3,7 @@ package database
 import (
 	"art/models"
 	"fmt"
+	"os"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
@@ -102,7 +103,7 @@ func ActivityInsertData(db *gorm.DB) error {
 		(3, '2025-11-29 18:00:00', '2025-11-29 19:00:00', 15, 0),
 		(4, '2025-11-30 17:30:00', '2025-11-29 18:30:00', 10, 0),
 		(5, '2025-11-29 15:00:00', '2025-11-29 16:00:00', 10, 0)
-		ON CONFLICT (activity_id, start_time) DO NOTHING;
+		ON CONFLICT (activity_id, start_time) WHERE deleted_at IS NULL DO NOTHING;
 	`
 		_, err = DB.Exec(insertSlots)
 		if err != nil {
@@ -131,9 +132,17 @@ func SeedUsers() error {
 	if count == 0 {
 		log.Info().Msg("No users found, inserting default owners")
 
+		pass1 := os.Getenv("PASSWORD1")
+		pass2 := os.Getenv("PASSWORD2")
+
+		if pass1 == "" || pass2 == "" {
+			log.Error().Msg("Password env is not set")
+			return fmt.Errorf("password is not set in env")
+		}
+
 		// Хэшируем пароли
-		hash1, _ := bcrypt.GenerateFromPassword([]byte("Blacksea44"), 14)
-		hash2, _ := bcrypt.GenerateFromPassword([]byte("44Blacksea"), 14)
+		hash1, _ := bcrypt.GenerateFromPassword([]byte(pass1), 14)
+		hash2, _ := bcrypt.GenerateFromPassword([]byte(pass2), 14)
 
 		users := []models.User{
 			{
@@ -141,14 +150,16 @@ func SeedUsers() error {
 				Password:    string(hash1),
 				PhoneNumber: "+380962551728",
 				Role:        "owner",
-				Name:        "Marina Didushko",
+				Name:        "Marina",
+				Surname:     "Didushko",
 			},
 			{
 				Username:    "Irina",
 				Password:    string(hash2),
 				PhoneNumber: "+380972551728",
 				Role:        "owner",
-				Name:        "Irina Boblo",
+				Name:        "Irina",
+				Surname:     "Boblo",
 			},
 		}
 

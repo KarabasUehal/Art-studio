@@ -251,7 +251,7 @@ const ActivityForm = () => {
             </div>
 
             <div className="submit-wrapper">
-              <button className="btn btn-success submit-btn" disabled={loading}>
+              <button className="submit-btn" disabled={loading}>
                 {loading ? 'Зберігаємо...' : 'Зберегти майстер-клас'}
               </button>
             </div>

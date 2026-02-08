@@ -23,6 +23,10 @@
   border: 2px solid #e5e904;
 }
 
+.modal-container {
+  background-color: rgba(0,0,0,0.5) !important;
+}
+
 .modal-title {
   margin-bottom: 20px;
   text-align: center;
@@ -40,13 +44,22 @@
   color: #e6d223 !important;
 }
 
-.modal-input {
+.template-form-input,
+.template-form select {
+  background: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #e6d223 !important;
+  font-size: 1.2em;
   width: 100%;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #dcf308;
   margin-bottom: 10px;
-  box-sizing: border-box;
+}
+
+.form-input:focus,
+.subscription-form select:focus {
+  border-color: #e6c843;
+  box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.2);
 }
 
 .modal-buttons {

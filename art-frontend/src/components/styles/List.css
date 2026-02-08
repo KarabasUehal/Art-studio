@@ -8,13 +8,12 @@
 .list-title {
   text-align: center;
   font-size: 2.0em;
-  color: #d3b614;
+  color: #e6c843;
   margin-bottom: 40px;
   text-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
   font-weight: 600;
 }
 
-/* Сетка карточек — аналог row + col-md-6 col-lg-4 */
 .list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -27,9 +26,8 @@
   width: 100%;
 }
 
-/* Карточка записи */
 .list-card {
-  background: rgba(233, 196, 161, 0.979);
+  background: #355345; 
   border: 2px solid #000000;
   border-radius: 15px;
   overflow: hidden;
@@ -41,10 +39,11 @@
 }
 
 .list-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(78, 205, 196, 0.2);
-  border-color: #eeec7f;
+ transform: translateY(-8px);
+ box-shadow: 0 16px 40px #d3b614;
+ border-color: #355345
 }
+
 
 .list-card-body {
   padding: 24px;
@@ -54,16 +53,31 @@
 }
 
 .list-card-title {
-  color: #000000;
+  color: #e6c843;
   font-size: 1.2em;
   margin-bottom: 16px;
   font-weight: 600;
 }
 
 .list-text {
+  color: #e6c843;
   margin: 8px 0;
   font-size: 1.05em;
   line-height: 1.5;
+}
+
+.list-name {
+  font-size: 1.45em;
+  color: #e6c843;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.list-info {
+  font-size: 1.1em;
+  color: #ddd;
+  margin: 12px 0;
+  line-height: 1.6;
 }
 
 .list-details {
@@ -72,14 +86,15 @@
 }
 
 .list-details-title {
-  color: #000000;
-  text-shadow: 0 0 5px rgba(255, 217, 0, 0.938);
+  color: #e6c843;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.938);
   font-size: 1.3em;
   margin-bottom: 16px;
 }
 
 .list-item {
-  background: rgb(177, 179, 173) !important;
+  background: rgba(233, 196, 161, 0.979);
+  color: #000000;
   border: 2px solid #000000;
   padding: 16px;
   border-radius: 12px;
@@ -97,31 +112,146 @@
 }
 
 .list-strong {
-  color: #ff0000;
+  color: #ff4444;
 }
 
-/* Кнопка удаления */
-.list-delete-btn {
-  background: #e98f8f;
-  color: #000000;
-  border: 2px solid #000000;
-  padding: 10px 20px;
-  border-radius: 30px;
+.list-btn-add {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 50px;
+  background: #e6c843;
+  color: rgb(0, 0, 0);
+  padding: 14px 40px;
+  border-radius: 12px;
+  font-size: 1.2em;
   font-weight: 600;
-  font-size: 1em;
-  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 20px #355345;
   transition: all 0.3s;
-  margin-top: 12px;
+}
+
+.list-btn-add:hover {
+  background: #e6c843;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(231, 111, 81, 0.4);
+}
+
+.admin-list-buttons {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.list-edit-btn,
+.list-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  font-size: 0.95em !important;
+  transition: all 0.3s;
+  min-width: 100px;
+  text-align: center;
+  box-sizing: border-box;             
+  line-height: 1;
+}
+
+.list-edit-btn {
+  background: #504e4e !important;
+  color: #ff8c00 !important;
+  border: 1px solid #ff8c00 !important;
+}
+
+.list-edit-btn:hover {
+  color: #ff8c00 !important;
+  background: #000000 !important;
+  transform: translateY(-3px);
+}
+
+.list-delete-btn {
+  background: #504e4e !important;
+  color: #ff4444 !important;
+  border: 1px solid #ff4444 !important;
 }
 
 .list-delete-btn:hover {
-  background: #f81a1a;
-  color: #000;
+  background: #000000 !important;
+  color: #ff4444 !important;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
 }
 
-/* Пагинация */
+.list-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 10px 0 15px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1.5px solid #ffeb3b;
+}
+
+.list-filter-label {
+  font-family: 'Caveat', cursive, sans-serif;
+  font-size: 1.4em;
+  font-weight: 500;
+  color: #ffeb3b;
+  white-space: nowrap;
+}
+
+.list-filter-input {
+  padding: 12px 16px;
+  font-size: 1.1em;
+  font-family: 'Segoe UI', sans-serif;
+  background: rgba(20, 20, 40, 0.9);
+  color: #ffeb3b;
+  border: 2px solid #ffeb3b;
+  border-radius: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 235, 59, 0.2);
+}
+
+.list-filter-input:focus {
+  border-color: #ffff8d;
+  box-shadow: 0 0 20px rgba(255, 235, 59, 0.5);
+  transform: scale(1.02);
+}
+
+/* Для тёмной темы в браузере (чтобы стрелки и календарь были видимы) */
+.list-filter-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.5); 
+  cursor: pointer;
+}
+
+/* Кнопка "Очистити" */
+.list-filter-clear-button {
+  padding: 12px 24px;
+  font-size: 1.1em;
+  font-weight: 300;
+  color: #000;
+  background: #ff6b6b;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 9px rgba(255, 107, 107, 0.3);
+}
+
+.list-filter-clear-button:hover {
+  background: #ff8787;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+}
+
+.list-filter-clear-button:active {
+  transform: translateY(0);
+}
+
 .list-pagination {
   display: flex;
   justify-content: center;
@@ -130,24 +260,49 @@
   flex-wrap: wrap;
 }
 
+.list-page-item {
+  list-style: none;
+}
+
 .list-page-link {
-  background: rgba(78, 205, 196, 0.15);
-  color: #4ecdc4;
-  border: 1.5px solid #4ecdc4;
-  padding: 10px 18px;
-  border-radius: 30px;
-  font-weight: 600;
-  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 40px;
+  height: 40px;
+  padding: 5px 10px;
+
+  background: #2a2a2a;
+  color: #eccf29;
+  border: 1px solid #555;
+  border-radius: 10px;
+
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: all 0.2s ease;
 }
 
-.list-page-link:hover {
-  background: #4ecdc4;
-  color: #000;
-  transform: scale(1.08);
+.list-page-link:hover,
+.list-page-item.active:hover {
+  background: #000000;
+  border-color: #000000;
+  border-radius: 10px;
+  color: #fcc101;
 }
 
-.list-pagination .active .list-page-link {
-  background: #4ecdc4;
+.list-page-item.active .list-page-link {
+  background: #e6c843;
   color: #000;
-  box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+  font-weight: bold;
+  border-color: #e6c843;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+}
+
+.list-page-item.disabled .list-page-link {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }

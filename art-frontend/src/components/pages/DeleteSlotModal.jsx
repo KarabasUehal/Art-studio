@@ -12,7 +12,7 @@ const DeleteSlotModal = ({ show, onHide, onDelete, slotId, slotInfo }) => {
             <button type="button" className="btn-close btn-close-white" onClick={onHide}></button>
           </div>
           <div className="delete-modal-body">
-            <p>Ви впевнені, що хочете видалити слот для <strong>"{slotInfo.activityName}" ({slotInfo.time})"</strong>? Після видалення цю дію буде неможливо скасувати.</p>
+            <p>Ви впевнені, що хочете видалити слот для <strong>"{slotInfo.activityName}" ({slotInfo.time})"</strong>? Ця дія видалить усі записи для слота та поверне відвідування за підпискою, витрачені на нього.</p>
           </div>
           <div className="delete-modal-footer">
             <button type="button" className="btn-modal-cancel" onClick={onHide}>

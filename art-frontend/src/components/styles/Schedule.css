@@ -5,27 +5,25 @@
 }
 
 .schedule-container {
-  background: rgba(0, 0, 0, 0.7); /* тёмный полупрозрачный фон */
+  background: rgba(0, 0, 0, 0.7); 
   padding: 30px;
   border-radius: 15px;
   min-height: 100vh;
   width: auto;
   overflow-x: auto;
   font-family: 'Caveat', cursive, sans-serif;
-  color: #fff; /* базовый цвет текста */
 }
 
-/* Заголовок страницы */
+
 .schedule-container h2 {
   font-weight: 700; 
   font-size: 2em !important; 
-  color: #6fd32d !important; /* ярко-зелёный */
+  color: #ffeb3b !important; 
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   text-align: center;
   margin-bottom: 25px;
 }
 
-/* Сообщения об ошибке и загрузке */
 .error-message {
   color: #ff4d4d;
   margin: 10px 0;
@@ -46,7 +44,7 @@
 
 /* --- Карточки дня --- */
 .day-card {
-  background: rgba(255, 255, 255, 0.05); /* слегка светлый полупрозрачный фон */
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 15px;
   margin-right: 4px;
@@ -59,13 +57,13 @@
   font-weight: 700;
   font-size: 1.2em;
   margin-bottom: 10px;
-  color: #64ee08; /* зелёный */
+  color: #ffeb3b; 
   text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
 /* --- Слоты --- */
 .slot-item {
-  position: relative; /* Для кнопки удаления */
+  position: relative; 
   cursor: pointer;
   padding: 12px;
   border-radius: 10px;
@@ -85,7 +83,7 @@
 /* --- Название, время и места слота --- */
 .slot-name {
   font-size: 1.2em !important;
-  color: #64ee08; /* зелёный */
+  color: #64ee08; 
   font-weight: 700;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
@@ -106,7 +104,7 @@
   border: none;
   cursor: pointer;
   transition: transform 0.2s;                              
-  background: rgb(241, 10, 33) !important; 
+  background: #e05b57 !important; 
   margin-top: 5px; 
   z-index: 10 !important;
   opacity: 0.9 !important;
@@ -138,20 +136,28 @@
   gap: 15px;
 }
 
-.week-navigation button {
-  font-family: 'Caveat', cursive;
-  font-weight: 400;
-  font-size: 1em;
-  padding: 6px 12px;
-  border-radius: 10px;
-  background: rgba(49, 109, 72, 0.8);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
-  transition: background 0.2s;
+.week-button {
+  display: inline-block;
+  background: #355345 !important;
+  color: #ffeb3b!important;
+  padding: 14px 40px !important;
+  border: 2px solid #000000 !important;
+  border-radius: 50px !important;
+  font-weight: 900 !important;
+  font-size: 1.1em !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
+  transition: all 0.3s;
+  margin: 0 auto;
 }
 
-.week-navigation button:hover {
-  background: rgba(49, 109, 72, 1);
+.week-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #ffeb3b;
+  color: #ffeb3b !important;
+  text-decoration: none !important;
 }
 
 /* --- Модальные окна --- */
@@ -262,13 +268,11 @@
   box-shadow: 0 0 6px rgb(0, 0, 0);
 }
 
-/* Внутренний элемент — делает ширину большой, чтобы был скролл */
 .top-scroll-inner {
   height: 100%;
-  min-width: max-content; /* важно: заставляет растягиваться под контент */
+  min-width: max-content; 
 }
 
-/* Основной горизонтальный контейнер */
 .days-grid {
   display: flex;
   overflow-x: auto;
