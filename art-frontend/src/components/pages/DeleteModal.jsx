@@ -1,19 +1,19 @@
 import React from 'react';
 import '@styles/Modal.css';
 
-const DeleteKidModal = ({ show, onHide, onDelete, kidId, kidName }) => {
-  if (!show) return null;
+const DeleteModal = ({ show, onHide, onDelete, modalTitle, modalElementName, modalQuestion, modalWarning }) => {
+    if (!show) return null;
 
-  return (
-    <div className="delete-modal-backdrop">
-      <div className="delete-modal">
+    return (
+<div className="studio-modal-backdrop">
+      <div className="studio-modal">
         <div className="delete-modal-header">
-          <h5 className="delete-modal-title">
-            Видалити данi дитини #{kidId}?
+          <h5 className="studio-modal-title">
+            {modalTitle}
           </h5>
           <button
             type="button"
-            className="delete-modal-close"
+            className="studio-modal-close"
             onClick={onHide}
             aria-label="Закрити"
           >
@@ -21,14 +21,14 @@ const DeleteKidModal = ({ show, onHide, onDelete, kidId, kidName }) => {
           </button>
         </div>
 
-        <div className="delete-modal-body">
+        <div className="studio-modal-body">
           <p>
-            Ви впевнені, що хочете видалити данi про "<strong>{kidName}</strong>"?<br />
-            Після видалення цю дію буде неможливо скасувати.
+            {modalQuestion} "<strong>{modalElementName}</strong>"?<br />
+            {modalWarning}
           </p>
         </div>
 
-        <div className="delete-modal-footer">
+        <div className="studio-modal-footer">
           <button
             type="button"
             className="btn-modal-cancel"
@@ -40,8 +40,7 @@ const DeleteKidModal = ({ show, onHide, onDelete, kidId, kidName }) => {
             type="button"
             className="btn-modal-delete"
             onClick={() => {
-              onDelete(kidId);
-              onHide();
+              onDelete();
             }}
           >
             Видалити
@@ -52,4 +51,4 @@ const DeleteKidModal = ({ show, onHide, onDelete, kidId, kidName }) => {
   );
 };
 
-export default DeleteKidModal;
+export default DeleteModal;

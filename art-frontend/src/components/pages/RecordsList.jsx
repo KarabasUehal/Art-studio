@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import DeleteRecordModal from './DeleteRecordModal.jsx';
+import DeleteModal from './DeleteModal.jsx';
 import ReactPaginate from 'react-paginate';
 import '@styles/List.css'; 
 
@@ -18,6 +18,7 @@ const RecordsList = ({ isAuthenticated }) => {
   const [selectedDate, setSelectedDate] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modalDate, setModalDate] = useState('');
   const [recordToDelete, setRecordToDelete] = useState(null);
 
   useEffect(() => {
@@ -72,9 +73,9 @@ const RecordsList = ({ isAuthenticated }) => {
     });
   };
 
-  const handleDeleteConfirm = async (id) => {
+  const handleDeleteConfirm = async () => {
     try {
-      await api.delete(`/records/${id}`);
+      await api.delete(`/records/${recordToDelete.id}`);
       fetchRecords(page, size);  // Refetch после удаления
       setShowDeleteModal(false);  // Закрыть модал
     } catch (err) {
@@ -160,7 +161,11 @@ const RecordsList = ({ isAuthenticated }) => {
                 
                 
                 <button 
-                  onClick={() => { setRecordToDelete(rec); setShowDeleteModal(true); }}
+                  onClick={() => { 
+                    setRecordToDelete(rec);
+                    setModalDate(formatSlotTime(rec?.details?.date));
+                    setShowDeleteModal(true); 
+                  }}
                   className="list-delete-btn"
                 >
                   Видалити
@@ -192,13 +197,17 @@ const RecordsList = ({ isAuthenticated }) => {
         />
       )}
 
-    <DeleteRecordModal
+    {recordToDelete && (
+    <DeleteModal
       show={showDeleteModal}
       onHide={() => setShowDeleteModal(false)}
       onDelete={handleDeleteConfirm}
-      recordId={recordToDelete?.id}
-      recordName={`${recordToDelete?.details?.activity_name || 'запис'}`}
+      modalTitle={`Видалити запис для ${recordToDelete?.parent_name}?`}
+      modalElementName={`${recordToDelete?.parent_name} на ${modalDate} на ${recordToDelete?.details?.activity_name}?`}
+      modalQuestion="Ви впевнені, що хочете видалити запис для"
+      modalWarning="Після видалення цю дію неможливо буде скасувати."
     />
+    )}
   </div>
  );
 };

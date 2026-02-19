@@ -195,13 +195,12 @@ func AddActivity() gin.HandlerFunc {
 		act_image.Caption = req.Images.Caption
 
 		activity := models.Activity{
-			Name:         req.Name,
-			Description:  req.Description,
-			Images:       act_image,
-			Price:        req.Price,
-			Duration:     req.Duration,
-			Availability: req.Availability,
-			IsRegular:    req.IsRegular,
+			Name:        req.Name,
+			Description: req.Description,
+			Images:      act_image,
+			Price:       req.Price,
+			Duration:    req.Duration,
+			IsRegular:   req.IsRegular,
 		}
 
 		if act_image.Photo == nil {
@@ -234,7 +233,12 @@ func AddActivity() gin.HandlerFunc {
 				"Failed to create activity": res.Error})
 			return
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for add activity")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
 			utils.InvalidateCache(c, "activities*")
@@ -288,7 +292,6 @@ func UpdateActivity() gin.HandlerFunc {
 		act.Images = updated_act.Images
 		act.Price = updated_act.Price
 		act.Duration = updated_act.Duration
-		act.Availability = updated_act.Availability
 		act.IsRegular = updated_act.IsRegular
 
 		tx := db.Begin()
@@ -305,7 +308,12 @@ func UpdateActivity() gin.HandlerFunc {
 				"Error to save activity": err,
 			})
 		}
-		tx.Commit()
+
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for update activity")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+			return
+		}
 
 		if redisClient != nil {
 			utils.InvalidateCache(c, "activities*", fmt.Sprintf("/activities/%v", id))

@@ -78,6 +78,7 @@ func GetAllUsers() gin.HandlerFunc {
 		if err := query.Order("id").
 			Limit(size).
 			Offset(offset).
+			Preload("UserKids").
 			Find(&users).Error; err != nil {
 
 			log.Error().Err(err).Msg("Error finding users")
@@ -414,7 +415,12 @@ func AddKid() gin.HandlerFunc {
 		tx.Commit()
 
 		if redisClient != nil {
-			utils.InvalidateCache(c, fmt.Sprintf("kids:list:user:%v", phone_number), "kids:*")
+			utils.InvalidateCache(
+				c,
+				fmt.Sprintf("kids:list:user:%v", phone_number),
+				"kids:*",
+				"kids*",
+			)
 		}
 
 		c.JSON(http.StatusOK, gin.H{

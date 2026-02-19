@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
-import DeleteSlotModal from './DeleteSlotModal';
+import DeleteModal from './DeleteModal';
 import "@styles//AdminSchedulePage.css";  
 import "@styles/Calendar.css";  
 
@@ -16,9 +16,10 @@ const AdminSchedulePage = () => {
   const [error, setError] = useState("");
   const [formError, setFormError] = useState(""); 
   const [loading, setLoading] = useState(false);
-  const [showDeleteSlotModal, setShowDeleteSlotModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
 
+  const [modalStartTime, setModalStartTime] = useState('');
   const [selectedDate, setSelectedDate] = useState(
   form.start_time ? new Date(form.start_time) : null
   );
@@ -40,8 +41,10 @@ const AdminSchedulePage = () => {
   const fetchActivities = async () => {
     try {
       const res = await api.get("/activities");
-    setActivities(res.data.activity || []);
-      if (res.data.activity.length === 0) {
+
+    const activitiesData = res.data.activity || [];
+    setActivities(activitiesData);
+      if (activitiesData.length === 0) {
         setError("Нема разових подій. Спочатку створіть їх у розділі 'Додати напрямок'");
       }
     } catch (err) {
@@ -84,6 +87,7 @@ const AdminSchedulePage = () => {
     } catch (err) {
       setFormError("Такий слот вже існує");
     }
+    setFormError("");
   };
 
   const handleDeleteSlot = (slot) => {
@@ -92,14 +96,14 @@ const AdminSchedulePage = () => {
       activityName: selectedActivity.name,
       time: new Date(slot.start_time).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })
     });
-    setShowDeleteSlotModal(true);
+    setShowDeleteModal(true);
   };
 
-  const handleDeleteConfirmSlot = async (id) => {
+  const handleDeleteConfirmSlot = async () => {
     try {
-      await api.delete(`/activity/${selectedActivity.id}/slots/${id}`);
-      setSlots(slots.filter((s) => (s.id || s.ID) !== id));
-      setShowDeleteSlotModal(false);
+      await api.delete(`/activity/${selectedActivity.id}/slots/${slotToDelete.id}`);
+      setSlots(slots.filter((s) => (s.id || s.ID) !== slotToDelete.id));
+      setShowDeleteModal(false);
     } catch (err) {
       setError("Помилка при видаленні слота");
     }
@@ -109,17 +113,28 @@ const AdminSchedulePage = () => {
     return <div className="access-denied">Доступ заборонено</div>;
   }
 
-  const filteredActivities = activities.filter(act =>
-  activityType === "regular" ? act.is_regular : !act.is_regular
-);
+  const filteredActivities = activities.filter(act => {
+  return activityType === "regular" ? act.is_regular : !act.is_regular
+});
 
-const manualSlots = slots.filter(s => s.source === 'manual');
+const filteredSlots = slots;
+
+  const formatStartTime = (timeStr) => {
+    if (!timeStr) return 'Не указана';
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) return 'Не указана';
+    return date.toLocaleString('uk-UA', { 
+      dateStyle: 'short',  
+      timeStyle: 'short',
+      timeZone: "UTC"   
+    });
+  };
 
   return (
     <div className="admin-schedule-page">
       <div className="admin-schedule-card">
         <h2 className="admin-title">
-          Управління слотами разових занять
+          Ручне створення занять
         </h2>
 
         {error && <div className="admin-error">{error}</div>}
@@ -158,7 +173,7 @@ const manualSlots = slots.filter(s => s.source === 'manual');
             </div>
 
             {filteredActivities.length === 0 ? (
-              <p className="no-activities">
+              <p className="empty-message">
                 Немає {activityType === "regular" ? "регулярних" : "разових"} подій
               </p>
             ) : (
@@ -219,12 +234,12 @@ const manualSlots = slots.filter(s => s.source === 'manual');
 
                 {/* Список слотов */}
                 {loading ? (
-                  <div className="loading">Завантаження разових слотів...</div>
-                ) : manualSlots.length === 0 ? (
-                  <p className="no-slots">Немає активних разових слотів</p>
+                  <div className="slot-loading">Завантаження слотів...</div>
+                ) : slots.length === 0 ? (
+                  <p className="empty-message">Немає активних слотів</p>
                 ) : (
                   <div className="slots-grid">
-                    {manualSlots.map((s) => {
+                    {slots.map((s) => {
                       const free = s.capacity - s.booked;
                       return (
                         <div key={s.id || s.ID} className="slot-card">
@@ -241,7 +256,7 @@ const manualSlots = slots.filter(s => s.source === 'manual');
                             </strong>
                           </div>
                           <button
-                            onClick={() => handleDeleteSlot(s)}
+                            onClick={() => {setModalStartTime(formatStartTime(s.start_time)); handleDeleteSlot(s)}}
                             className="btn-delete-slot"
                             title="Видалити слот"
                           >
@@ -254,7 +269,7 @@ const manualSlots = slots.filter(s => s.source === 'manual');
                 )}
               </>
             ) : (
-              <div className="placeholder">
+              <div className="slot-placeholder">
                 Оберіть заняття зліва
               </div>
             )}
@@ -262,13 +277,17 @@ const manualSlots = slots.filter(s => s.source === 'manual');
         </div>
       </div>
 
-      <DeleteSlotModal
-        show={showDeleteSlotModal}
-        onHide={() => setShowDeleteSlotModal(false)}
+      {slotToDelete && (
+      <DeleteModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
         onDelete={handleDeleteConfirmSlot}
-        slotId={slotToDelete?.id}
-        slotInfo={{ activityName: selectedActivity?.name, time: slotToDelete?.time }}
+        modalTitle={`Видалити слот для ${slotToDelete?.activityName}?`}
+        modalElementName={`${slotToDelete?.activityName} на ${modalStartTime}?`}
+        modalQuestion="Ви впевнені, що хочете видалити слот для"
+        modalWarning="Після видалення цю дію неможливо буде скасувати."
       />
+      )}
     </div>
   );
 };

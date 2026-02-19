@@ -2,7 +2,12 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin-bottom: 8px;
+}
+
+.card-checkbox {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .custom-checkbox input {
@@ -51,6 +56,7 @@
 .select-all {
   display: inline-flex;
   align-items: center;
+  margin-bottom: 40px;
   gap: 10px;
 }
 
@@ -64,4 +70,33 @@
 
 .select-all:hover .select-all-text {
   color: #e6bb43;
+}
+
+.has-selection-block {
+  display: flex;
+  align-items: center;        
+  justify-content: center;   
+  gap: 30px;                  
+  padding: 15px 20px;
+  margin: 20px 0;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+}
+
+.selection-text-warning {
+  color: #e6c843;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 15px; 
+} 
+
+@media (max-width: 600px) {
+  .has-selection-block {
+    flex-direction: column;
+    gap: 15px;
+  }
 }

@@ -301,6 +301,10 @@ func UpdateTemplate() gin.HandlerFunc {
 			return
 		}
 
+		if input.Capacity < 1 {
+			input.Capacity = 10
+		}
+
 		template.DayOfWeek = input.DayOfWeek
 		template.Capacity = input.Capacity
 
@@ -397,7 +401,8 @@ func ExtendSchedule() gin.HandlerFunc {
 			weeks = 1
 		}
 
-		if err := GenerateRegularSlots(weeks); err != nil {
+		errSubs, err := GenerateRegularSlots(weeks)
+		if err != nil {
 			log.Error().Err(err).Msg("Error extending schedule")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to extend schedule"})
 			return
@@ -424,16 +429,29 @@ func ExtendSchedule() gin.HandlerFunc {
 			)
 		}
 
+		count := len(errSubs)
+		if count > 0 {
+			saveSubErrors(errSubs)
+		}
+		if count > 0 {
+			log.Warn().Msgf("Some subs has been failed to enroll")
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "warning",
+				"message": "Schedule extended but some slots failed to enroll subs"})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{"message": "Schedule extended"})
 	}
 }
 
-func GenerateRegularSlots(weeks int) error {
+func GenerateRegularSlots(weeks int) ([]models.Subscription, error) {
 	db := database.GetGormDB()
+
+	var AllErrSubs []models.Subscription
 	var activities []models.Activity
 	if err := db.Where("is_regular = ?", true).Find(&activities).Error; err != nil {
 		log.Error().Err(err).Msg("Error finding activities")
-		return err
+		return AllErrSubs, err
 	}
 
 	now := time.Now().UTC()
@@ -444,7 +462,7 @@ func GenerateRegularSlots(weeks int) error {
 		var templates []models.ScheduleTemplate
 		if err := db.Where("activity_id = ?", act.ID).Find(&templates).Error; err != nil {
 			log.Error().Err(err).Msg("Error finding templates")
-			return err
+			return AllErrSubs, err
 		}
 
 		for current := startDate; current.Before(endDate); current = current.AddDate(0, 0, 1) {
@@ -471,7 +489,7 @@ func GenerateRegularSlots(weeks int) error {
 					hour, minute, 0, 0, time.UTC)
 
 				var existing models.ActivitySlot // Проверяем, существует ли слот (чтобы не дублировать)
-				if err := db.Where("activity_id = ? AND start_time >= ? AND start_time < ?",
+				if err := db.Where("activity_id = ? AND start_time >= ? AND start_time < ? and deleted_at is NULL",
 					act.ID, slotStart, slotStart.Add(time.Minute)).First(&existing).Error; err == nil {
 					continue
 				} else if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -492,33 +510,43 @@ func GenerateRegularSlots(weeks int) error {
 				if res := tx.Create(&slot); res.Error != nil {
 					tx.Rollback()
 					log.Error().Err(res.Error).Msg("Error to create slot")
-					return fmt.Errorf("error: %e", res.Error)
+					return AllErrSubs, fmt.Errorf("error: %e", res.Error)
 				}
-				tx.Commit()
+
+				if err := tx.Commit().Error; err != nil {
+					log.Error().Err(err).Msg("Commit failed for creating slot on generate slots func")
+					return AllErrSubs, err
+				}
 
 				log.Info().Msgf("Generated slots for activity %d: %s", act.ID, act.Name)
 
-				if err := autoEnrollSubscriptions(db, act.ID, &slot); err != nil {
+				// Создание слотов и записи на них по подписке не атомарны, расписание может продлиться без них
+				// Неудавшиеся к продлению подписки можно будет найти на странице ошибок, чтобы записать вручную, если важно
+				errSubs, err := autoEnrollSubscriptions(db, &slot)
+				if err != nil {
 					log.Error().Err(err).Msg("Failed to auto-enroll subscriptions") // Логирование без прерывания генерации
 				}
+
+				AllErrSubs = append(AllErrSubs, errSubs...)
 
 			}
 		}
 	}
-	return nil
+	return AllErrSubs, nil
 }
 
-func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.ActivitySlot) error {
+func autoEnrollSubscriptions(db *gorm.DB, slot *models.ActivitySlot) ([]models.Subscription, error) {
 
-	log.Info().Msgf("Starting auto-enroll for activity %d, slot %d", activityID, slot.ID)
+	log.Info().Msgf("Starting auto-enroll for activity %d, slot %d", slot.ActivityID, slot.ID)
+	var errSubs []models.Subscription
 
 	var subscriptions []models.Subscription // Поиск всех активных абонементов на эту активность
+	// visits_used пока не проверяю, проверю уже дальше в lockedSub
 	err := db.
 		Joins("JOIN subscription_types st ON st.id = subscriptions.subscription_type_id").
 		Where(`
         st.activity_id = ?
-        AND subscriptions.visits_used < subscriptions.visits_total
-    `, activityID).
+    `, slot.ActivityID).
 		Preload("SubKids").
 		Preload("User").
 		Preload("SubscriptionType").
@@ -527,7 +555,7 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find subscriptions")
-		return err
+		return errSubs, err
 	}
 
 	log.Info().Int("subscriptions_count", len(subscriptions)).Msg("Found subscriptions")
@@ -572,6 +600,7 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 			var lockedSlot models.ActivitySlot
 			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
 				First(&lockedSlot, slot.ID).Error; err != nil {
+				errSubs = append(errSubs, lockedSub)
 				tx.Rollback()
 				log.Warn().Uint("slot_id", slot.ID).Err(err).Msg("Failed to lock slot")
 				continue
@@ -592,7 +621,7 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 				TotalPrice:     sub.PricePaid / uint(sub.VisitsTotal),
 				SlotID:         slot.ID,
 				Details: models.RecordDetail{
-					ActivityID:   activityID,
+					ActivityID:   slot.ActivityID,
 					ActivityName: lockedSub.SubscriptionType.Activity.Name,
 					Date:         slot.StartTime,
 					NumberOfKids: 1,
@@ -607,6 +636,7 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 			}
 
 			if err := tx.Create(&record).Error; err != nil {
+				errSubs = append(errSubs, lockedSub)
 				tx.Rollback()
 				log.Error().Err(err).Msg("Failed to create auto-record")
 				continue
@@ -616,6 +646,7 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 			if err := tx.Model(&models.Subscription{}).
 				Where("id = ?", lockedSub.ID).
 				UpdateColumn("visits_used", gorm.Expr("visits_used + 1")).Error; err != nil {
+				errSubs = append(errSubs, lockedSub)
 				tx.Rollback()
 				log.Error().Err(err).Msgf("Failed to update subscription visits_used for id %d", sub.ID)
 				continue
@@ -624,7 +655,8 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 			// Увеличиваем Booked в слоте
 			if lockedSlot.Booked < lockedSlot.Capacity {
 				lockedSlot.Booked++
-				if err := tx.Save(lockedSlot).Error; err != nil {
+				if err := tx.Save(&lockedSlot).Error; err != nil {
+					errSubs = append(errSubs, lockedSub)
 					tx.Rollback()
 					log.Error().Err(err).Msgf("Failed to update slot booked for id %d", slot.ID)
 					continue
@@ -632,16 +664,120 @@ func autoEnrollSubscriptions(db *gorm.DB, activityID uint, slot *models.Activity
 			}
 
 			if err := tx.Commit().Error; err != nil {
-				log.Error().Err(err).Msg("Transaction commit failed for auto enroll subscriptions")
+				errSubs = append(errSubs, lockedSub)
+				log.Error().
+					Err(err).
+					Msgf("Transaction commit failed for auto enroll subscriptions. Slot id: %d, sub id: %d", lockedSlot.ID, lockedSub.ID)
 				continue
 			}
 
-			log.Info().Uint("record_id", record.ID).Msg("Auto-record created successfully")
+			log.Info().Uint("record_id", record.ID).Msgf("Auto-record created successfully for slot id: %d, sub id: %d", lockedSlot.ID, lockedSub.ID)
 		}
 	}
 
 	log.Info().Msgf("Auto-enroll completed for slot %d", slot.ID)
-	return nil
+	return errSubs, nil
+}
+
+func EnrollSubs() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := database.GetGormDB()
+		var AllErrSubs []models.Subscription
+
+		var slots []models.ActivitySlot
+		if err := db.Find(&slots).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				log.Error().Err(err).Msgf("Slots not found")
+				c.JSON(http.StatusNotFound, gin.H{
+					"Error": "Slots not found",
+				})
+				return
+			}
+			log.Error().Err(err).Msgf("Error finding slots")
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"Error": "Failed to find slots",
+			})
+			return
+		}
+
+		for _, slot := range slots {
+			errSubs, err := autoEnrollSubscriptions(db, &slot)
+			if err != nil {
+				log.Error().Err(err).Msgf("Error while auto-enroll subs")
+				return
+			}
+			AllErrSubs = append(AllErrSubs, errSubs...)
+		}
+
+		count := len(AllErrSubs)
+		log.Info().Msg("Subs enroll comleted")
+
+		if count > 0 {
+			saveSubErrors(AllErrSubs)
+		}
+
+		if count > 0 {
+			log.Warn().Msgf("Some subs has been failed to enroll")
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "warning",
+				"message": "Some slots failed to enroll subs"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Subs enroll completed"})
+	}
+}
+
+func EnrollSubsBySlotID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		db := database.GetGormDB()
+		var AllErrSubs []models.Subscription
+
+		slot_id, err := strconv.Atoi(c.Param("slot_id"))
+		if err != nil {
+			log.Error().Err(err).Msg("Invalid slot id")
+		}
+
+		var slot models.ActivitySlot
+		if err := db.
+			Preload("User").
+			Preload("SubKids").
+			First(&slot, slot_id).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				log.Error().Err(err).Msgf("Slot not found by id: %d", slot_id)
+				c.JSON(http.StatusNotFound, gin.H{
+					"Error": "Slot not found",
+				})
+				return
+			}
+			log.Error().Err(err).Msgf("Error finding slot by id: %d", slot_id)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"Error": "Failed to find slot",
+			})
+			return
+		}
+
+		errSubs, err := autoEnrollSubscriptions(db, &slot)
+		if err != nil {
+			log.Error().Err(err).Msgf("Error while auto-enroll subs by slot id: %d", slot_id)
+			return
+		}
+		AllErrSubs = append(AllErrSubs, errSubs...)
+
+		count := len(AllErrSubs)
+		if count > 0 {
+			saveSubErrors(AllErrSubs)
+		}
+
+		log.Info().Msg("Subs enroll comleted")
+		if count > 0 {
+			log.Warn().Msgf("Some subs has been failed to enroll")
+			c.JSON(http.StatusOK, gin.H{
+				"status":  "warning",
+				"message": "Some subs has been failed to enroll"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Subs enroll completed"})
+	}
 }
 
 func canEnrollKid(db *gorm.DB, sub *models.Subscription, subKid *models.SubKid, slot *models.ActivitySlot) (bool, error) {
@@ -661,4 +797,24 @@ func canEnrollKid(db *gorm.DB, sub *models.Subscription, subKid *models.SubKid, 
 	}
 
 	return true, nil
+}
+
+func saveSubErrors(subs []models.Subscription) {
+	for _, sub := range subs {
+		var studio_error models.StudioError
+
+		studio_error.SubscriptionId = sub.ID
+		studio_error.Info = fmt.Sprintf("Під час автозапису за підписками було пропущено цю підписку: id %v, им'я %v, вiк %v, батько %v", sub.ID, sub.SubKids[0].Name, sub.SubKids[0].Age, sub.User.Name)
+
+		db := database.GetGormDB()
+		tx := db.Begin()
+		if err := tx.Create(&studio_error).Error; err != nil {
+			log.Error().Err(err).Msgf("Error creating studio error for sub id: %d", sub.ID)
+			continue
+		}
+		if err := tx.Commit().Error; err != nil {
+			log.Error().Err(err).Msg("Commit failed for create studio_error")
+			return
+		}
+	}
 }

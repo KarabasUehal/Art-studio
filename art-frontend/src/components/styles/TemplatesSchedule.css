@@ -70,7 +70,6 @@
 .btn-template-extend:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 20px #ffeb3b;
-  color: #ffeb3b !important;
   text-decoration: none !important;
 }
 
@@ -112,14 +111,17 @@
 
 .template-card {
   background: #2a2a2a;
-  border: 1px solid #3a3a3a;
+  border: 2px solid #3a3a3a;
   border-radius: 12px;
   margin-bottom: 14px;
   transition: transform 0.2s ease;
+  max-width: 250px;
 }
 
 .template-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px #ffeb3b;
+  background: #355345;
 }
 
 .template-card-inner {
@@ -176,9 +178,10 @@
   background: #b34646;
 }
 
-.no-templates {
-  color: #e6b823;
-  font-style: italic;
+.empty-message {
   text-align: center;
-  padding: 20px;
+  color: #888;
+  font-size: 1.6em;
+  margin: 80px 0;
+  font-weight: 300;
 }

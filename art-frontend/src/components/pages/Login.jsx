@@ -31,17 +31,19 @@
 
         return (
             <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label>Логiн:</label>
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" required />
+                <div className="register-form-group">
+                    <label className="register-form-label">Логiн:</label>
+                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="register-form-input" required />
                 </div>
-                <div className="mb-3">
-                    <label>Пароль:</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" required />
+                <div className="register-form-group">
+                    <label className="register-form-label">Пароль:</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="register-form-input" required />
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
+                <div className="form-actions">
                 <button type="button" onClick={Back} className="btn-register-cancel">Назад</button>
                 <button type="submit" className="btn-register-submit">Увійти</button>
+                </div>
             </form>
         );
     };

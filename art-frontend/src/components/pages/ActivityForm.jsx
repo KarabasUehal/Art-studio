@@ -11,8 +11,7 @@ const ActivityForm = () => {
     description: '',
     price: 0,
     duration: 60,  
-    images: { main_image_url: '', photo: [], caption: ''},
-    availability: true,   
+    images: { main_image_url: '', photo: [], caption: ''},  
     is_regular: false
   });
   const [loading, setLoading] = useState(false);
@@ -31,7 +30,6 @@ const ActivityForm = () => {
                   caption: res.data.images?.caption || "",
                   photo: Array.isArray(res.data.images?.photo) ? res.data.images.photo : []
                   },
-          availability: res.data.availability ?? true,
           is_regular: res.data.is_regular ?? false
         });
       }).catch(err => {
@@ -50,7 +48,6 @@ const ActivityForm = () => {
     description: formData.description,
     price: formData.price,
     duration: formData.duration,
-    availability: formData.availability,
     is_regular: formData.is_regular, 
     images: {
     main_image_url: formData.images.main_image_url,
@@ -225,19 +222,7 @@ const ActivityForm = () => {
               </ul>
             </div>
 
-            {/* Світчі */}
-            <div className="switch-group">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={formData.availability}
-                  onChange={e => setFormData({ ...formData, availability: e.target.checked })}
-                />
-                <span className="slider"></span>
-                <span className="switch-label">Доступний для запису</span>
-              </label>
-            </div>
-
+            {/* Світч */}
             <div className="switch-group">
               <label className="switch">
                 <input

@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS "subscription_types" (
   "is_active" BOOLEAN DEFAULT TRUE,
   "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  "deleted_at" TIMESTAMP NULL,
-  CONSTRAINT uq_activity_name UNIQUE ("activity_id", "name")
+  "deleted_at" TIMESTAMP NULL
 );
 
+CREATE UNIQUE INDEX uq_activity_name_active
+ON subscription_types ("activity_id", "name")
+WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_subscription_types_activity_id ON subscription_types(activity_id);
 CREATE INDEX IF NOT EXISTS idx_subscription_types_active ON subscription_types(is_active) WHERE is_active = true;

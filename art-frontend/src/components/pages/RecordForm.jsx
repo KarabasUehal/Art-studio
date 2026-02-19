@@ -62,16 +62,13 @@ const RecordForm = () => {
     .catch(() => setUserKids([]));
 }, []);
 
-  // Форматирование времени
-  const formatSlotTime = (timeStr) => {
-    if (!timeStr) return 'Не вказано';
-    const date = new Date(timeStr);
-    return date.toLocaleString('uk-UA', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-      timeZone: 'Europe/Kiev',
-    });
-  };
+  const formatTime = (iso) => {
+  if (!iso) return '--:--';
+  // если iso выглядит как "15:00" — вернём как есть
+  if (iso.length === 5 && iso[2] === ':') return iso;
+  // иначе ISO string
+  return iso.slice(11,16);
+};
 
   const addKid = () => {
     setFormData({
@@ -186,7 +183,7 @@ const RecordForm = () => {
         {/* Предвыбранный слот */}
         {slotId && selectedSlot && (
           <div className="slot-info">
-            <strong>Обраний час:</strong> {formatSlotTime(selectedSlot.start_time)}
+            <strong>Обраний час:</strong> {formatTime(selectedSlot.start_time)}
             <span className="places-left">
               — вільно {selectedSlot.capacity - selectedSlot.booked} місць
             </span>
@@ -208,7 +205,7 @@ const RecordForm = () => {
                 const free = slot.capacity - slot.booked;
                 return (
                   <option key={slot.id || slot.ID} value={slot.id || slot.ID} disabled={free <= 0}>
-                    {formatSlotTime(slot.start_time)} — вільно {free} місць
+                    {formatTime(slot.start_time)} — вільно {free} місць
                   </option>
                 );
               })}

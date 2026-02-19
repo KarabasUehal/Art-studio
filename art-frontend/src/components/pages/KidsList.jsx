@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import DeleteKidModal from './DeleteKidModal.jsx';
+import DeleteModal from './DeleteModal.jsx';
 import ReactPaginate from 'react-paginate';
 import '@styles/List.css'; 
 
@@ -39,9 +39,9 @@ const KidsList = ({ isAuthenticated }) => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     try {
-      await api.delete(`/client/kids/${id}`);
+      await api.delete(`/client/kids/${kidToDelete.ID}`);
       fetchKids(page, size);  // Refetch после удаления
       setShowDeleteModal(false);  // Закрыть модал
     } catch (err) {
@@ -105,12 +105,14 @@ const KidsList = ({ isAuthenticated }) => {
         />
       )}
 
-      <DeleteKidModal
+      <DeleteModal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         onDelete={handleDelete}
-        kidId={kidToDelete?.id}
-        kidName={`${kidToDelete?.name || 'дитину'}`}
+        modalTitle={`Видалити данi дитини?`}
+        modalElementName={`${kidToDelete?.name}?`}
+        modalQuestion="Ви впевнені, що хочете видалити данi дитини"
+        modalWarning="Після видалення цю дію неможливо буде скасувати."
       />
     </div>
   );

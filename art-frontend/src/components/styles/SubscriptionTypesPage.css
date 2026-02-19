@@ -21,24 +21,44 @@
 }
 
 .btn-add-subtype {
-  display: block;
-  width: fit-content;
-  margin: 0 auto 50px;
-  background: #e6c843;
-  color: rgb(0, 0, 0);
-  padding: 14px 40px;
-  border-radius: 12px;
-  font-size: 1.2em;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(231, 111, 81, 0.3);
+  display: inline-block;
+  background: #355345 !important;
+  color: #ffeb3b!important;
+  padding: 14px 40px !important;
+  border: 2px solid #000000 !important;
+  border-radius: 50px !important;
+  font-weight: 900 !important;
+  font-size: 1.1em !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
   transition: all 0.3s;
+  margin: 0 auto;
+  font-family: 'Caveat', cursive, sans-serif; 
 }
 
 .btn-add-subtype:hover {
-  background: #e6c843;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(231, 111, 81, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #ffeb3b;
+  text-decoration: none !important;
+}
+
+.subtype-col {
+  width: 100%;
+  padding: 0 15px; 
+}
+
+@media (min-width: 768px) {
+  .subtype-col {
+    width: 50%;
+  }
+}
+
+@media (min-width: 992px) {
+  .subtype-col {
+    width: 33.3333%;
+  }
 }
 
 .subscription-type-card {
@@ -80,7 +100,7 @@
 
 .admin-subtype-buttons {
   margin-top: 24px;
-  display: flex;
+  display: inline;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -88,13 +108,14 @@
 .btn-subtype-edit,
 .btn-subtype-delete {
   display: inline-block;
-  padding: 10px 20px !important;
+  padding: 7px 14px !important;
   border-radius: 12px !important;
   font-weight: bold !important;
   text-decoration: none !important;
-  font-size: 0.95em !important;
+  font-size: 0.8em !important;
+  margin-right: 12px;
   transition: all 0.3s;
-  min-width: 100px;
+  min-width: 70px;
   text-align: center;
 }
 
@@ -143,4 +164,26 @@
   background: #ffeb3b;
   color: #000;
   box-shadow: 0 0 20px rgba(255,235,59,0.5);
+}
+
+.empty-message {
+  text-align: center;
+  color: #888;
+  font-size: 1.6em;
+  margin: 80px 0;
+  font-weight: 300;
+}
+
+.strong-active {
+  font-size: 0.9em;
+  text-align: center;
+  color: #43df06;
+  font-family: 'Caveat', cursive, sans-serif; 
+}
+
+.strong-not-active {
+  font-size: 0.9em;
+  text-align: center;
+  color: #3d2424;
+  font-family: 'Caveat', cursive, sans-serif; 
 }

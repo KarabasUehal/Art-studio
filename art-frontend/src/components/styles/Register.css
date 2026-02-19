@@ -84,7 +84,7 @@
 }
 
 .btn-register-cancel {
-  background: #686868;
+  background: #c7cac5;
   color: #000000 !important;
   padding: 12px 36px;
   border-radius: 12px;
@@ -96,7 +96,7 @@
 }
 
 .btn-register-cancel:hover {
-  background: #c7cac5;
+  background: #686868;
 }
 
 .btn-register-submit {

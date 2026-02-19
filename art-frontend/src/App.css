@@ -95,6 +95,11 @@ body, .App {
   font-size: 24px !important;
 }
 
+.nav-btn-warning-menu:hover,
+.nav-btn-success-menu:hover {
+  transform: translateY(-3px);
+}
+
 .nav-btn-danger {
   color: #ff0000 !important;
   padding: 5px 12px !important;

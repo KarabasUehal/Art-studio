@@ -3,7 +3,7 @@ import api from '../../utils/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import ReactPaginate from 'react-paginate';
-import DeleteActivityModal from './DeleteActivityModal';
+import DeleteModal from './DeleteModal';
 import '@styles/Activities.css'; 
 
 const Activities = ({ isAuthenticated }) => {
@@ -88,9 +88,9 @@ const Activities = ({ isAuthenticated }) => {
     navigate(`/record/${activityId}`);
   };
 
-  const handleDeleteConfirm = async (id) => {
+  const handleDeleteConfirm = async () => {
   try {
-    await api.delete(`/activities/${id}`);
+    await api.delete(`/activities/${activityToDelete.id}`);
     
     const params = {
       page: page,
@@ -109,6 +109,7 @@ const Activities = ({ isAuthenticated }) => {
       setTotalPages(data.total_pages || 1);
       setTotalCount(data.total_count || 0);
       setPage(data.current_page || 1);
+      setActivityToDelete(null);
       setShowDeleteModal(false);
       return;
     }
@@ -269,13 +270,18 @@ const Activities = ({ isAuthenticated }) => {
       )}
 
       {/* Модалка удаления активности */}
-      <DeleteActivityModal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        onDelete={handleDeleteConfirm}
-        activityId={activityToDelete?.id}
-        activityName={activityToDelete?.name || 'активність'}
-      />
+      {showDeleteModal && activityToDelete && (
+          <DeleteModal
+              show={showDeleteModal}
+              onHide={() => setShowDeleteModal(false)}
+              onDelete={handleDeleteConfirm}
+              element={activityToDelete}
+              modalTitle={`Видалити напрям ${activityToDelete.id}?`}
+              modalElementName={activityToDelete.name || 'активність'}
+              modalQuestion="Ви впевнені, що хочете видалити "
+              modalWarning="Після видалення цю дію буде неможливо скасувати."
+            />
+          )}
     </div>
   </div>
  );

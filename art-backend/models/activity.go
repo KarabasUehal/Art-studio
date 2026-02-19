@@ -8,7 +8,7 @@ import (
 )
 
 type Activity struct {
-	ID             uint           `json:"id" gorm:"primaryKey"`
+	ID             uint           `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name           string         `json:"name" gorm:"not null;unique;size:100"`
 	Description    string         `json:"description" gorm:"not null;type:text"`
 	Images         ActivityImage  `json:"images" gorm:"foreignKey:ActivityID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
@@ -16,7 +16,6 @@ type Activity struct {
 	Duration       uint           `json:"duration" gorm:"type:integer;not null"`
 	AvailableSlots int            `json:"available_slots" gorm:"not null"`
 	Slots          []ActivitySlot `json:"slots" gorm:"foreignKey:ActivityID;constraint:OnDelete:CASCADE;"`
-	Availability   bool           `json:"availability" gorm:"not null;default:true"`
 	IsRegular      bool           `json:"is_regular" gorm:"column:is_regular;not null;default:false"`
 
 	CreatedAt time.Time  `json:"-"`

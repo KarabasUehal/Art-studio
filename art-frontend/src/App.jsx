@@ -12,7 +12,6 @@ import ClientSchedulePage from './components/pages/ClientSchedulePage';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import AdminRegister from './components/pages/AdminRegister';
 import AdminTemplatesPage from './components/pages/AdminTemplatesPage';
 import SubscriptionTypesPage from './components/pages/SubscriptionTypesPage';
 import SubscriptionsPage from './components/pages/SubscriptionsPage';
@@ -22,6 +21,7 @@ import KidForm from './components/pages/KidForm';
 import KidsPage from './components/pages/ClientKidsPage';
 import KidsList from './components/pages/KidsList';
 import UsersList from './components/pages/UsersList';
+import AdminErrorsList from './components/pages/AdminErrorsList';
 
 
 const backgroundImage = 'https://i.postimg.cc/59R6pXsS/background.jpg';
@@ -101,6 +101,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
                   <Link to="/records" className="nav-btn-warning">Усi записи</Link>
                   <Link to="admin/kids" className="nav-btn-warning">Усi діти</Link>
                   <Link to="/admin/users" className="nav-btn-warning">Користувачi</Link>
+                  <Link to="/admin/errors" className="nav-btn-danger">Помилки</Link>
                 </>
               )}
                 <Link to="/client/records" className="nav-btn-info">Мої записи</Link>
@@ -139,7 +140,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           {role === 'owner' && (
           <>
           <Link to="/admin/subscriptions" className="nav-btn-warning-menu">Куплені абонементи</Link>
-          <Link to="/admin/templates" className="nav-btn-warning-menu">Управління шаблонами</Link>
+          <Link to="/admin/templates" className="nav-btn-warning-menu">Шаблони тижня</Link>
           <Link to="/admin/slots" className="nav-btn-warning-menu">Створити слот</Link>
           </>
           )}
@@ -169,6 +170,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/client/kids/edit/:id" element={isAuthenticated ? <KidForm /> : <Navigate to="/login" />} />
           <Route path="/admin/kids" element={<KidsList isAuthenticated={isAuthenticated} />} />
           <Route path="/admin/users" element={<UsersList isAuthenticated={isAuthenticated} />} />
+          <Route path="/admin/errors" element={<AdminErrorsList isAuthenticated={isAuthenticated} />} />
         </Routes>
 
         <div className="faq-section mt-5 mb-5">

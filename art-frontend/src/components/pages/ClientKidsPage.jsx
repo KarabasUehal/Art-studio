@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
-import DeleteKidModal from './DeleteKidModal';
+import DeleteModal from './DeleteModal';
 import '@styles/List.css';
 
 const ClientKidsPage = () => {
@@ -37,20 +37,21 @@ const ClientKidsPage = () => {
   }
 };
 
-  const handleDelete = async (id) => {
-    if (!id || id === 'undefined' || isNaN(id)) {
+  const handleDelete = async () => {
+    if (!kidToDelete.ID || kidToDelete.ID === 'undefined' || isNaN(kidToDelete.ID)) {
       alert('ID ребёнка не найден');
-      console.error('Invalid ID:', id);
+      console.error('Invalid ID:', kidToDelete.ID);
       return;
     }
 
     try {
-      await api.delete(`/client/kids/${id}`);
-      setKids((prev) => prev.filter((kid) => kid.ID !== id)); // Обновляем список детей
+      await api.delete(`/client/kids/${kidToDelete.ID}`);
+      setKids((prev) => prev.filter((kid) => kid.ID !== kidToDelete.ID)); // Обновляем список детей
     } catch (err) {
       alert('Ошибка удаления');
       console.error('Ошибка удаления ребёнка:', err);
     }
+    setShowDeleteModal(false);
   };
 
   if (loading) return <div className="text-center py-5 text-white">Завантаження...</div>;
@@ -104,13 +105,15 @@ const ClientKidsPage = () => {
             ))}
             </div>
 
-        <DeleteKidModal
+        <DeleteModal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         onDelete={handleDelete}
-        kidId={kidToDelete?.ID}
-        kidName={kidToDelete?.name || 'дитину'}
-      />
+        modalTitle={`Видалити данi дитини?`}
+        modalElementName={`${kidToDelete?.name}?`}
+        modalQuestion="Ви впевнені, що хочете видалити данi дитини"
+        modalWarning="Після видалення цю дію неможливо буде скасувати."
+        />
       </div>
   );
 };

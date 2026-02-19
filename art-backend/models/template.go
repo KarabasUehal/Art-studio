@@ -3,7 +3,7 @@ package models
 import "time"
 
 type ScheduleTemplate struct {
-	ID         uint       `json:"id" gorm:"primaryKey"`
+	ID         uint       `json:"id" gorm:"primaryKey;autoIncrement"`
 	ActivityID uint       `json:"activity_id" gorm:"not null;uniqueIndex:uniq_template"`
 	DayOfWeek  int        `json:"day_of_week" gorm:"not null;uniqueIndex:uniq_template"`
 	StartTime  string     `json:"start_time" gorm:"type:VARCHAR(5);not null;uniqueIndex:uniq_template"`

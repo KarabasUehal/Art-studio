@@ -96,7 +96,12 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания пользователя"})
 		return
 	}
-	tx.Commit()
+
+	if err := tx.Commit().Error; err != nil {
+		log.Error().Err(err).Msg("Commit failed for registeration")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+		return
+	}
 
 	log.Info().Str("user_username", user.Username).Msg("Create user")
 
@@ -211,7 +216,12 @@ func RegisterByOwner(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error to create user"})
 		return
 	}
-	tx.Commit()
+
+	if err := tx.Commit().Error; err != nil {
+		log.Error().Err(err).Msg("Commit failed for register by owner")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User registered by owner"})
 }

@@ -111,7 +111,7 @@ func main() {
 	api.POST("/subscriptions", middleware.OwnerOnly(), handlers.AddSubscription())
 	api.PUT("/subscriptions/:id", middleware.OwnerOnly(), handlers.UpdateSubscription())
 	api.DELETE("/subscriptions/:id", middleware.OwnerOnly(), handlers.DeleteSubscription())
-	api.PATCH("/subscriptions/:id/extend", middleware.OwnerOnly(), handlers.ExtendSubscription())
+	api.PATCH("/subscriptions/:id/extend", middleware.OwnerOnly(), handlers.ExtendSubscription()) // Продление подписки на её длительность
 
 	api.GET("/templates/by-activity/:act_id", handlers.GetTemplatesByActID())
 	api.GET("/templates/:id", handlers.GetTemplateByID())
@@ -121,7 +121,9 @@ func main() {
 	api.PUT("/templates/:id", middleware.OwnerOnly(), handlers.UpdateTemplate())
 	api.DELETE("/templates/:id", middleware.OwnerOnly(), handlers.DeleteTemplate())
 
-	api.POST("/schedule/extend", middleware.OwnerOnly(), handlers.ExtendSchedule()) // Для продления расписания на неделю
+	api.POST("/schedule/extend", middleware.OwnerOnly(), handlers.ExtendSchedule())              // Для продления расписания на неделю
+	api.POST("/schedule/enroll/", middleware.OwnerOnly(), handlers.EnrollSubs())                 // Для автозаписей по подпискам, если созданы новые
+	api.POST("/schedule/enroll/:slot_id", middleware.OwnerOnly(), handlers.EnrollSubsBySlotID()) // Для автозаписи по подпискам на один слот
 
 	api.GET("/activity/:activity_id/slots/:slot_id", handlers.GetSlotByID())
 	api.POST("/activity/:activity_id/slots", middleware.OwnerOnly(), handlers.AddSlot())
@@ -131,14 +133,17 @@ func main() {
 	api.POST("/admin/register", middleware.OwnerOnly(), handlers.RegisterByOwner)
 
 	api.GET("/client/records", handlers.GetMyRecords())
-	api.POST("/record", handlers.MakeRecord())
+	api.POST("/record", handlers.MakeRecord()) // Самостоятельная запись пользователем на одно занятие
 
 	api.GET("/client/kids/:id", handlers.GetKidByID())
 	api.GET("/client/kids", handlers.GetMyKids())
-	api.GET("/admin/kids", handlers.GetAllKids())
+	api.GET("/admin/kids", middleware.OwnerOnly(), handlers.GetAllKids())
 	api.POST("/client/kids", handlers.AddKid())
 	api.PUT("/client/kids/:id", handlers.UpdateKid())
 	api.DELETE("/client/kids/:id", handlers.DeleteKid())
+
+	api.GET("/admin/errors", middleware.OwnerOnly(), handlers.GetAllErrors())
+	api.DELETE("/admin/errors:id", middleware.OwnerOnly(), handlers.DeleteError())
 
 	go func() { // Запуск HTTP-сервера в горутине с использованием corsMiddleware для CORS
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

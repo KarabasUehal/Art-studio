@@ -1,4 +1,4 @@
-import '@styles/DeleteModal.css'; 
+import '@styles/SuccessModal.css'; 
 import React from 'react';
 
 const SuccessExtendSubModal = ({

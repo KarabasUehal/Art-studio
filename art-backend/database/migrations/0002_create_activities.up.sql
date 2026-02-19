@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS "activities" (
     "price" INTEGER NOT NULL CHECK ("price" >= 0),
     "available_slots" INTEGER NOT NULL,
     "duration" INTEGER NOT NULL CHECK ("duration" > 0),
-    "availability" BOOLEAN NOT NULL DEFAULT TRUE,
     "is_regular" BOOLEAN NOT NULL DEFAULT FALSE,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

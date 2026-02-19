@@ -1,4 +1,4 @@
-.delete-modal-backdrop {
+.studio-modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +11,7 @@
   z-index: 1050;
 }
 
-.delete-modal {
+.studio-modal {
   background: rgb(138, 138, 134);
   color: #020201;
   border: 1px solid #333;
@@ -28,13 +28,13 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-.delete-modal p,
-.delete-modal h5, 
-.delete-modal button {
+.studio-modal p,
+.studio-modal h5, 
+.studio-modal button {
   color: #020201 !important;
 }
 
-.delete-modal strong {
+.studio-modal strong {
   color: #e6d223 !important;
 }
 
@@ -55,13 +55,13 @@
   background: #a5eea2;
 } 
 
-.delete-modal-title {
+.studio-modal-title {
   margin: 0;
-  font-size: 1.6em;
+  font-size: 1.3em;
   font-weight: 600;
 }
 
-.delete-modal-close {
+.studio-modal-close {
   background: none;
   border: none;
   font-size: 2em;
@@ -71,19 +71,19 @@
   opacity: 0.9;
 }
 
-.delete-modal-close:hover {
+.studio-modal-close:hover {
   opacity: 1;
 }
 
-.delete-modal-body {
+.studio-modal-body {
   padding: 28px 24px;
   color: #020201;
-  font-size: 1.2em;
+  font-size: 1.1em;
   line-height: 1.6;
   text-align: center;
 }
 
-.delete-modal-footer {
+.studio-modal-footer {
   padding: 16px 24px;
   display: flex;
   justify-content: center;
@@ -108,7 +108,7 @@
 }
 
 .btn-modal-delete,
-.btn-modal-extend {
+.btn-modal-success {
   color: rgb(0, 0, 0) !important;
   padding: 12px 36px;
   border-radius: 12px;
@@ -123,7 +123,7 @@
   background: #e97a76;
 }
 
-.btn-modal-extend {
+.btn-modal-success {
   background: #a5eea2;
 }
 

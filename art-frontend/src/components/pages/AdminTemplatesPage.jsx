@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import AddEditTemplateModal from './AddEditTemplateModal'; 
-import DeleteTemplateModal from './DeleteTemplateModal'; 
+import DeleteModal from './DeleteModal'; 
+import ScheduleExtendModal from './ScheduleExtendModal.jsx'; 
 import SuccessScheduleModal from './SuccessScheduleModal.jsx';
 import '@styles/TemplatesSchedule.css';
 
@@ -15,7 +16,8 @@ const AdminTemplatesPage = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Поиск по имени активности
   const [selectedTemplate, setSelectedTemplate] = useState(null); // Для редактирования/удаления
   const [showAddEditModal, setShowAddEditModal] = useState(false); // Модалка add/edit
-  const [showDeleteTemplateModal, setShowDeleteTemplateModal] = useState(false);// Модалка delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);// Модалка delete
+  const [showScheduleExtendModal, setShowScheduleExtendModal] = useState(false);// Модалка delete
   const [showExtendConfirm, setShowExtendConfirm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -135,21 +137,21 @@ const handleDeleteTemplate = (template) => {
       activityName: activity?.name || 'Невідома активність',
       time: formatTime(template.start_time),
     });
-    setShowDeleteTemplateModal(true);
+    setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
     try {
       await api.delete(`/templates/${selectedTemplate.id}`);
       fetchAllTemplates();
-      setShowDeleteTemplateModal(false);
+      setShowDeleteModal(false);
     } catch (err) {
       setError('Помилка видалення шаблону');
     }
   };
 
   const handleExtendSchedule = () => {
-  setShowExtendConfirm(true);
+  setShowScheduleExtendModal(true);
 };
 
   const handleConfirmExtend = async (weeks = 1) => {
@@ -159,7 +161,7 @@ const handleDeleteTemplate = (template) => {
     } catch (err) {
       setError('Помилка продовження розкладу');
     }
-    setShowExtendConfirm(false)
+    setShowScheduleExtendModal(false)
   };
 
   // Фильтрованные шаблоны по поиску (по имени активности)
@@ -221,7 +223,7 @@ const handleDeleteTemplate = (template) => {
             {Object.keys(daysOfWeek).map((dayNum) => (
               <td key={dayNum}>
                 {groupedByDay[dayNum].length === 0 ? (
-                  <p className="no-templates">Немає шаблонів</p>
+                  <p className="empty-message">Немає шаблонів</p>
                 ) : (
                   groupedByDay[dayNum].map((tmpl) => {
                     const act = activities.find(
@@ -280,36 +282,23 @@ const handleDeleteTemplate = (template) => {
       />
 
       {/* Модалка предпросмотра */}
-      {showExtendConfirm && (
-  <div className="modal-overlay">
-    <div className="modal-container">
-      <label className="modal-label">Продовжити розклад на тиждень?</label>
-
-      <div className="modal-buttons">
-        <button className="btn btn-cancel-modal" onClick={() => setShowExtendConfirm(false)}>
-          Відмінити
-        </button>
-        <button className="btn btn-success-modal" onClick={() => handleConfirmExtend(1)}>
-          Так, продовжити
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-<DeleteTemplateModal
-        show={showDeleteTemplateModal}
-        onHide={() => {
-          setShowDeleteTemplateModal(false);
-          setSelectedTemplate(null);
-        }}
-        onDelete={handleConfirmDelete}
-        templateId={selectedTemplate?.id}
-        templateInfo={{
-          activityName: selectedTemplate?.activityName || '—',
-          time: selectedTemplate?.time || '--:--'
-        }}
+      <ScheduleExtendModal
+        show={showScheduleExtendModal}
+        onHide={() => setShowScheduleExtendModal(false)}
+        onExtend={handleConfirmExtend}
       />
+
+          {selectedTemplate && (
+            <DeleteModal
+              show={showDeleteModal}
+              onHide={() => setShowDeleteModal(false)}
+              onDelete={handleConfirmDelete}
+              modalTitle={`Видалити шаблон для ${selectedTemplate?.activityName}?`}
+              modalElementName={`${selectedTemplate?.activityName} на ${selectedTemplate?.time}?`}
+              modalQuestion="Ви впевнені, що хочете видалити шаблон для "
+              modalWarning="Після видалення цю дію неможливо буде скасувати."
+            />
+          )}
 
       <SuccessScheduleModal show={showSuccess} onHide={() => setShowSuccess(false)} />
 

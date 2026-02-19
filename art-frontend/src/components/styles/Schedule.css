@@ -35,14 +35,17 @@
   margin: 10px 0;
 }
 
-/* --- Сетка дней --- */
+.schedule-span {
+  font-size: 1em;
+  color: #ffeb3b;
+}
+
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   box-sizing: border-box;
 }
 
-/* --- Карточки дня --- */
 .day-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext, useLayoutEffect, useRef } from 
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
-import DeleteSlotModal from './DeleteSlotModal';
+import DeleteModal from './DeleteModal';
 import "@styles/Schedule.css";
 
 const ClientSchedulePage = () => {
@@ -13,7 +13,7 @@ const ClientSchedulePage = () => {
   const [error, setError] = useState("");
   const [currentStartDate, setCurrentStartDate] = useState(new Date());  // Добавлено: Начало текущей недели
 
-  const [showDeleteSlotModal, setShowDeleteSlotModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
 
   const topScrollRef = useRef(null);
@@ -162,18 +162,18 @@ const handleDeleteSlot = (activity, slot) => {
       activityName: activity.name,
       time: slot.start_time.slice(11, 16)  // Время для текста модала
     });
-    setShowDeleteSlotModal(true);
+    setShowDeleteModal(true);
   };
 
   // Добавлено: Функция подтверждения удаления слота
-  const handleDeleteConfirmSlot = async (id) => {
+  const handleDeleteConfirmSlot = async () => {
     try {
     
       const activityId = slotToDelete.activityId;  
-      await api.delete(`/activity/${activityId}/slots/${id}`);
+      await api.delete(`/activity/${activityId}/slots/${slotToDelete.id}`);
       
       loadActivities();
-      setShowDeleteSlotModal(false); 
+      setShowDeleteModal(false); 
     } catch (err) {
       setError("Ошибка при удалении");
     }
@@ -186,7 +186,7 @@ const handleDeleteSlot = (activity, slot) => {
 
       <div className="week-navigation">
         <button onClick={prevWeek} className="week-button">← Попередній тиждень</button>
-        <span className="fw-bold">
+        <span className="schedule-span">
           {days[0]?.toLocaleDateString("uk-UA", { weekday: "long", day: "2-digit", month: "2-digit" })} — {days[6]?.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit" })}
         </span>
         <button onClick={nextWeek} className="week-button">Наступний тиждень →</button>
@@ -202,55 +202,70 @@ const handleDeleteSlot = (activity, slot) => {
             <h5>
               {day.toLocaleDateString("uk-UA", { weekday: "short", day: "2-digit", month: "2-digit" })}
             </h5>
-            {activities.flatMap((a) =>
-              a.slots
-                ?.filter((s) => new Date(s.start_time).toDateString() === day.toDateString())
-                .map((slot) => {
-                  const slotTimeString = slot.start_time.slice(11, 16);
-                  return (
-                    <div
-                      key={slot.id || slot.ID}  
-                      className="slot-item"
-                      onClick={() => handleBookSlot(a, slot)}  
-                      style={{ 
-                        opacity: slot.capacity - slot.booked <= 0 ? 0.5 : 1, 
-                        cursor: 'pointer',
-                        position: 'relative',
-                        paddingBottom: '35px'
-                      }}
-                    >
-                      <div className="slot-name">{a.name}</div>
-                      <div className="slot-time">{slotTimeString}</div>
-                      <div className="slot-places">
-                        {slot.capacity - slot.booked}/{slot.capacity} місць
-                      </div>
+            {activities
+              .flatMap((activity) =>
+                activity.slots?.map((slot) => ({
+                  ...slot,
+                  activity: activity,
+                })) || []
+              )
+              .filter((slot) =>
+                new Date(slot.start_time).toDateString() === day.toDateString()
+              )
+              .sort((a, b) =>
+                new Date(a.start_time) - new Date(b.start_time)
+              )
+              .map((slot) => {
+                const slotTimeString = slot.start_time.slice(11, 16);
+                const activity = slot.activity;
 
-                      {role === 'owner' && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();  
-                            handleDeleteSlot(a, slot);  
-                          }}
-                          className="delete-slot-btn"
-                        >
-                          🗑️
-                        </button>
-                      )}
+                return (
+                  <div
+                    key={slot.ID || slot.id || slot.slot_id}
+                    className="slot-item"
+                    onClick={() => handleBookSlot(activity, slot)}
+                    style={{
+                      opacity: slot.capacity - slot.booked <= 0 ? 0.5 : 1,
+                      cursor: "pointer",
+                      position: "relative",
+                      paddingBottom: "35px",
+                    }}
+      >
+                    <div className="slot-name">{activity.name}</div>
+                    <div className="slot-time">{slotTimeString}</div>
+                    <div className="slot-places">
+                      {slot.capacity - slot.booked}/{slot.capacity} місць
                     </div>
-                  );
-                })
-            )}
+
+                    {role === "owner" && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSlot(activity, slot);
+                        }}
+                        className="delete-slot-btn"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                );
+            })}
           </div>
         ))}
       </div>
     
-      <DeleteSlotModal
-        show={showDeleteSlotModal}
-        onHide={() => setShowDeleteSlotModal(false)}
+      {slotToDelete && (
+      <DeleteModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
         onDelete={handleDeleteConfirmSlot}
-        slotId={slotToDelete?.id}
-        slotInfo={{ activityName: slotToDelete?.activityName, time: slotToDelete?.time }}
+        modalTitle={`Видалити слот для ${slotToDelete?.activityName}?`}
+        modalElementName={`${slotToDelete?.activityName} на ${slotToDelete?.time}?`}
+        modalQuestion="Ви впевнені, що хочете видалити слот для"
+        modalWarning="Після видалення цю дію неможливо буде скасувати."
       />
+      )}
     </div>
   );
 };
