@@ -1,97 +1,105 @@
-.templates-page {
+.template-page {
   max-width: 1300px;
   margin: 0 auto;
   padding: 30px;
-  background: #1b1b1b;
+  background: linear-gradient(135deg, #d8d8d8, #704b88);
   font-family: 'Segoe UI', sans-serif;
   color: #e5e5e5;
 }
 
-.templates-page h2 {
+.template-page h2 {
   text-align: center;
   font-size: 2.2em;
-  color: #e6b823;
+  color: #3bf2ff !important;
   margin-bottom: 25px;
   font-weight: 600;
 }
 
-.templates-search {
+.template-search {
   width: 100%;
   padding: 12px 14px;
   margin-bottom: 18px;
   border-radius: 10px;
   border: 1px solid #3a3a3a;
-  background: #242424;
-  color: #e5e5e5;
+  background: #ab8cc0;
+  color: #ffffff;
   font-size: 1em;
 }
 
-.templates-search::placeholder {
-  color: #9e9e9e;
+.template-search::placeholder {
+  color: #cecece;
 }
 
-.templates-actions {
+.template-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
-.btn-template-add,
-.btn-template-extend {
+.template-btn-add,
+.template-btn-extend {
   display: inline-block;
-  
-  padding: 14px 40px !important;
-  border: 2px solid #000000 !important;
-  border-radius: 50px !important;
-  font-weight: 400 !important;
-  font-size: 1.1em !important;
+
+  padding: 14px 40px;
+  background: #704b88;
+  color: #3bf2ff;
+  font-weight: 700;
+  padding: 14px 40px;
+  border-radius: 24px;
+  width: auto;          
+  border: 1px solid #000000;
+  font-weight: 550;
+  font-size: 1.1em;
+  font-family: 'Caveat', cursive, sans-serif !important; 
+  transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-decoration: none !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
-  transition: all 0.3s;
+
   margin: 0 auto;
-  cursor: pointer;
-  font-family: 'Caveat', cursive, sans-serif !important;
+  cursor: pointer;       
 }
 
-.btn-template-add {
-  background: #355345 !important;
-  color: #ffeb3b!important;
+.template-btn-add {
+  background: #704b88; 
+  color: #3bf2ff;
 }
 
-.btn-template-extend {
-  background: #3a2826 !important;
-  color: #ffeb3b!important;
+.template-btn-extend {
+  background: #3bf2ff;
+  color: #704b88;
 }
 
-.btn-template-add:hover,
-.btn-template-extend:hover {
+.template-btn-add:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 20px #ffeb3b;
+  box-shadow: 0 10px 20px #3bf2ff;
   text-decoration: none !important;
 }
 
-.table-container {
+.template-btn-extend:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #704b88; 
+}
+
+.template-table-container {
   max-height: 75vh;
   overflow-y: auto;
-  background: #202020;
+  background: transparent;
   border-radius: 14px;
   border: 1px solid #3a3a3a;
 }
 
-.templates-table {
+.template-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.templates-table thead th {
+.template-table thead th {
   position: sticky;
   top: 0;
-  background: #262626;
-  color: #ffeb3b;
+  background: #ffffff;
+  color: #704b88; 
   font-weight: 600;
   padding: 16px;
   text-align: center;
@@ -99,19 +107,19 @@
   z-index: 10;
 }
 
-.templates-table td {
+.template-table td {
   padding: 14px;
   vertical-align: top;
   border-right: 1px solid #2e2e2e;
 }
 
-.templates-table td:last-child {
+.template-table td:last-child {
   border-right: none;
 }
 
 .template-card {
-  background: #2a2a2a;
-  border: 2px solid #3a3a3a;
+  background: #704b88; 
+  border: 3px solid #353535;
   border-radius: 12px;
   margin-bottom: 14px;
   transition: transform 0.2s ease;
@@ -119,9 +127,8 @@
 }
 
 .template-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px #ffeb3b;
-  background: #355345;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #3bf2ff;
 }
 
 .template-card-inner {
@@ -131,28 +138,30 @@
 
 .template-card-title {
   font-size: 1.0em;
-  color: #52cc22; /* #d6c77a */
+  color: #3bf2ff; 
   margin-bottom: 8px;
   font-weight: 600;
 }
 
 .template-card-time,
 .template-card-capacity {
-  color: #ffeb3b; 
+  color: #ffffff; 
+  text-shadow: 10px #000;
   font-size: 0.9em;
   margin: 4px 0;
 }
 
 .template-card-buttons {
   display: flex;
-  gap: 10px;
-  flex-direction: column; 
+  flex-direction: row;
+  justify-content: center; 
   align-items: center;
+  gap: 10px;
   margin-top: 12px;
   font-size: 0.9em;
 }
 
-.btn-template-edit {
+.template-btn-edit {
   background: #eba04b;
   color: #000000;
   border: 1px solid #000000;
@@ -161,11 +170,11 @@
   cursor: pointer;
 }
 
-.btn-template-edit:hover {
+.template-btn-edit:hover {
   background: #e4871c;
 }
 
-.btn-template-delete {
+.template-btn-delete {
   background: #c76f6f;
   color: #000000;
   border: 1px solid #000000;
@@ -174,13 +183,13 @@
   cursor: pointer;
 }
 
-.btn-template-delete:hover {
+.template-btn-delete:hover {
   background: #b34646;
 }
 
-.empty-message {
+.template-empty-message {
   text-align: center;
-  color: #888;
+  color: #ffffff;
   font-size: 1.6em;
   margin: 80px 0;
   font-weight: 300;

@@ -18,7 +18,7 @@
 .custom-checkbox .checkmark {
   width: 26px;
   height: 26px;
-  background: #000;
+  background: #704b88;
   border-radius: 7px;           
   border: 2px solid #333;
   transition: all 0.2s ease;
@@ -27,12 +27,12 @@
 }
 
 .custom-checkbox:hover .checkmark {
-  border-color: #e6c843;
+  border-color: #3bf2ff;
 }
 
 .custom-checkbox input:checked + .checkmark {
-  background: #e6c843;
-  border-color: #e6c843;
+  background: #3bf2ff;
+  border-color: #000000;
 }
 
 .custom-checkbox .checkmark::after {
@@ -62,14 +62,14 @@
 
 .checkbox-text {
   font-size: 0.95em;
-  color: #e6c843;
+  color: #704b88;
   user-select: none;
   white-space: nowrap;
   margin-left: 12px;
 }
 
 .select-all:hover .select-all-text {
-  color: #e6bb43;
+  color: #3bf2ff;
 }
 
 .has-selection-block {
@@ -79,13 +79,13 @@
   gap: 30px;                  
   padding: 15px 20px;
   margin: 20px 0;
-  background: #111;
+  background: #704b88;
   border: 1px solid #333;
   border-radius: 12px;
 }
 
 .selection-text-warning {
-  color: #e6c843;
+  color: #3bf2ff;
   font-size: 0.9rem;
 }
 

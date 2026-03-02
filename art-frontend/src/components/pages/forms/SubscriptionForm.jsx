@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../utils/api';
+import api from '../../../utils/api';
 import '@styles//SubscriptionForm.css';
 
 const SubscriptionForm = () => {
@@ -128,13 +128,13 @@ const SubscriptionForm = () => {
         <form onSubmit={handleSubmit} className="subscription-form">
 
           {/* Користувач */}
-          <div className="form-group">
-            <label className="form-label">Батько / Користувач</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Батько / Користувач</label>
             <select
               value={form.user_id}
               onChange={(e) => setForm({ ...form, user_id: e.target.value })}
               required
-              className="form-input"
+              className="subscription-form-input"
             >
               <option value="">Оберіть користувача</option>
               {Array.isArray(users) && users.map(user => (
@@ -146,8 +146,8 @@ const SubscriptionForm = () => {
           </div>
 
           {/* Тип абонемента */}
-          <div className="form-group">
-            <label className="form-label">Тип абонемента</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Тип абонемента</label>
               <select
                 value={form.subscription_type_id}
                 onChange={(e) => {
@@ -156,7 +156,7 @@ const SubscriptionForm = () => {
                   setForm({ ...form, subscription_type_id: value });
                 }}
                 required
-                className="form-input"
+                className="subscription-form-input"
               >
                 <option value="">Оберіть тип</option>
                 {Array.isArray(types) && types.map(type => (
@@ -168,8 +168,8 @@ const SubscriptionForm = () => {
             </div>
 
           {/* Дитина */}
-          <div className="form-group">
-            <label className="form-label">Ім'я дитини</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Ім'я дитини</label>
             <input
               type="text"
               value={form.sub_kids[0].name}
@@ -194,12 +194,12 @@ const SubscriptionForm = () => {
               pattern="[A-Za-zА-Яа-яіїєґІЇЄҐ\s'-]+"
               title="Ім'я може містити тільки літери, пробіли, апостроф або дефіс"
               required
-              className="form-input"
+              className="subscription-form-input"
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Вік</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Вік</label>
             <input
               type="number"
               min="3"
@@ -211,12 +211,12 @@ const SubscriptionForm = () => {
               setForm({ ...form, sub_kids: newSubKids });
               }}
               required
-              className="form-input"
+              className="subscription-form-input"
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Стать</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Стать</label>
             <select
               value={form.sub_kids[0].gender}
               onChange={(e) => {
@@ -225,7 +225,7 @@ const SubscriptionForm = () => {
               setForm({ ...form, sub_kids: newSubKids });
               }}
               required
-              className="form-input"
+              className="subscription-form-input"
             >
               <option value="" disabled>Оберіть стать</option>
               <option value="male">Хлопчик</option>
@@ -234,35 +234,35 @@ const SubscriptionForm = () => {
           </div>
 
           {/* Ціна та дата */}
-          <div className="form-group">
-            <label className="form-label">Оплачено (грн)</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Оплачено (грн)</label>
             <input
               type="number"
               value={form.price_paid}
               onChange={(e) => setForm({ ...form, price_paid: e.target.value })}
               required
-              className="form-input"
+              className="subscription-form-input"
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Дата початку</label>
+          <div className="subscription-form-group">
+            <label className="subscription-form-label">Дата початку</label>
             <input
               type="date"
               value={form.start_date}
               onChange={(e) => setForm({ ...form, start_date: e.target.value })}
               required
-              className="form-input"
+              className="subscription-form-input"
             />
           </div>
 
           {error && <div className="record-error">{error}</div>}
 
-          <div className="form-actions">
-            <button type="button" onClick={() => navigate(-1)} className="btn-cancel">
+          <div className="subscription-form-actions">
+            <button type="button" onClick={() => navigate(-1)} className="sub-btn-cancel">
               Скасувати
             </button>
-            <button type="submit" className="btn-save">
+            <button type="submit" className="sub-btn-save">
               Видати абонемент
             </button>
           </div>

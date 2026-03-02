@@ -1,52 +1,32 @@
 h2{
   font-family: 'Caveat', cursive !important;
   font-weight: 500; 
-  font-size: 1.8em !important; 
-  color: #f0c91d !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-size: 1.8em; 
+  color: #3bf2ff !important;
 }
 
 h3 {
-  font-family: 'Caveat', cursive !important;
+  font-family: 'Caveat', cursive;
   font-weight: 400; 
-  font-size: 1.5em !important; 
-  color: #f0c91d !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-size: 1.5em; 
+  color: #704b88; 
 }
 
-.record-page {
-  background: linear-gradient(135deg, rgba(99, 93, 93, 0.5), rgba(141, 132, 132, 0.5)); 
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px 20px;
-  font-family: 'Segoe UI', sans-serif;
+.record-form-wrapper {
+  padding: 3rem 1rem;
 }
 
-.record-card {
-  background: #181414;
-  color: #c7e0bd;
-  border-radius: 16px;
-  padding: 35px 40px;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto; 
-  box-shadow: 0 0 25px rgba(27, 212, 27, 0.4);
-  border: 2px solid  #f0c91d !important;
-  position: relative;
-  overflow: visible;
+.record-form-card {
+  max-width: 700px;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
-.record-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(27, 212, 27, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-  animation: pulse 8s infinite;
+.record-form-body {
+  padding: 3rem;
 }
 
 @keyframes pulse {
@@ -54,99 +34,97 @@ h3 {
   50% { opacity: 0.6; }
 }
 
-.record-title {
+.record-form-title {
   text-align: center;
   font-size: 2.2em;
   margin-bottom: 10px;
-  color: #f0c91d;
-  text-shadow: 0 0 10px #000000;
+  color: #704b88;
 }
 
-.record-price {
+.record-form-price {
   display: block;
   font-size: 0.6em;
-  color: #dadb7f;
+  color: #9371aa;
   margin-top: 8px;
   text-shadow: none;
 }
 
 .slot-info {
-  background: #222;
+  background: #ffffff;
+  color: #704b88;
   padding: 12px 16px;
   border-radius: 10px;
   text-align: center;
   margin: 20px 0;
-  border: 1px solid #f0c91d !important;
+  border: 1px solid #704b88;
   font-size: 1.1em;
 }
 
 .places-left {
-  color: #dadb7f;
+  color: #9371aa;
   margin-left: 10px;
 }
 
-.form-group {
+.record-form-group {
   margin-bottom: 20px;
 }
 
-.record-label {
+.record-form-label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 600;
-  color: #d8da7c;
-  text-shadow: 0 0 5px rgb(36, 44, 8);
+  font-weight: 400;
+  color: #9371aa;
 }
 
-.record-else-label {
+.record-form-else-label {
   margin: 30px 0 15px;
-  color:  #f0c91d !important;
+  font-weight: 400;
+  color:  #704b88;
   text-align: center;
-  text-shadow: 0 0 8px #000000;
 }
 
-.record-input,
-.record-select {
+.record-form-input,
+.record-form-select {
   width: 100%;
   padding: 12px 14px;
-  background: #222;
-  border: 2px solid  #f0c91d !important;
+  background: #ffffff;
+  border: 2px solid  #704b88;
   border-radius: 10px;
-  color: #c0c77f;
+  color: #704b88;
   font-size: 1em;
   transition: all 0.3s;
 }
 
-.record-input:focus,
-.record-select:focus {
+.record-form-input:focus,
+.record-form-select:focus {
   outline: none;
-  border-color: #eeff00;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-  background: #2a2a2a;
+  border-color: #704b88;
+  background: #ffffff;
 }
 
 .places-hint {
   margin-top: 6px;
-  color: #dbda7f;
+  color: #9c78b4;
   font-size: 0.9em;
 }
 
 .kids-title {
   margin: 30px 0 15px;
-  color: #e6d223;
+  font-weight: 400;
+  color: #704b88;
   text-align: center;
-  text-shadow: 0 0 8px #000000;
 }
 
 .kid-card {
-  background: rgba(27, 212, 27, 0.08);
-  border: 1px dashed #f0c91d !important;
+  background: rgb(255, 255, 255);
+  border: 1px dashed #704b88;
   border-radius: 12px;
   padding: 18px;
   margin-bottom: 16px;
   position: relative;
 }
 
-.btn-remove-kid {
+.record-form-remove-kid {
   margin-top: 10px;
   background: #e78989;
   color: #000;
@@ -156,24 +134,24 @@ h3 {
   font-size: 0.85em;
 }
 
-.btn-remove-kid:hover {
+.record-form-remove-kid:hover {
   background: #ff3030;
 }
 
-.btn-add-kid {
+.record-form-add-kid {
   display: block;
   margin: 20px auto;
   background: transparent;
-  color: #dbca7f;
-  border: 2px dashed #f0c91d !important;
+  color: #704b88;
+  border: 2px dashed #704b88;
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
   transition: 0.3s;
 }
 
-.btn-add-kid:hover {
-  background: rgba(127, 219, 127, 0.2);
+.record-form-add-kid:hover {
+  background: #704b88;
   border-color: #000000;
 }
 
@@ -187,41 +165,46 @@ h3 {
   border: 1px solid #ff3030;
 }
 
-.btn-record-submit {
-  width: 50%;
-  margin-top: 30px;
-  padding: 16px;
-  font-size: 0.8em;
-  font-weight: bold;
-  background: #f0c91d !important;
-  color: #000;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+.record-form-submit {
+  background: #704b88;
+  color: #3bf2ff;
+  font-weight: 500;
+  padding: 12px 8px;
+  border-radius: 24px;
+  width: auto;          
+  min-width: 140px;
+  max-width: 280px;
+  border: 1px solid #000000;
+  font-size: 1.05em;
   transition: all 0.3s;
-  text-align: center;
+  text-transform: none;
+  letter-spacing: 0.8px;
+
+  font-family: 'Caveat', cursive !important;   
+  text-align: center;               
+  display: flex;                    
+  align-items: center;             
+  justify-content: center;          
 }
 
-.btn-record-submit:hover:not(:disabled) {
-  background: #f0c91d;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.623);
+.record-form-submit:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #3bf2ff;
 }
 
-.btn-record-submit:disabled {
+.record-form-submit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.submit-wrapper {
+.record-form-submit-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 30px;
 }
 
 .record-loading {
-  color: #dbda7f;
+  color: #704b88;
   text-align: center;
   padding: 100px;
   font-size: 1.5em;

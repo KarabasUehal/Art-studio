@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams } from 'react-router-dom';
 import Activities from './components/pages/Activities';
-import ActivityForm from './components/pages/ActivityForm';
-import Login from './components/pages/Login';
-import Register from './components/pages/Register';
-import RecordForm from './components/pages/RecordForm';
-import RecordsList from './components/pages/RecordsList';
+import ActivityForm from './components/pages/forms/ActivityForm';
+import Login from './components/pages/auth/Login';
+import Register from './components/pages/auth/Register';
+import RecordForm from './components/pages/forms/RecordForm';
+import AdminRecordsList from './components/pages/AdminRecordsList';
 import ClientRecords from './components/pages/ClientRecords';
 import AdminSchedulePage from './components/pages/AdminSchedulePage';
 import ClientSchedulePage from './components/pages/ClientSchedulePage';
@@ -15,12 +15,12 @@ import './App.css';
 import AdminTemplatesPage from './components/pages/AdminTemplatesPage';
 import SubscriptionTypesPage from './components/pages/SubscriptionTypesPage';
 import SubscriptionsPage from './components/pages/SubscriptionsPage';
-import SubTypeForm from './components/pages/SubTypeForm';
-import SubscriptionForm from './components/pages/SubscriptionForm';
-import KidForm from './components/pages/KidForm';
+import SubTypeForm from './components/pages/forms/SubTypeForm';
+import SubscriptionForm from './components/pages/forms/SubscriptionForm';
+import KidForm from './components/pages/forms/KidForm';
 import KidsPage from './components/pages/ClientKidsPage';
-import KidsList from './components/pages/KidsList';
-import UsersList from './components/pages/UsersList';
+import AdminKidsList from './components/pages/AdminKidsList';
+import AdminUsersList from './components/pages/AdminUsersList';
 import AdminErrorsList from './components/pages/AdminErrorsList';
 
 
@@ -94,25 +94,25 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
 
         <nav className="mb-4 d-flex flex-wrap justify-content-center gap-2 btn-buttons nav-buttons">
           {isAuthenticated && role ? (
-            <>
+            <div className="studio-buttons-top-wrapper">
               {role === 'owner' && (
                 <>
-                  <Link to="/admin/register" className="nav-btn-warning">Створити акаунт</Link>
-                  <Link to="/records" className="nav-btn-warning">Усi записи</Link>
-                  <Link to="admin/kids" className="nav-btn-warning">Усi діти</Link>
-                  <Link to="/admin/users" className="nav-btn-warning">Користувачi</Link>
-                  <Link to="/admin/errors" className="nav-btn-danger">Помилки</Link>
+                  <Link to="/admin/register" className="studio-btn-admin">Створити акаунт</Link>
+                  <Link to="/admin/users" className="studio-btn-admin">Користувачi</Link>
+                  <Link to="/admin/errors" className="studio-btn-admin">Помилки</Link>
+                  <Link to="/records" className="studio-btn-admin">Усi записи</Link>
+                  <Link to="admin/kids" className="studio-btn-admin">Усi діти</Link>
                 </>
               )}
-                <Link to="/client/records" className="nav-btn-info">Мої записи</Link>
-                <Link to="/client/kids" className="nav-btn-info">Мої діти</Link>
-              <button onClick={logout} className="nav-btn-danger">Вийти</button>
-            </>
+                <Link to="/client/records" className="studio-btn-client">Мої записи</Link>
+                <Link to="/client/kids" className="studio-btn-client">Мої діти</Link>
+              <button onClick={logout} className="studio-btn-logout">Вийти</button>
+            </div>
           ) : (
-            <>
-              <Link to="/register" className="nav-btn-warning">Зареєструватись</Link>
-              <Link to="/login" className="nav-btn-primary">Увiйти</Link>
-            </>
+            <div className="studio-buttons-top-wrapper">
+              <Link to="/register" className="studio-btn-client">Зареєструватись</Link>
+              <Link to="/login" className="studio-btn-login">Увiйти</Link>
+            </div>
           )}
         </nav>
 
@@ -133,18 +133,18 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <h1>Арт-студія дитячої творчості! 🎨✨</h1>
         </div>
 
-         <nav className="mb-3 d-flex flex-wrap gap-2 justify-content-center">
-          <Link to="/" className="nav-btn-success-menu">Напрямки</Link>
-          <Link to="/schedule" className="nav-btn-success-menu">Графік занять</Link>
-          <Link to="/subscriptions/types" className="nav-btn-success-menu">Абонементи напрямкiв</Link>
+         <div className="studio-buttons-bot-wrapper">
+          <Link to="/" className="studio-btn-client-menu">Напрямки</Link>
+          <Link to="/schedule" className="studio-btn-client-menu">Графік занять</Link>
+          <Link to="/subscriptions/types" className="studio-btn-client-menu">Абонементи напрямкiв</Link>
           {role === 'owner' && (
           <>
-          <Link to="/admin/subscriptions" className="nav-btn-warning-menu">Куплені абонементи</Link>
-          <Link to="/admin/templates" className="nav-btn-warning-menu">Шаблони тижня</Link>
-          <Link to="/admin/slots" className="nav-btn-warning-menu">Створити слот</Link>
+          <Link to="/admin/subscriptions" className="studio-btn-admin-menu">Куплені абонементи</Link>
+          <Link to="/admin/templates" className="studio-btn-admin-menu">Шаблони тижня</Link>
+          <Link to="/admin/slots" className="studio-btn-admin-menu">Створити слот</Link>
           </>
           )}
-         </nav>
+         </div >
 
         <Routes>
           <Route path="/" element={<Activities isAuthenticated={isAuthenticated} />} /> 
@@ -153,7 +153,7 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/register" element={isAuthenticated && role === 'owner' ? <Register adminMode={true} /> : <Navigate to="/login" />} />
-          <Route path="/records" element={<RecordsList isAuthenticated={isAuthenticated} />} />
+          <Route path="/records" element={<AdminRecordsList isAuthenticated={isAuthenticated} />} />
           <Route path="/client/records" element={<ClientRecords isAuthenticated={isAuthenticated} />} />
           <Route path="/record/:activityId/:slotId?" element={isAuthenticated ? <RecordForm /> : <Navigate to="/login" />} />
           <Route path="/admin/slots" element={isAuthenticated && role === 'owner' ? <AdminSchedulePage /> : <Navigate to="/login" />} />
@@ -168,8 +168,8 @@ const logoImage       = 'https://i.postimg.cc/qqSq7FtK/Dushka.jpg';
           <Route path="/client/kids" element={isAuthenticated ? <KidsPage /> : <Navigate to="/login" />} />
           <Route path="/client/kids/add" element={isAuthenticated ? <KidForm /> : <Navigate to="/login" />} />
           <Route path="/client/kids/edit/:id" element={isAuthenticated ? <KidForm /> : <Navigate to="/login" />} />
-          <Route path="/admin/kids" element={<KidsList isAuthenticated={isAuthenticated} />} />
-          <Route path="/admin/users" element={<UsersList isAuthenticated={isAuthenticated} />} />
+          <Route path="/admin/kids" element={<AdminKidsList isAuthenticated={isAuthenticated} />} />
+          <Route path="/admin/users" element={<AdminUsersList isAuthenticated={isAuthenticated} />} />
           <Route path="/admin/errors" element={<AdminErrorsList isAuthenticated={isAuthenticated} />} />
         </Routes>
 

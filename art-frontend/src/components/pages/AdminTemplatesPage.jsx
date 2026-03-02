@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
-import AddEditTemplateModal from './AddEditTemplateModal'; 
-import DeleteModal from './DeleteModal'; 
-import ScheduleExtendModal from './ScheduleExtendModal.jsx'; 
-import SuccessScheduleModal from './SuccessScheduleModal.jsx';
+import AddEditTemplateModal from './modals/AddEditTemplateModal'; 
+import DeleteModal from './modals/DeleteModal'; 
+import ScheduleExtendModal from './modals/ScheduleExtendModal.jsx'; 
+import InfoModal from './modals/InfoModal.jsx';
 import '@styles/TemplatesSchedule.css';
 
 
@@ -16,13 +16,11 @@ const AdminTemplatesPage = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Поиск по имени активности
   const [selectedTemplate, setSelectedTemplate] = useState(null); // Для редактирования/удаления
   const [showAddEditModal, setShowAddEditModal] = useState(false); // Модалка add/edit
-  const [showDeleteModal, setShowDeleteModal] = useState(false);// Модалка delete
-  const [showScheduleExtendModal, setShowScheduleExtendModal] = useState(false);// Модалка delete
-  const [showExtendConfirm, setShowExtendConfirm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);// Модалка удаления
+  const [showScheduleExtendModal, setShowScheduleExtendModal] = useState(false);// Модалка продления
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const daysOfWeek = {
     1: 'Понеділок',
@@ -157,7 +155,7 @@ const handleDeleteTemplate = (template) => {
   const handleConfirmExtend = async (weeks = 1) => {
     try {
       await api.post(`/schedule/extend?weeks=${weeks}`);
-      setShowSuccess(true)
+      setShowInfoModal(true)
     } catch (err) {
       setError('Помилка продовження розкладу');
     }
@@ -181,7 +179,7 @@ const handleDeleteTemplate = (template) => {
   if (loading) return <div>Завантаження...</div>;
 
   return (
-  <div className="templates-page">
+  <div className="template-page">
     <h2>Управління шаблонами розкладу</h2>
 
     <input
@@ -189,27 +187,27 @@ const handleDeleteTemplate = (template) => {
       placeholder="Пошук за назвою активності..."
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
-      className="templates-search"
+      className="template-search"
     />
 
-    <div className="templates-actions">
+    <div className="template-actions">
       <button
         onClick={handleAddTemplate}
-        className="btn-template-add"
+        className="template-btn-add"
       >
         Додати шаблон
       </button>
 
       <button
         onClick={handleExtendSchedule}
-        className="btn-template-extend"
+        className="template-btn-extend"
       >
         Продовжити розклад
       </button>
     </div>
 
-    <div className="table-container">
-      <table className="templates-table">
+    <div className="template-table-container">
+      <table className="template-table">
         <thead>
           <tr>
             {Object.entries(daysOfWeek).map(([num, name]) => (
@@ -223,7 +221,7 @@ const handleDeleteTemplate = (template) => {
             {Object.keys(daysOfWeek).map((dayNum) => (
               <td key={dayNum}>
                 {groupedByDay[dayNum].length === 0 ? (
-                  <p className="empty-message">Немає шаблонів</p>
+                  <p className="template-empty-message">Немає шаблонів</p>
                 ) : (
                   groupedByDay[dayNum].map((tmpl) => {
                     const act = activities.find(
@@ -248,14 +246,14 @@ const handleDeleteTemplate = (template) => {
                           <div className="template-card-buttons">
                             <button
                               onClick={() => handleEditTemplate(tmpl)}
-                              className="btn-template-edit"
+                              className="template-btn-edit"
                             >
                               🖊️
                             </button>
 
                             <button
                               onClick={() => handleDeleteTemplate(tmpl)}
-                              className="btn-template-delete"
+                              className="template-btn-delete"
                             >
                               🗑️
                             </button>
@@ -300,7 +298,12 @@ const handleDeleteTemplate = (template) => {
             />
           )}
 
-      <SuccessScheduleModal show={showSuccess} onHide={() => setShowSuccess(false)} />
+      <InfoModal 
+      show={showInfoModal} 
+      onHide={() => setShowInfoModal(false)} 
+      onSuccess={() => setShowInfoModal(false)}
+      modalInfo='Розклад продовжено!'
+      />
 
     </div>
   );

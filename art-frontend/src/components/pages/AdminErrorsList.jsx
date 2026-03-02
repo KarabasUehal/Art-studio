@@ -51,14 +51,18 @@ const AdminErrorsList = ({ isAuthenticated }) => {
 
   if (error) return <div className="alert alert-danger text-center">{error}</div>;
   if (loading) return <div className="text-center mt-5">Завантаження помилок...</div>;
-  if (studio_errors.length === 0 && totalCount === 0) return <div className="text-center mt-5">Помилок не знайдено</div>;
 
   const handlePageChange = ({ selected }) => setPage(selected + 1);
 
   return (
     <div className="list-page">
     <h2 className="list-title">Помилки</h2>
-      <div className="list-grid">
+    {studio_errors.length === 0 && totalCount === 0 ? (
+          <p className="empty-message">
+            Помилок не знайдено
+          </p>
+    ) : (
+        <div className="list-grid">
         {studio_errors.map((st_err) => (
           <div key={st_err.id} className="list-grid-item">
             <div className="list-card">
@@ -78,6 +82,8 @@ const AdminErrorsList = ({ isAuthenticated }) => {
           </div>
         ))}
       </div>
+    )}
+      
       {totalPages > 1 && (
         <ReactPaginate
           previousLabel="← Назад"

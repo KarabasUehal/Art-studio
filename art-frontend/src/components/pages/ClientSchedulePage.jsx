@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext, useLayoutEffect, useRef } from 
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
-import DeleteModal from './DeleteModal';
+import DeleteModal from './modals/DeleteModal';
 import "@styles/Schedule.css";
 
 const ClientSchedulePage = () => {

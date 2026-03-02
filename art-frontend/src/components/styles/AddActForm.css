@@ -1,0 +1,254 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #d8d8d8, #704b88);
+  color: #704b88;
+}
+
+.activity-form-wrapper {
+  padding: 3rem 1rem;
+}
+
+.activity-card {
+  max-width: 650px;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.activity-card-body {
+  padding: 3rem;
+}
+
+.activity-title {
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 3rem;
+  color: #3bf2ff !important;
+}
+
+.activity-form-group {
+  margin-bottom: 1.75rem;
+}
+
+.activity-form-label {
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-align: left;
+}
+
+input.activity-form-input,
+textarea.activity-form-textarea {
+  background: #ece8e8;  
+  color: #141414;             
+  border: 2px solid #444;
+  border-radius: 10px;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.2em;
+  box-sizing: border-box;   
+  font-family: 'Segoe UI', sans-serif;            
+  margin-bottom: 10px;
+  
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.activity-form-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.activity-form-input:focus,
+.activity-form-textarea:focus {
+  border-color: #704b88;
+  background: #ece7e7;                  
+  box-shadow: 0 0 0 3px rgba(67, 219, 230, 0.25);
+  outline: none;
+}
+
+.activity-form-hint {
+  font-size: 1.6rem;
+  margin-top: 0.4rem;
+  color: #674997;
+}
+
+.activity-form-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.activity-form-col {
+  flex: 1;
+}
+
+.activity-input-group {
+  display: flex;
+}
+
+.activity-input-addon {
+  background: #ece8e8; 
+  color: #704b88;
+  border: 1px solid #444;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-weight: 400;
+  font-size: 1.1em;
+  box-sizing: border-box;   
+  font-family: 'Segoe UI', sans-serif;            
+  margin-bottom: 10px;
+  
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.activity-url-delete {
+  background-color: #eba4a4;
+  padding: 0.35rem 0.75rem;
+  font-size: 1.2rem;
+}
+
+.activity-add-url {
+  background-color: #ece8e8;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.6rem;
+}
+
+.activity-add-url,
+.activity-url-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 2px solid #444;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.activity-add-url:hover,
+.activity-url-delete:hover {
+  transform: translateY(-4px);
+  filter: brightness(1.1);
+}
+
+.activity-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.photo-add-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.photo-list {
+  margin-top: 1rem;
+  padding-left: 1rem;
+}
+
+.photo-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  gap: 1rem;
+}
+
+.activity-switch-group {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.activity-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.activity-switch input {
+  display: none;
+}
+
+.activity-slider {
+  position: relative;
+  width: 46px;
+  height: 24px;
+  background-color: #818181;
+  border-radius: 999px;
+  transition: background-color 0.25s ease;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.activity-slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: rgba(101, 130, 139, 0.6);
+  border-radius: 50%;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.activity-switch input:checked + .activity-slider {
+  background-color: #3bf2ff;
+}
+
+.activity-switch input:checked + .activity-slider::before {
+  transform: translateX(22px);
+  background-color: #1e1e1e;
+}
+
+.activity-switch-label {
+  font-weight: 400;
+  color: #704b88;
+}
+
+.activity-switch:hover .activity-slider {
+  filter: brightness(1.1);
+}
+
+.activity-submit-wrapper {
+  margin-top: 3rem;
+  justify-content: center;
+}
+
+.activity-submit-btn {
+  display: inline-block;
+  background: #704b88;
+  color: #3bf2ff;
+  padding: 14px 40px;
+  border: 2px solid #000000;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 1.1em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
+  transition: all 0.3s;
+  margin: 0 auto;
+}
+
+.activity-submit-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px #3bf2ff;
+  text-decoration: none !important;
+}

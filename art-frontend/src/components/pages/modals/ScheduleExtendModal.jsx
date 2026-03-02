@@ -1,15 +1,15 @@
 import React from 'react';
 import '@styles/Modal.css';
 
-const DeleteModal = ({ show, onHide, onDelete, modalTitle, modalElementName, modalQuestion, modalWarning }) => {
+const ScheduleExtendModal = ({ show, onHide, onExtend}) => {
     if (!show) return null;
 
     return (
 <div className="studio-modal-backdrop">
       <div className="studio-modal">
-        <div className="delete-modal-header">
+        <div className="extend-modal-header">
           <h5 className="studio-modal-title">
-            {modalTitle}
+            Шаблон рокладу студії
           </h5>
           <button
             type="button"
@@ -23,27 +23,26 @@ const DeleteModal = ({ show, onHide, onDelete, modalTitle, modalElementName, mod
 
         <div className="studio-modal-body">
           <p>
-            {modalQuestion} "<strong>{modalElementName}</strong>"?<br />
-            {modalWarning}
+            <strong>Продовжити розклад на тиждень?</strong>
           </p>
         </div>
 
         <div className="studio-modal-footer">
           <button
             type="button"
-            className="btn-modal-cancel"
+            className="modal-btn-cancel"
             onClick={onHide}
           >
             Вiдмiна
           </button>
           <button
             type="button"
-            className="btn-modal-delete"
+            className="modal-btn-success"
             onClick={() => {
-              onDelete();
+              onExtend();
             }}
           >
-            Видалити
+            Продовжити
           </button>
         </div>
       </div>
@@ -51,4 +50,4 @@ const DeleteModal = ({ show, onHide, onDelete, modalTitle, modalElementName, mod
   );
 };
 
-export default DeleteModal;
+export default ScheduleExtendModal;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import DeleteModal from './DeleteModal.jsx';
+import DeleteModal from './modals/DeleteModal.jsx';
 import ReactPaginate from 'react-paginate';
 import '@styles/List.css'; 
 
-const KidsList = ({ isAuthenticated }) => {
+const AdminKidsList = ({ isAuthenticated }) => {
   const [kids, setKids] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,7 @@ const KidsList = ({ isAuthenticated }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const { role } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [kidToDelete, setKidToDelete] = useState(null);
@@ -56,7 +58,6 @@ const KidsList = ({ isAuthenticated }) => {
 
   if (error) return <div className="alert alert-danger text-center">{error}</div>;
   if (loading) return <div className="text-center mt-5">Завантаження даних дітей...</div>;
-  if (kids.length === 0 && totalCount === 0) return <div className="text-center mt-5">Дітей не знайдено</div>;
 
   const handlePageChange = ({ selected }) => setPage(selected + 1);
 
@@ -65,16 +66,31 @@ const KidsList = ({ isAuthenticated }) => {
   return (
     <div className="list-page">
     <h2 className="list-title">Усі діти студії</h2>
+     {kids.length === 0 && totalCount === 0 ? (
+        <p className="empty-message">
+          Дітей не знайдено
+        </p>
+     ) : (
       <div className="list-grid">
         {kids.map((kid) => (
           <div key={kid.id} className="list-grid-item">
             <div className="list-card">
             <div className="list-card-body">
-              <h5 className="list-card-title">{kid.name}</h5>
-                <p className="list-text">{kid.age}</p>
-                <p className="list-text"> <strong>Стать:</strong> {kid.gender === 'male' ? 'Хлопчик' : kid.gender === 'female' ? 'Дівчинка' : 'Неизвестно'} {getKidEmoji(kid.gender)}</p>
+              <h5 className="list-card-title">
+                <strong className="list-strong">
+                  {kid.name}
+                </strong>
+              </h5>
+                <p className="list-text"><strong>Вiк:</strong> {kid.age}</p>
+                <p className="list-text"><strong>Стать:</strong> {kid.gender === 'male' ? 'Хлопчик' : kid.gender === 'female' ? 'Дівчинка' : 'Неизвестно'} {getKidEmoji(kid.gender)}</p>
                 <p className="list-text"><strong>Батько:</strong> {kid.parent_name}</p>
-                <div>
+                <div className="list-buttons">
+                  <button
+                    onClick={() => navigate(`/client/kids/edit/${kid.ID}`)}
+                    className="list-edit-btn"
+                  >
+                    Редагувати
+                  </button>
                   <button 
                     onClick={() => { setKidToDelete(kid); setShowDeleteModal(true); }}
                     className="list-delete-btn"
@@ -86,7 +102,10 @@ const KidsList = ({ isAuthenticated }) => {
             </div>
           </div>
         ))}
-      </div>
+      </div>)
+
+     }
+      
       {totalPages > 1 && (
         <ReactPaginate
           previousLabel="← Назад"
@@ -118,4 +137,4 @@ const KidsList = ({ isAuthenticated }) => {
   );
 };
 
-export default KidsList;
+export default AdminKidsList;

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import api from '../../utils/api.jsx';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import DeleteModal from './DeleteModal.jsx';
+import DeleteModal from './modals/DeleteModal.jsx';
 import ReactPaginate from 'react-paginate';
 import '@styles/List.css'; 
 
-const RecordsList = ({ isAuthenticated }) => {
+const AdminRecordsList = ({ isAuthenticated }) => {
   const [records, setRecords] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -27,6 +27,12 @@ const RecordsList = ({ isAuthenticated }) => {
   }
 }, [page, size, isAuthenticated, role, selectedDate]);
 
+useEffect(() => {
+  if (selectedDate) {
+    setPage(1);
+  }
+}, [selectedDate]);
+
   const fetchRecords = async (pageNum = page, sizeNum = size) => {
     setLoading(true);
     try {
@@ -35,7 +41,7 @@ const RecordsList = ({ isAuthenticated }) => {
       size: sizeNum,
     };
     if (selectedDate) {
-      params.date = selectedDate; // ← добавляем параметр date=2026-01-15
+      params.date = selectedDate; 
     }
 
       const response = await api.get('/records', { params });
@@ -90,7 +96,6 @@ const RecordsList = ({ isAuthenticated }) => {
 
   if (error) return <div className="alert alert-danger text-center">{error}</div>;
   if (loading) return <div className="text-center mt-5">Завантаження записів...</div>;
-  if (records.length === 0 && totalCount === 0) return <div className="text-center mt-5">Записів не знайдено</div>;
 
   const handlePageChange = ({ selected }) => {
     const newPage = selected + 1;
@@ -104,7 +109,7 @@ const RecordsList = ({ isAuthenticated }) => {
   <div className="list-page" lang="uk">
     <h2 className="list-title">Усі записи до студії</h2>
     
-    {/* ФИЛЬТР ПО ДАТЕ */}
+    {/* Фильтр по дате */}
       <div className="list-filter">
         <label className="list-filter-label">
           Фільтр за датою заняття:
@@ -126,9 +131,9 @@ const RecordsList = ({ isAuthenticated }) => {
       </div>
 
       {records.length === 0 ? (
-        <div className="text-center mt-5">
+        <p className="empty-message">
           {selectedDate ? 'Записів на обрану дату не знайдено' : 'Записів не знайдено'}
-        </div>
+        </p>
       ) : (
     <div className="list-grid">
       {records.map((rec) => (
@@ -212,4 +217,4 @@ const RecordsList = ({ isAuthenticated }) => {
  );
 };
 
-export default RecordsList;
+export default AdminRecordsList;

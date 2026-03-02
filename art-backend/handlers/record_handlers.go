@@ -315,7 +315,9 @@ func GetAllRecords() gin.HandlerFunc {
 			return
 		}
 
-		cacheKey := fmt.Sprintf("records:all:page:%d:size:%d", page, size)
+		dateFilter := c.Query("date")
+
+		cacheKey := fmt.Sprintf("records:all:page:%d:size:%d:date:%s", page, size, dateFilter)
 
 		cached, err := redisClient.Get(c, cacheKey).Result()
 		if err == nil {
@@ -331,14 +333,12 @@ func GetAllRecords() gin.HandlerFunc {
 			log.Error().Err(err).Msg("Failed to hit cache for all records")
 		}
 
-		dateFilter := c.Query("date")
-
 		query := db.Model(&models.Record{})
 
 		if dateFilter != "" {
 			// Фильтр по полю Details->date (jsonb)
 			// PostgreSQL позволяет обращаться к jsonb-полям через ->
-			query = query.Where("details->>'date' LIKE ?", dateFilter+"%")
+			query = query.Where("DATE(details->>'date') = ?", dateFilter)
 		}
 
 		// Подсчёт общего количества заказов

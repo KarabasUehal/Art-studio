@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import SuccessRecordModal from './SuccessRecordModal.jsx';
-import api from '../../utils/api.jsx';
+import api from '../../../utils/api.jsx';
+import InfoModal from '../modals/InfoModal.jsx';
 import '@styles/RecordForm.css';
 import '@styles/Checkbox.css';
 
@@ -21,7 +21,7 @@ const RecordForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Загрузка активности и слотов
   useEffect(() => {
@@ -79,7 +79,15 @@ const RecordForm = () => {
 
   const updateKid = (index, field, value) => {
     const kids = [...formData.kids];
-    kids[index][field] = value;
+    let newValue = value;
+
+    // Валидация для имени
+    if (field === "name") {
+      newValue = value.replace(/[^а-яА-ЯёЁіІїЇєЄґҐ\s-]/g, "");
+    }
+
+    kids[index][field] = newValue;
+
     setFormData({ ...formData, kids });
   };
 
@@ -142,7 +150,7 @@ const RecordForm = () => {
       };
 
       await api.post('/record', req);
-      setShowSuccess(true);
+      setShowModal(true);
       // Сброс формы
       setFormData({
         numberOfKids: 1,
@@ -172,13 +180,17 @@ const RecordForm = () => {
   const manualCount = formData.kids.filter(k => k.name.trim()).length;
   const totalKidsCount = selectedCount + manualCount;
 
+  const hasSelectedKids = selectedKidIds.length > 0;
+
   return (
-    <div className="record-page">
-      <div className="record-card">
-        <h2 className="record-title">
+    <div className="record-form-wrapper">
+      <div className="record-form-card">
+        <div className="record-form-body">
+        <h2 className="record-form-title">
           Запис на «{activity.name}»
-          <span className="record-price">{activity.price} грн / мiсце</span>
+          <span className="record-form-price">{activity.price} грн / мiсце</span>
         </h2>
+        <form className="record-form" onSubmit={handleSubmit}>
 
         {/* Предвыбранный слот */}
         {slotId && selectedSlot && (
@@ -192,10 +204,10 @@ const RecordForm = () => {
 
         {/* Выбор слота */}
         {!slotId && (
-          <div className="form-group">
-            <label className="record-label">Оберіть час заняття</label>
+          <div className="record-form-group">
+            <label className="record-form-label">Оберіть час заняття</label>
             <select
-              className="record-select"
+              className="record-form-select"
               value={formData.slotId}
               onChange={(e) => setFormData({ ...formData, slotId: e.target.value })}
               required
@@ -213,10 +225,10 @@ const RecordForm = () => {
           </div>
         )}
 
-          <h3 className="record-else-label">Оберіть дітей</h3>
-
         {userKids.length > 0 && (
           <>
+            <h3 className="record-form-else-label">Оберіть дітей</h3>
+
             {userKids.map(kid => (
               <label className="custom-checkbox" key={kid.id}>
                 <input
@@ -231,24 +243,23 @@ const RecordForm = () => {
                     }}
                   />
                   <span className="checkmark"></span>
-                  <span className="checkbox-text">{kid.name} ({kid.age} років</span>
-                  )
+                  <span className="checkbox-text">{kid.name} ({kid.age} років)</span>  
               </label>
             ))}
           </>
           
         )}
 
-        <h3 className="record-else-label">{userKids.length ? 'Або додайте дитину вручну' : 'Дані дитини'}</h3>
+        <h3 className="record-form-else-label">{userKids.length ? 'Або додайте дитину вручну' : 'Дані дитини'}</h3>
 
 
-        <div className="form-group">
-          <label className="record-label">Кількість дітей</label>
+        <div className="record-form-group">
+          <label className="record-form-label">Кількість дітей</label>
           <input
             type="number"
             min="1"
             max={availablePlaces}
-            className="record-input"
+            className="record-form-input"
             value={formData.numberOfKids}
             onChange={(e) => {
               let num = Math.max(1, Math.min(+e.target.value || 1, availablePlaces));
@@ -268,26 +279,26 @@ const RecordForm = () => {
           <div key={i} className="kid-card">
             <input
               placeholder="Ім'я дитини"
-              className="record-input"
+              className="record-form-input"
               value={kid.name}
               onChange={(e) => updateKid(i, 'name', e.target.value)}
-              required
+              required={!hasSelectedKids}
             />
             <input
               type="number"
               placeholder="Вік"
               min="3"
               max="17"
-              className="record-input"
+              className="record-form-input"
               value={kid.age}
               onChange={(e) => updateKid(i, 'age', +e.target.value)}
-              required
+              required={!hasSelectedKids}
             />
             <select
-              className="record-select"
+              className="record-form-select"
               value={kid.gender}
               onChange={(e) => updateKid(i, 'gender', e.target.value)}
-              required
+              required={!hasSelectedKids}
             >
               <option value="" disabled>Оберіть стать</option>
               <option value="male">Хлопчик</option>
@@ -295,7 +306,7 @@ const RecordForm = () => {
             </select>
 
             {formData.kids.length > 1 && (
-              <button type="button" className="btn-remove-kid" onClick={() => removeKid(i)}>
+              <button type="button" className="record-form-remove-kid" onClick={() => removeKid(i)}>
                 Видалити дитину
               </button>
             )}
@@ -304,19 +315,24 @@ const RecordForm = () => {
 
         {error && <div className="record-error">{error}</div>}
 
-      <div className="submit-wrapper">
+      <div className="record-form-submit-wrapper">
         <button
-          type="submit"
           disabled={loading || !formData.slotId || totalKidsCount === 0}
-          className="btn-record-submit"
-          onClick={handleSubmit}
+          className="record-form-submit"
         >
           {loading ? 'Записуємо...' : `Записатися (${activity.price * totalKidsCount} грн)`}
         </button>
+      </div>
+      </form>
         </div>
       </div>
 
-      <SuccessRecordModal show={showSuccess} onHide={() => setShowSuccess(false)} />
+      <InfoModal 
+      show={showModal} 
+      onHide={() => setShowModal(false)} 
+      onSuccess={() => setShowModal(false)}
+      modalInfo="Запис створено! До зустрічі в арт-студії!"
+      />
     </div>
   );
 };

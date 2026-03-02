@@ -1,6 +1,6 @@
 .admin-schedule-page {
   min-height: 100vh;
-  background: transparent;
+  background: linear-gradient(135deg, #d8d8d8, #704b88);
   border-radius: 16px;
   padding: 40px 20px;
   font-family: 'Segoe UI', sans-serif;
@@ -9,7 +9,7 @@
 .admin-schedule-card {
   max-width: 1200px;
   margin: 0 auto;
-  background: rgba(0, 0, 0, 0.6) !important;
+  background: transparent;
   border-radius: 16px;
   padding: 35px;
   border: 2px solid #000000;
@@ -17,15 +17,15 @@
   overflow: hidden;
 }
 
-.admin-title {
-  text-align: center !important;
-  font-size: 1.8em !important;
-  color: #ffd102 !important;
-  text-shadow: 0 0 15px #000000 !important;
+.manual-slot-title {
+  text-align: center;
+  font-size: 1.8em;
+  color: #704b88;
+  text-shadow: 0 0 15px #000000;
   margin-bottom: 30px;
 }
 
-.admin-error {
+.manual-slot-error {
   background: rgba(255, 50, 50, 0.2);
   color: #ff8c8c;
   padding: 12px;
@@ -35,25 +35,24 @@
   margin-bottom: 20px;
 }
 
-.admin-grid {
+.manual-slot-grid {
   display: grid;
   grid-template-columns: 340px 1fr;
   gap: 30px;
 }
 
-.activities-sidebar {
-  background: #355345;
+.manual-slot-activities-sidebar {
+  background: #ffffff;
   border-radius: 12px;
   padding: 20px;
-  border: 1px dashed #ffd102;
+  border: 1px solid #704b88;
   height: fit-content;  
 }
 
-.sidebar-title {
-  color: #ffd102 !important;
-  text-shadow: 0 0 8px #000000 !important;
+.manual-slot-sidebar-title {
+  color: #704b88;
   margin-bottom: 15px;
-  font-size: 1.4em !important;
+  font-size: 1.4em;
 }
 
 .empty-message {
@@ -64,16 +63,16 @@
   font-weight: 300;
 }
 
-.activities-list {
+.manual-slot-activities-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.activity-btn {
-  background: #222;
-  color: #c7e0bd;
-  border: 2px solid #ffd102;
+.manual-slot-activity-btn {
+  background: #ffffff;
+  color: #704b88;
+  border: 2px solid #704b88;
   padding: 12px 16px;
   border-radius: 10px;
   text-align: left;
@@ -81,109 +80,113 @@
   font-weight: 500;
 }
 
-.activity-btn:hover {
-  background: rgba(27, 212, 27, 0.2);
+.manual-slot-activity-btn:hover {
+  background: rgba(105, 43, 156, 0.2);
   transform: translateX(5px);
 }
 
-.activity-btn.active {
-  background: #ffd102;
-  color: #000;
-  font-weight: bold;
-  box-shadow: 0 0 20px  ;
+.manual-slot-activity-btn.active {
+  background: #704b88;
+  color: #ffffff;
 }
 
-.slots-content {
+.manual-slot-content {
   display: flex;
   flex-direction: column;
   gap: 25px;
 }
 
 .selected-activity-title {
-  color: #ffd102;
+  color: #704b88 !important;
   font-size: 1.8em;
   margin: 0;
 }
 
 .selected-activity-title span {
-  color: #41e23b;
+  color: #3bf2ff;
   text-shadow: 0 0 5px #a53b28;
 }
 
-.add-slot-form {
-  background: rgba(27, 212, 27, 0.08);
+.manual-slot-add-form {
+  background: rgba(192, 108, 231, 0.08);
   padding: 20px;
   border-radius: 12px;
-  border: 1px solid #ffd102;
+  border: 1px solid #704b88;
 }
 
-.form-row {
+.manual-slot-form-row {
   display: grid;
   grid-template-columns: 1fr 150px auto;
   gap: 15px;
   align-items: end;
 }
 
-.input-group label {
-  display: block;
+.manual-slot-input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.manual-slot-input-group label {
   margin-bottom: 8px;
-  color: #c7e0bd;
+  color: #704b88;
   font-weight: 600;
 }
 
-.admin-input {
+.manual-slot-admin-input {
   width: 100%;
   padding: 12px 14px;
-  background: #222;
-  border: 2px solid #ffd102;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 2px solid #704b88;
   border-radius: 10px;
-  color: #ffd102;
+  color: #704b88;
   font-size: 1em;
 }
 
-.admin-input:focus {
+.manual-slot-admin-input:focus {
   outline: none;
-  border-color: #ffd102;
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+  box-shadow: 0 0 15px rgba(34, 34, 34, 0.6);
 }
 
-.btn-add-slot {
-  background: #ffd102;
-  color: #000;
+.manual-slot-btn-add {
+  background: #704b88;
+  color: #3bf2ff;
   font-weight: bold;
   padding: 12px 24px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgb(0, 0, 0);
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
-.btn-add-slot:hover {
+.manual-slot-btn-add:hover {
   transform: translateY(-3px);
+  box-shadow: 0 3px 12px #3bf2ff;
 }
 
-.slot-loading, .no-slots, .slot-placeholder {
+.manual-slot-loading, .no-slots, .manual-slot-placeholder {
   text-align: center;
-  color: #000000;
   font-size: 1.2em;
   padding: 40px;
-  background: #355345;
-  color: #ffd102;
+  background: #ffffff;
+  color: #704b88;
   border-radius: 12px;
-  border: 1px dashed #ffd102;
+  border: 1px solid #704b88;
 }
 
-.slots-grid {
+.manual-slot-list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 18px;
   margin-top: 10px;
 }
 
-.slot-card {
-  background: #1a1a1a;
-  border: 2px solid #ffd102;
+.manual-slot-card {
+  background: #ffffff;
+  color: #704b88;
+  border: 2px solid #704b88;
   border-radius: 12px;
   padding: 16px;
   transition: all 0.3s;
@@ -191,23 +194,22 @@
   overflow: hidden;
 }
 
-.slot-card:hover {
+.manual-slot-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(27, 212, 27, 0.3);
 }
 
-.slot-time {
+.manual-slot-time {
   font-size: 1.1em;
-  color: #c7e0bd;
+  color: #704b88 !important;
   margin-bottom: 8px;
 }
 
-.slot-places {
-  color: #d0d677;
+.manual-slot-places {
+  color: #704b88 !important; 
   font-weight: bold;
 }
 
-.activities-tabs {
+.manual-slot-activities-tabs {
   display: flex;
   justify-content: center;
   gap: 14px;
@@ -215,10 +217,10 @@
   flex-wrap: wrap;
 }
 
-.tab-btn {
-  background: rgba(209, 198, 94, 0.08);
-  color: #ffd102;
-  border: 1.5px solid #ffd102;
+.manual-slot-tab-btn {
+  background: #ffffff;
+  color: #704b88;
+  border: 1.5px solid #704b88;
   padding: 10px 24px;             
   border-radius: 40px;
   font-weight: 600;
@@ -227,20 +229,16 @@
   transition: all 0.3s;
 }
 
-.tab-btn:hover {
-  background: rgba(255,235,59,0.2);
+.manual-slot-tab-btn:hover {
+  box-shadow: 0 0 0 8px rgba(175, 122, 211, 0.6);
   transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(255,235,59,0.25);
 }
 
-.tab-btn.active {
-  background: #ffd102;
-  color: #000;
-  box-shadow: 0 0 0 8px rgba(255,235,59,0.6);
-  font-weight: 700;
+.manual-slot-tab-btn.active {
+  box-shadow: 0 0 0 8px rgba(175, 122, 211, 0.6);
 }
 
-.btn-delete-slot {
+.manual-slot-delete {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -253,18 +251,18 @@
   cursor: pointer;
 }
 
-.btn-delete-slot:hover {
+.manual-slot-delete:hover {
   background: #ff3030;
 }
 
-.access-denied {
+.manual-slot-access-denied {
   text-align: center;
   padding: 100px;
   color: #ff6b6b;
   font-size: 2em;
 }
 
-.form-warning {
+.manual-slot-form-warning {
   margin-top: 8px;
   padding: 10px 14px;
   border-radius: 10px;

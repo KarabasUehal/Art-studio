@@ -40,7 +40,6 @@ const ClientRecords = ({ isAuthenticated }) => {
 
   if (error) return <div className="alert alert-danger text-center">{error}</div>;
   if (loading) return <div className="text-center mt-5">Завантажуємо ваші записи...🎨</div>;
-  if (records.length === 0 && totalCount === 0) return <div className="text-center mt-5">Поки що немає записів. Виберіть майстер-клас та запишіться!</div>;
 
   const handlePageChange = ({ selected }) => setPage(selected + 1);
 
@@ -73,7 +72,12 @@ const ClientRecords = ({ isAuthenticated }) => {
       Мої записи 
     </h2>
 
-    <div className="list-grid">
+    {records.length === 0 && totalCount === 0 ? (
+        <p className="empty-message">
+        Поки що немає записів. Виберіть майстер-клас та запишіться!
+        </p>
+    ) : (
+      <div className="list-grid">
       {records.map((rec) => (
         <div key={rec.id} className="list-grid-item">
          <div className="list-card">
@@ -119,6 +123,8 @@ const ClientRecords = ({ isAuthenticated }) => {
         </div>
       ))}
     </div>
+)}
+    
 
       {totalPages > 1 && (
         <ReactPaginate

@@ -5,7 +5,7 @@
 }
 
 .schedule-container {
-  background: rgba(0, 0, 0, 0.7); 
+  background: linear-gradient(135deg, #bdadc7, #704b88); 
   padding: 30px;
   border-radius: 15px;
   min-height: 100vh;
@@ -16,9 +16,9 @@
 
 
 .schedule-container h2 {
-  font-weight: 700; 
-  font-size: 2em !important; 
-  color: #ffeb3b !important; 
+  font-weight: 600; 
+  font-size: 2em; 
+  color: #3bf2ff !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   text-align: center;
   margin-bottom: 25px;
@@ -31,13 +31,13 @@
 
 .loading {
   text-align: center;
-  color: #64ee08;
+  color: #3bf2ff;
   margin: 10px 0;
 }
 
 .schedule-span {
-  font-size: 1em;
-  color: #ffeb3b;
+  font-size: 1.2em;
+  color: #3bf2ff;
 }
 
 .days-grid {
@@ -60,7 +60,7 @@
   font-weight: 700;
   font-size: 1.2em;
   margin-bottom: 10px;
-  color: #ffeb3b; 
+  color: #3bf2ff; 
   text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
@@ -72,29 +72,29 @@
   border-radius: 10px;
   margin: 5px 0;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 2.5px solid rgb(98, 53, 112);
   overflow: visible;
   transition: background-color 0.2s, transform 0.2s;
   text-align: center;
 }
 
 .slot-item:hover {
-  background-color: rgba(49, 109, 72, 0.6);
-  transform: translateY(-2px);
+  background-color: #704b88;
+  transform: translateY(-3px);
 }
 
 /* --- Название, время и места слота --- */
 .slot-name {
-  font-size: 1.2em !important;
-  color: #64ee08; 
-  font-weight: 700;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  font-size: 1.2em;
+  color: #3bf2ff; 
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
 
 .slot-time,
 .slot-places {
-  font-size: 1em !important;
-  color: #fff;
+  font-size: 1em;
+  color: #ffffff !important; 
   text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
 
@@ -102,7 +102,7 @@
   display: inline-block;      
   padding: 4px 8px;            
   font-size: 21px;          
-  border-radius: 50%;       
+  border-radius: 25%;       
   color: white;
   border: none;
   cursor: pointer;
@@ -141,93 +141,27 @@
 
 .week-button {
   display: inline-block;
-  background: #355345 !important;
-  color: #ffeb3b!important;
-  padding: 14px 40px !important;
-  border: 2px solid #000000 !important;
-  border-radius: 50px !important;
-  font-weight: 900 !important;
-  font-size: 1.1em !important;
+
+  background: #704b88;
+  color: #3bf2ff;
+  padding: 14px 40px;
+  border-radius: 24px;
+  width: auto;          
+  border: 1px solid #000000;
+  font-weight: 550;
+  font-size: 1.1em;
+  font-family: 'Caveat', cursive !important; 
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-decoration: none !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
+
   transition: all 0.3s;
-  margin: 0 auto;
+  letter-spacing: 0.8px;  
+  margin: 0 auto;          
 }
 
 .week-button:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 20px #ffeb3b;
-  color: #ffeb3b !important;
-  text-decoration: none !important;
-}
-
-/* --- Модальные окна --- */
-.modal-content {
-  background-color: #575353; 
-}
-
-.modal-header {
-  background-color: #e6717d; 
-  color: rgb(0, 0, 0);
-  border-color: rgb(243, 0, 0);
-  border-radius: 10px 10px 0 0;
-}
-
-.modal-title {
-  font-weight: bold;
-}
-
-.modal-body {
-  font-size: 1.0em;
-  padding: 20px;
-}
-
-.modal-footer .btn {
-  border-radius: 25px;
-  font-weight: 350;
-  margin: 0 5px;
-  padding: 0.6rem 1.8rem;
-  font-size: 1.0em;
-  min-width: 60px;
-  transition: all 0.2s ease;
-}
-
-.modal-footer .btn-success-custom {
-  background-color: #52c06c !important;
-  border-color: #13a334 !important;
-  color: rgb(0, 0, 0) !important;
-}
-
-.modal-footer .btn-danger-custom {
-  background-color: #df6470 !important;
-  border-color: #dc3545 !important;
-  color: rgb(0, 0, 0) !important;
-}
-
-.modal-footer .btn-secondary-custom {
-  background-color: #17a2b8 !important;
-  border-color: #17a2b8 !important;
-  color: rgb(0, 0, 0) !important;
-}
-
-.modal-footer .btn-success-custom:hover {
-  background-color: #218838 !important;
-  border-color: #1e7e34 !important;
-  transform: translateY(-2px);
-}
-
-.modal-footer .btn-danger-custom:hover {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
-  transform: translateY(-2px);
-}
-
-.modal-footer .btn-secondary-custom:hover {
-  background-color: #138496 !important;
-  border-color: #117a8b !important;
-  transform: translateY(-2px);
+  box-shadow: 0 10px 20px #3bf2ff;
 }
 
 .top-scroll,
@@ -260,14 +194,14 @@
 }
 
 .top-scroll::-webkit-scrollbar-thumb {
-  background: #a5d466;
+  background: #3bf2ff;
   border-radius: 10px;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
   border: 3px solid rgba(0, 0, 0, 0.4);
 }
 
 .top-scroll::-webkit-scrollbar-thumb:hover {
-  background: #ffff8d;
+  background: #6beaf3;
   box-shadow: 0 0 6px rgb(0, 0, 0);
 }
 
@@ -285,7 +219,7 @@
   gap: 16px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #a5d466 transparent;
+  scrollbar-color: #3bf2ff transparent;
 }
 
 .days-grid::-webkit-scrollbar {
@@ -298,13 +232,13 @@
 }
 
 .days-grid::-webkit-scrollbar-thumb {
-  background: #ffeb3b;
+  background: #3bf2ff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 .days-grid::-webkit-scrollbar-thumb:hover {
-  background: #ffff8d;
+  background: #6beaf3;
 }
 
 /* --- Адаптив --- */

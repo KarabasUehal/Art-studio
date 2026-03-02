@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../utils/api';
+import api from '../../../utils/api';
 import '@styles/KidForm.css';
 
 const KidForm = () => {
@@ -73,17 +73,17 @@ const KidForm = () => {
         {id ? 'Редагувати дитину' : 'Додати нову дитину'}
       </h2>
 
-      <form className="kid-form" onSubmit={handleSubmit}>
+      <form className="kid-kid-form" onSubmit={handleSubmit}>
 
         {/* Ім'я дитини */}
-        <div className="form-group">
-          <label htmlFor="name" className="form-label">
+        <div className="kid-form-group">
+          <label htmlFor="name" className="kid-form-label">
             Ім'я дитини
           </label>
           <input
             type="text"
             id="name"
-            className="form-input"
+            className="kid-form-input"
             placeholder="Наприклад: Марія"
             value={formData.name}
             onChange={(e) =>
@@ -94,14 +94,14 @@ const KidForm = () => {
         </div>
 
         {/* Вік */}
-        <div className="form-group">
-          <label htmlFor="age" className="form-label">
+        <div className="kid-form-group">
+          <label htmlFor="age" className="kid-form-label">
             Вік
           </label>
           <input
             type="number"
             id="age"
-            className="form-age-input"
+            className="kid-form-age-input"
             value={formData.age}
             onChange={(e) =>
               setFormData({ ...formData, age: +e.target.value })
@@ -112,13 +112,13 @@ const KidForm = () => {
         </div>
 
         {/* Стать */}
-        <div className="form-group">
-          <label htmlFor="gender" className="form-label">
+        <div className="kid-form-group">
+          <label htmlFor="gender" className="kid-form-label">
             Стать
           </label>
           <select
             id="gender"
-            className="form-input"
+            className="kid-form-input"
             value={formData.gender}
             onChange={(e) =>
               setFormData({ ...formData, gender: e.target.value })
@@ -133,11 +133,11 @@ const KidForm = () => {
 
         {error && <div className="kid-error">{error}</div>}
 
-        <div className="form-actions">
+        <div className="kid-form-actions">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="btn-cancel"
+            className="kid-btn-cancel"
           >
             Скасувати
           </button>
@@ -145,7 +145,7 @@ const KidForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="btn-save"
+            className="kid-btn-save"
           >
             {loading ? 'Збереження...' : 'Зберегти'}
           </button>

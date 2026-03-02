@@ -2,16 +2,16 @@
   min-height: 100vh;
   padding: 40px 20px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #20201f, #474746);
+  background: linear-gradient(135deg, #d8d8d8, #704b88);
   font-family: 'Caveat', cursive, sans-serif;
 }
 
 .list-title {
   text-align: center;
   font-size: 2.0em;
-  color: #e6c843;
+  color: #3bf2ff !important;
   margin-bottom: 40px;
-  text-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
   font-weight: 600;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .list-card {
-  background: #355345; 
+  background: #ffffff;
   border: 2px solid #000000;
   border-radius: 15px;
   overflow: hidden;
@@ -42,7 +42,7 @@
 
 .list-card:hover {
  transform: translateY(-8px);
- box-shadow: 0 16px 40px #d3b614;
+ box-shadow: 0 16px 40px #26d4e0;
  border-color: #355345
 }
 
@@ -55,14 +55,14 @@
 }
 
 .list-card-title {
-  color: #e6c843;
+  color: #704b88;
   font-size: 1.2em;
   margin-bottom: 16px;
   font-weight: 600;
 }
 
 .list-text {
-  color: #e6c843;
+  color: #704b88;
   margin: 8px 0;
   font-size: 1.05em;
   line-height: 1.5;
@@ -70,7 +70,7 @@
 
 .list-name {
   font-size: 1.45em;
-  color: #e6c843;
+  color: #704b88;
   margin-bottom: 16px;
   font-weight: 600;
 }
@@ -88,14 +88,13 @@
 }
 
 .list-details-title {
-  color: #e6c843;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.938);
+  color: #704b88;
   font-size: 1.3em;
   margin-bottom: 16px;
 }
 
 .list-item {
-  background: rgba(233, 196, 161, 0.979);
+  background: rgba(161, 233, 229, 0.979);
   color: #000000;
   border: 2px solid #000000;
   padding: 16px;
@@ -119,29 +118,29 @@
 
 .list-btn-add {
   display: inline-block;
-  background: #355345 !important;
-  color: #ffeb3b!important;
-  padding: 14px 40px !important;
-  border: 2px solid #000000 !important;
-  border-radius: 50px !important;
-  font-weight: 900 !important;
-  font-size: 1.1em !important;
+  background: #704b88;
+  color: #3bf2ff;
+  padding: 14px 40px;
+  border: 2px solid #000000;
+  border-radius: 50px;
+  font-weight: 550;
+  font-size: 1.1em;
+  font-family: 'Caveat', cursive; 
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-decoration: none !important;
+  text-decoration: none;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.774);
   transition: all 0.3s;
   margin: 0 auto;
-  font-family: 'Caveat', cursive, sans-serif; 
 }
 
 .list-btn-add:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 20px #ffeb3b;
+  box-shadow: 0 10px 20px #3bf2ff;
   text-decoration: none !important;
 }
 
-.admin-list-buttons {
+.list-buttons {
   margin-top: 24px;
   display: flex;
   gap: 12px;
@@ -153,11 +152,11 @@
 .list-success-btn {
   display: inline-flex;
   align-items: center;
-  padding: 10px 20px !important;
-  border-radius: 12px !important;
-  font-weight: bold !important;
-  text-decoration: none !important;
-  font-size: 0.95em !important;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 0.95em;
   transition: all 0.3s;
   min-width: 100px;
   text-align: center;
@@ -166,38 +165,35 @@
 }
 
 .list-success-btn {
-  background: #504e4e !important;
-  color: #00ff62 !important;
-  border: 1px solid #00ff62 !important;
+  background: #76f1fa;
+  color: #704b88;
+  border: 1px solid #704b88;
 }
 
 .list-success-btn:hover {
-  color: #00ff62 !important;
-  background: #000000 !important;
+  background: #3bf2ff;
   transform: translateY(-3px);
 }
 
 .list-edit-btn {
-  background: #504e4e !important;
-  color: #ff8c00 !important;
-  border: 1px solid #ff8c00 !important;
+  background: #ebe5e5;
+  color: #ff5100;
+  border: 1px solid #ff5100;
 }
 
 .list-edit-btn:hover {
-  color: #ff8c00 !important;
-  background: #000000 !important;
+  background: #ffffff;
   transform: translateY(-3px);
 }
 
 .list-delete-btn {
-  background: #504e4e !important;
-  color: #ff4444 !important;
-  border: 1px solid #ff4444 !important;
+  background: #946dad;
+  color: #3bf2ff;
+  border: 1px solid #704b88;
 }
 
 .list-delete-btn:hover {
-  background: #000000 !important;
-  color: #ff4444 !important;
+  background: #704b88;
   transform: translateY(-3px);
 }
 
@@ -210,24 +206,26 @@
   margin: 10px 0 15px;
   padding: 20px;
   border-radius: 20px;
-  border: 1.5px solid #ffeb3b;
+  border: 1.5px solid #704b88;
 }
 
 .list-filter-label {
   font-family: 'Caveat', cursive, sans-serif;
   font-size: 1.4em;
   font-weight: 500;
-  color: #ffeb3b;
+  color: #704b88;
   white-space: nowrap;
 }
 
 .list-filter-input {
+  width: 100%;
+  max-width: 500px;
   padding: 12px 16px;
   font-size: 1.1em;
   font-family: 'Segoe UI', sans-serif;
-  background: rgba(20, 20, 40, 0.9);
-  color: #ffeb3b;
-  border: 2px solid #ffeb3b;
+  background: #ffffff;
+  color: #704b88;
+  border: 2px solid #704b88;
   border-radius: 16px;
   outline: none;
   transition: all 0.3s ease;
@@ -235,18 +233,16 @@
 }
 
 .list-filter-input:focus {
-  border-color: #ffff8d;
-  box-shadow: 0 0 20px rgba(255, 235, 59, 0.5);
+  border-color: #a980c5;
+  box-shadow: 0 0 20px rgba(141, 93, 185, 0.5);
   transform: scale(1.02);
 }
 
-/* Для тёмной темы в браузере (чтобы стрелки и календарь были видимы) */
 .list-filter-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.8) brightness(1.5); 
+  filter: invert(0) brightness(1.5); 
   cursor: pointer;
 }
 
-/* Кнопка "Очистити" */
 .list-filter-clear-button {
   padding: 12px 24px;
   font-size: 1.1em;
@@ -291,9 +287,9 @@
   height: 40px;
   padding: 5px 10px;
 
-  background: #2a2a2a;
-  color: #eccf29;
-  border: 1px solid #555;
+  background: #ffffff;
+  color: #704b88;
+  border: 1px solid #704b88;
   border-radius: 10px;
 
   font-size: 1em;
@@ -305,17 +301,14 @@
 
 .list-page-link:hover,
 .list-page-item.active:hover {
-  background: #000000;
-  border-color: #000000;
-  border-radius: 10px;
-  color: #fcc101;
+  background: #704b88;
+  color: #ffffff;
 }
 
 .list-page-item.active .list-page-link {
-  background: #e6c843;
-  color: #000;
+  background: #704b88;
+  color: #ffffff;
   font-weight: bold;
-  border-color: #e6c843;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
 }
 
@@ -323,4 +316,15 @@
   opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.empty-message {
+  padding: 80px 20px;
+  font-size: 1.4em;    
+  text-align: center;
+  color: #704b88 !important;            
+  margin: 80px 0;
+  font-weight: 300;
+  border-radius: 18px;
+  font-family: 'Segoe UI', sans-serif;
 }

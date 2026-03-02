@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext.jsx';
-import DeleteModal from './DeleteModal';
-import SuccessModal from './SuccessModal';
+import DeleteModal from './modals/DeleteModal';
+import SuccessModal from './modals/SuccessModal';
 import '@styles//List.css';
 import '@styles//SubscriptionsPage.css';
 import '@styles//Checkbox.css';
@@ -21,9 +21,7 @@ const SubscriptionsPage = () => {
   const [selectedSub, setSelectedSub] = useState(null); // Для модалки продления
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Модалка продления
   const [showDeleteModal, setShowDeleteModal] = useState(false); // Модалка удаления
-  const [bulk, setBulk] = useState(false);
   const [error, setError] = useState('');
-  const { role } = useContext(AuthContext);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSubs, setFilteredSubs] = useState([]);
@@ -41,7 +39,7 @@ const query = searchQuery.toLowerCase().trim();
 
   const filtered = subs.filter(sub => {
     const subName = `${(sub.subscription_type?.name || '').toLowerCase()}`;
-    const userName = (sub.user?.name || '').toLowerCase();
+    const userName = (sub.user?.surname || '').toLowerCase();
 
     return subName.includes(query) || userName.includes(query);
   });
@@ -49,11 +47,19 @@ const query = searchQuery.toLowerCase().trim();
   setFilteredSubs(filtered);
 }, [searchQuery, subs]);
 
-  const fetchSubscriptions = async () => {
+  const fetchSubscriptions = async (pageNum = page, sizeNum = size) => {
     setLoading(true);
     try {
-      const res = await api.get('/subscriptions');
+      const params = {
+      page: pageNum,
+      size: sizeNum,
+    };
+
+      const res = await api.get('/subscriptions', { params });
       setSubs(res.data.subscriptions || res.data || []);
+      setTotalPages(res.data.total_pages || 1);
+      setTotalCount(res.data.total_count || 0);
+      setPage(res.data.current_page || 1);
     } catch (err) {
       console.error('Ошибка загрузки абонементов:', err);
       alert('Не вдалося завантажити абонементи');
@@ -85,14 +91,12 @@ const query = searchQuery.toLowerCase().trim();
   const handleBulkExtend = () => {
   if (selectedIds.length === 0) return;
   setSelectedSub(null); 
-  setBulk(true);
   setShowSuccessModal(true);
 };
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
     setSelectedSub(null); 
-    setBulk(true);
     setShowDeleteModal(true);
   };
 
@@ -143,10 +147,10 @@ const query = searchQuery.toLowerCase().trim();
         
                 {hasSelection && (
                   <div className="has-selection-block">
-                    <strong className="selection-text-warning">
+                    <strong>
                       Вибрано: {selectedIds.length}
                     </strong>
-                    <div className="actions">
+                    <div className="has-selection-actions">
                       <button
                         onClick={handleBulkExtend}
                         className="list-success-btn"
@@ -166,13 +170,26 @@ const query = searchQuery.toLowerCase().trim();
 
     <div className="list-page" lang="uk">
     
-      <input
-      type="text"
-      placeholder="Пошук..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="templates-search"
-    />
+         <div className="list-filter">
+           <label className="list-filter-label">Пошук:</label>
+         
+           <input
+             type="text"
+             placeholder="Введіть прізвище або напрям..."
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+             className="list-filter-input"
+           />
+
+           {searchQuery && (
+             <button
+               className="list-filter-clear-button"
+               onClick={() => setSearchQuery("")}
+             >
+               Очистити
+             </button>
+           )}
+         </div>
 
       {loading ? (
       <div className="text-center mt-5">Завантаження користувачів...</div>
@@ -220,27 +237,19 @@ const query = searchQuery.toLowerCase().trim();
               <h5 className="list-card-title"><strong>{sub.user?.name} {sub.user?.surname}</strong></h5>
               
               <p className="list-text"><strong>Напрям:</strong> {sub.subscription_type?.name || '—'}</p>
-              <p className="list-text"><strong>Дитина:</strong> {sub.sub_kids && sub.sub_kids.length > 0
+              <p className="list-text"><strong>Дитина:</strong> 
+                      <strong className="list-strong">{sub.sub_kids && sub.sub_kids.length > 0
                           ? sub.sub_kids
-                              .map(k => `${k.name} (${k.age} років)`)
+                              .map(k => ` ${k.name} (${k.age} років)`)
                               .join(', ')
                           : '—'}
+                      </strong>     
               </p>
               <p className="list-text"><strong>Занять:</strong> {sub.visits_used}/{sub.visits_total}</p>
               <p className="list-text"><strong>Почався:</strong> {new Date(sub.start_date).toLocaleDateString('uk-UA')}</p>
               <p className="list-text"><strong>Спливає:</strong> {new Date(sub.end_date).toLocaleDateString('uk-UA')}</p>
 
-                    <div className="admin-list-buttons">
-                      <button
-                        onClick={() => {
-                          setSelectedIds([sub.ID]);    
-                          setSelectedSub(sub);
-                          setShowSuccessModal(true);
-                        }}
-                          className="list-success-btn"
-                        >
-                      Продовжити
-                      </button>
+                    <div className="list-buttons">
                       <button
                       onClick={() => {
                         setSelectedIds([sub.ID]);    
@@ -250,6 +259,16 @@ const query = searchQuery.toLowerCase().trim();
                       className="list-delete-btn">
                       Видалити
                     </button>
+                    <button
+                        onClick={() => {
+                          setSelectedIds([sub.ID]);    
+                          setSelectedSub(sub);
+                          setShowSuccessModal(true);
+                        }}
+                          className="list-success-btn"
+                        >
+                      Продовжити
+                      </button>
                     </div>
             </div>
           </div>

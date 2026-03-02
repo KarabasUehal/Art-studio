@@ -40,14 +40,14 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
   if (!show) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <h3 className="modal-title">{template ? 'Редагувати шаблон' : 'Додати шаблон'}</h3>
+    <div className="template-modal-overlay">
+      <div className="template-modal-container">
+        <h3 className="template-modal-title">{template ? 'Редагувати шаблон' : 'Додати шаблон'}</h3>
 
-        <form onSubmit={handleSubmit} className="template-form">
+        <form onSubmit={handleSubmit} className="template-template-form">
         <div className='template-form-group'></div>
         
-        <label className="modal-label">Напрям:</label>
+        <label className="template-modal-label">Напрям:</label>
         <select
           name="activity_id"
           value={formData.activity_id}
@@ -60,7 +60,7 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           ))}
         </select>
 
-        <label className="modal-label">День тижня:</label>
+        <label className="template-modal-label">День тижня:</label>
           <select
           name="day_of_week"
           value={formData.day_of_week}
@@ -74,7 +74,7 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
             <option value={5}>П'ятниця</option>
           </select>
 
-        <label className="modal-label">Час початку (HH:MM):</label>
+        <label className="template-modal-label">Час початку (HH:MM):</label>
         <input
           type="time"
           name="start_time"
@@ -83,7 +83,7 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           className="template-form-input"
         />
 
-        <label className="modal-label">Місткість:</label>
+        <label className="template-modal-label">Місткість:</label>
         <input
           type="number"
           name="capacity"
@@ -93,9 +93,9 @@ const AddEditTemplateModal = ({ show, onHide, onSave, template, activities }) =>
           className="template-form-input"
         />
 
-        <div className="modal-buttons">
-          <button onClick={onHide} className="btn btn-cancel-modal">Скасування</button>
-          <button onClick={handleSubmit} className="btn btn-success-modal">Зберегти</button>
+        <div className="template-modal-buttons">
+          <button onClick={onHide} className="tmpl-cancel-modal">Скасування</button>
+          <button onClick={handleSubmit} className="tmpl-success-modal">Зберегти</button>
         </div>
         
         </form>

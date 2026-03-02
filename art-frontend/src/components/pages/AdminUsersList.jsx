@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext.jsx';
 import ReactPaginate from 'react-paginate';
 import '@styles/List.css'; 
 
-const UsersList = ({ isAuthenticated }) => {
+const AdminUsersList = ({ isAuthenticated }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -94,13 +94,26 @@ useEffect(() => {
   <div className="list-page" lang="uk">
     <h2 className="list-title">Усі клієнти студії</h2>
     
-      <input
-      type="text"
-      placeholder="Пошук..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="templates-search"
-    />
+      <div className="list-filter">
+           <label className="list-filter-label">Пошук:</label>
+         
+           <input
+             type="text"
+             placeholder="Введіть iм'я або номер телефону..."
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
+             className="list-filter-input"
+           />
+
+           {searchQuery && (
+             <button
+               className="list-filter-clear-button"
+               onClick={() => setSearchQuery("")}
+             >
+               Очистити
+             </button>
+           )}
+         </div>
 
       {loading ? (
       <div className="text-center mt-5">Завантаження користувачів...</div>
@@ -118,8 +131,10 @@ useEffect(() => {
         <div key={user.id} className="list-grid-item">
           <div className="list-card">
             <div className="list-card-body">
-              <h5 className="list-card-title"><strong>{user.name} {user.surname}</strong></h5>
-              
+              <h5 className="list-card-title">
+                <strong className="list-strong">
+                  {user.name} {user.surname}
+                </strong></h5>
               <p className="list-text"><strong>Телефон:</strong> {user.phone_number}</p>
               <p className="list-text"><strong>З нами з:</strong> {formatTime(user.created_at)}</p>
               <p className="list-text">
@@ -133,7 +148,7 @@ useEffect(() => {
                        ))}
                      </ul>
                    ) : (
-                     <span>Немає дітей</span>
+                     <span>Немає даних про дітей</span>
                    )}
               </p>
 
@@ -167,4 +182,4 @@ useEffect(() => {
  );
 };
 
-export default UsersList;
+export default AdminUsersList;

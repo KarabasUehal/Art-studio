@@ -1,99 +1,103 @@
-.modal-overlay {
+.template-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(255, 255, 255, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-.modal-container {
-  background-color: #181414;
-  color: #c7e0bd;
+.template-modal-container {
+  background-color: #ffffff;
+  color: #704b88;
   border-radius: 12px;
   padding: 25px 30px;
   width: 600px;
   max-height: 90%;
   overflow-y: auto;
-  box-shadow: 0 0 15px rgb(184, 181, 4);
-  border: 2px solid #e5e904;
+  box-shadow: 0 0 15px rgba(86, 27, 121, 0.527);
+  border: 2px solid #704b88;
 }
 
-.modal-container {
-  background-color: rgba(0,0,0,0.5) !important;
+.template-modal-container {
+  background-color: rgba(255, 255, 255, 0.65) !important;
 }
 
-.modal-title {
+.template-modal-title {
   margin-bottom: 20px;
   text-align: center;
-  font-weight: bold;
-  color: #e6d223 !important;
-  text-shadow: 1px 1px 3px #232406, 0 0 10px #051d05 !important;
+  font-weight: 500;
+  color: #3bf2ff !important;
+  text-shadow: 0px 0px 4px #14051b;
   font-size: 1.8em !important;
 }
 
-.modal-label {
+.template-modal-label {
   margin-top: 15px;
   margin-bottom: 5px;
   display: block;
   font-weight: 500;
-  color: #e6d223 !important;
+  color: #704b88;
 }
 
 .template-form-input,
 .template-form select {
-  background: #2a2a2a;
+  background: #ffffff;
   border: 2px solid #444;
   border-radius: 10px;
   padding: 14px 16px;
-  color: #e6d223 !important;
+  color: #704b88;
   font-size: 1.2em;
   width: 100%;
   margin-bottom: 10px;
 }
 
-.form-input:focus,
-.subscription-form select:focus {
-  border-color: #e6c843;
-  box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.2);
+.template-form-input:focus,
+.template-subscription-form select:focus {
+  border-color: #704b88;
+  box-shadow: 0 0 0 3px rgba(210, 97, 244, 0.2);
 }
 
-.modal-buttons {
+.template-modal-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.btn-success-modal {
-  background-color: #8bd182;
-  color: #000000 !important;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
+.tmpl-cancel-modal {
+  background: #c7cac5;
+  color: #000000;
+  padding: 12px 36px;
+  border-radius: 12px;
+  border: 2.5px solid transparent;
+  font-size: 1em;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgb(207, 243, 3);
+  transition: background 0.3s;
 }
 
-.btn-success-modal:hover {
-  background-color: rgb(229, 245, 5) !important;
-  color: #000 !important;
+.tmpl-cancel-modal:hover {
+  background: #ffffff;
+  border-color: #c7cac5;
 }
 
-.btn-cancel-modal {
-  background-color: #e08c8c;
-  color: #000000 !important;
-  padding: 8px 18px;
-  border: 2px solid #000000;
-  border-radius: 6px;
+.tmpl-success-modal  {
+  background: #c68aee;
+  color: rgb(0, 0, 0);
+  padding: 12px 36px;
+  border-radius: 12px;
+  border: 2.5px solid transparent;
+  font-size: 1em;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgb(255, 30, 0);
+  transition: background 0.3s;
 }
 
-.btn-cancel-modal:hover {
-  background-color: rgb(255, 30, 0) !important;
-  color: #000 !important;
+.tmpl-success-modal:hover {
+  background: #ffffff;
+  border-color: #c68aee;
 }

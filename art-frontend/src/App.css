@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
 
 body, .App {
-  font-family: 'Caveat', cursive, sans-serif !important; 
-  font-size: 1.5em !important; 
+  font-family: 'Caveat', cursive, sans-serif; 
+  font-size: 1.5em; 
 }
 
 .App-logo {
@@ -37,7 +37,7 @@ body, .App {
 }
 
 .container {
-  background-color: rgba(163, 145, 145, 0.86);
+  background-color: rgba(163, 145, 145, 0.89);
   position: relative;
   border-radius: 10px;
   padding: 20px;
@@ -55,101 +55,70 @@ body, .App {
   padding: 20px;
 }
 
-.nav-btn-success, .nav-btn-success-menu, 
-.nav-btn-warning, .nav-btn-warning-menu,
-.nav-btn-primary, .nav-btn-info, 
-.nav-btn-danger,
-.nav-btn-outline-danger, .nav-btn-outline-primary {
+.studio-buttons-top-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 6px;
+}
+
+.studio-buttons-bot-wrapper {
+  margin-bottom: 9px;
+  display: flex; 
+  gap: 5px; 
+  justify-content: center;
+}
+
+.studio-btn-admin, .studio-btn-admin-menu,
+.studio-btn-client, .studio-btn-client-menu,
+.studio-btn-login, .studio-btn-logout {
   text-decoration: none;
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  font-family: 'Caveat', cursive !important;
+
+  background-color: rgb(255, 255, 255);
+  color: #704b88;
+  box-shadow: 0 0 0 2px #704b88;
+
+  font-family: 'Segoe UI', sans-serif;
   font-weight: 400; 
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  border-color: rgba(49, 109, 72, 0.932) !important;
+  font-size: 20px;
+
   border-radius: 10px;
-  line-height: 1.1; 
+  line-height: 1.2; 
   transition: all 0.3s;
+  padding: 5px 12px;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  gap: 10px;
+  margin: 0;
 }
 
-.nav-btn-success, .nav-btn-primary, .nav-btn-info, .nav-btn-outline-primary, .nav-btn-outline-danger {
-  color: #6ddd23 !important;
-  padding: 5px 12px !important;
-  font-size: 20px !important;
+.studio-btn-login {
+  background-color: #e3b7f5;
 }
 
-.nav-btn-success-menu {
-  color: #6ddd23 !important;
-  padding: 10px 24px !important;
-  font-size: 24px !important;
+.studio-btn-logout {
+  background-color: #fab8b8;
 }
 
-.nav-btn-warning {
-  color: #ffa600 !important;
-  padding: 5px 12px !important;
-  font-size: 20px !important; 
-}
-
-.nav-btn-warning-menu {
-  color: #ffa600 !important;
-  padding: 10px 24px !important;
-  font-size: 24px !important;
-}
-
-.nav-btn-warning-menu:hover,
-.nav-btn-success-menu:hover {
-  transform: translateY(-3px);
-}
-
-.nav-btn-danger {
-  color: #ff0000 !important;
-  padding: 5px 12px !important;
-  font-size: 20px !important; 
-}
-
-.nav-btn-danger:hover, 
-.nav-btn-success:hover, 
-.nav-btn-warning:hover, 
-.nav-btn-primary:hover, 
-.nav-btn-info:hover {
+.studio-btn-login:hover, 
+.studio-btn-logout:hover {
   transform: translateY(-2px);
-  text-decoration: none !important;
 }
 
-.nav-btn-outline-primary,
-.nav-btn-outline-success,
-.nav-btn-outline-warning,
-.nav-btn-outline-danger {
+.studio-btn-admin:hover, .studio-btn-admin-menu:hover,
+.studio-btn-client:hover, .studio-btn-client-menu:hover {
+  background-color: #704b88;
+  color: #ffffff;
+  transform: translateY(-2px);
   text-decoration: none;
-  background-color: rgba(0, 0, 0, 0.35) !important; 
-  border-radius: 10px;
-  font-family: 'Caveat', cursive !important;
-  font-weight: 400;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-  border-color: rgba(49,109,72,0.6) !important;
-}
-
-.nav-btn-outline-warning {
-  color: #ffa600 !important;
-}
-.nav-btn-outline-success,
-.nav-btn-outline-primary {
-  color: #6ddd23 !important;
-}
-.nav-btn-outline-danger {
-  color: #ff0000 !important;
-}
-
-.nav-btn-success.active,
-.nav-btn-primary.active,
-.nav-btn-warning.active {
-  background-color: rgba(0, 0, 0, 0.85) !important;
 }
 
 .form-control, .form-select, select option {
-  font-family: 'Caveat', cursive;
   font-weight: 400;
   background-color: transparent;
-  color: #6ddd23;
+  color: #704b88;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.5);
   font-size: 22px;
@@ -158,9 +127,9 @@ body, .App {
 
 h1 {
   font-family: 'Caveat', cursive;
-  font-weight: 700; 
-  font-size: 1.8em; 
-  color: #ffeb3b;
+  font-weight: 600; 
+  font-size: 2.0em; 
+  color: #3bf2ff;
   text-shadow: 1px 1px 2px rgb(0, 0, 0);
   text-align: center;
 } 
@@ -177,7 +146,7 @@ h3 {
   font-family: 'Caveat', cursive;
   font-weight: 700; 
   font-size: 2em; 
-  color: #ffe600;
+  color: #3bf2ff;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -188,7 +157,7 @@ h3 {
 .faq-tittle {
   margin-bottom: 20px;
   text-align: center;
-  color: #ffe600;
+  color: #3bf2ff;
   font-size: 2.2rem; 
   font-weight: bold;
   text-shadow: 0 2px 8px rgba(0,0,0,0.6);
@@ -249,7 +218,7 @@ h3 {
   background: transparent;
   padding: 0 24px 20px;
   font-size: 1.45rem;
-  color: #ffe600;
+  color: #3bf2ff;
   line-height: 1.6;
 }
 
@@ -307,21 +276,6 @@ h3 {
   h1 {
     font-size: 1.1em !important;
   }
-}
-
-.nav-buttons {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-  flex-direction: row;
-  gap: 10px;
-  margin: 0;
-}
-
-.nav-buttons .btn {
-  font-size: 14px;
-  padding: 8px 16px;
 }
 
 @media (max-width: 768px) {

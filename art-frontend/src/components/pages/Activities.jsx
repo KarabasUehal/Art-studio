@@ -3,7 +3,8 @@ import api from '../../utils/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import ReactPaginate from 'react-paginate';
-import DeleteModal from './DeleteModal';
+import DeleteModal from './modals/DeleteModal';
+import PhotosModal from './modals/PhotosModal';
 import '@styles/Activities.css'; 
 
 const Activities = ({ isAuthenticated }) => {
@@ -18,20 +19,12 @@ const Activities = ({ isAuthenticated }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState(null);
 
+  const [showPhotos, setShowPhotos] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const [modalTitle, setModalTitle] = useState("");
+
   const { role } = useContext(AuthContext);
   const navigate = useNavigate();
-
-   const imageMapping = {
-    1: 'https://i.postimg.cc/5y0Qyvng/Lipka.jpg',
-    2: 'https://i.postimg.cc/x8CN8Htv/Jivopis5.jpg',
-    3: 'https://i.postimg.cc/T1w51mCq/Jivopis_Rozvitok.jpg',
-    4: 'https://i.postimg.cc/fL50M5jX/Fashion_illustration.jpg',
-    5: 'https://i.postimg.cc/TwcnpTxz/Vyazanie.jpg',
-    6: 'https://i.postimg.cc/W3SJsS6D/Actor.jpg',
-    7: 'https://i.postimg.cc/0jQKjmc4/STEM.jpg',
-    8: 'https://i.postimg.cc/Y98mt8fN/English.jpg',
-    9: 'https://i.postimg.cc/1XtVX6JJ/Shahi.jpg'
-  };
 
   useEffect(() => {
     setPage(1); 
@@ -77,7 +70,6 @@ const Activities = ({ isAuthenticated }) => {
 
   const getImageSrc = (act) => {
     if (act.images && act.images.main_image_url) return act.images.main_image_url;
-    return imageMapping[act.id] || '';
   };
 
   const handleSignUp = (activityId) => {
@@ -146,6 +138,12 @@ const Activities = ({ isAuthenticated }) => {
   }
 };
 
+const openPhotos = (activity) => {
+  setPhotos(activity.images?.photo || []);
+  setModalTitle(activity.name);
+  setShowPhotos(true);
+};
+
   const renderEmptyState = () => {
     switch (activeTab) {
       case 'regular':
@@ -169,13 +167,13 @@ const Activities = ({ isAuthenticated }) => {
       )}
 
       <div className="activities-tabs">
-        <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
+        <button className={`activities-tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
           Усі заняття
         </button>
-        <button className={`tab-btn ${activeTab === 'regular' ? 'active' : ''}`} onClick={() => setActiveTab('regular')}>
+        <button className={`activities-tab-btn ${activeTab === 'regular' ? 'active' : ''}`} onClick={() => setActiveTab('regular')}>
           Регулярні
         </button>
-        <button className={`tab-btn ${activeTab === 'one-time' ? 'active' : ''}`} onClick={() => setActiveTab('one-time')}>
+        <button className={`activities-tab-btn ${activeTab === 'one-time' ? 'active' : ''}`} onClick={() => setActiveTab('one-time')}>
           Особливі події
         </button>
       </div>
@@ -184,7 +182,7 @@ const Activities = ({ isAuthenticated }) => {
       {loading && <div className="text-center py-5" style={{ color: '#fbff00', fontSize: '1.5em' }}>Завантажуємо...</div>}
 
       {!loading && activities.length === 0 && (
-        <div className="empty-state">
+        <div className="empty-message">
           {renderEmptyState()}
         </div>
       )}
@@ -219,6 +217,13 @@ const Activities = ({ isAuthenticated }) => {
                 </div>
 
                 <div className="activity-card-footer">
+                <button
+                className="activity-photos-btn"
+                onClick={() => openPhotos(act)}
+                >
+                  Фото
+                </button>
+  
                 <button onClick={() => handleSignUp(act.id)} className="btn-signup">
                   Записатись
                 </button>
@@ -229,9 +234,9 @@ const Activities = ({ isAuthenticated }) => {
                   <div className="activity-admin-actions">
                     <button
                       onClick={() => navigate(`/edit/${act.id}`)}
-                        className="admin-btn admin-btn-edit"
+                      className="admin-btn admin-btn-edit"
                       >
-                        Редагувати
+                      🖊️
                     </button>
                     <button
                       onClick={() => {
@@ -239,7 +244,7 @@ const Activities = ({ isAuthenticated }) => {
                         setShowDeleteModal(true);
                       }}
                       className="admin-btn admin-btn-delete">
-                      Видалити
+                      🗑️
                     </button>
                   </div>
                 )}
@@ -282,6 +287,13 @@ const Activities = ({ isAuthenticated }) => {
               modalWarning="Після видалення цю дію буде неможливо скасувати."
             />
           )}
+      {/* Модалка показа фотографий */}
+          <PhotosModal
+          show={showPhotos}
+          onClose={() => setShowPhotos(false)}
+          photos={photos}
+          title={modalTitle}
+          />
     </div>
   </div>
  );

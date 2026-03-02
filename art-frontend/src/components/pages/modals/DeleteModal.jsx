@@ -1,13 +1,13 @@
 import React from 'react';
-import '@styles/SuccessModal.css';
+import '@styles/Modal.css';
 
-const SuccessModal = ({ show, onHide, onSuccess, modalTitle, modalElementName, modalQuestion, modalWarning }) => {
+const DeleteModal = ({ show, onHide, onDelete, modalTitle, modalElementName, modalQuestion, modalWarning }) => {
     if (!show) return null;
 
     return (
 <div className="studio-modal-backdrop">
       <div className="studio-modal">
-        <div className="extend-modal-header">
+        <div className="delete-modal-header">
           <h5 className="studio-modal-title">
             {modalTitle}
           </h5>
@@ -31,19 +31,19 @@ const SuccessModal = ({ show, onHide, onSuccess, modalTitle, modalElementName, m
         <div className="studio-modal-footer">
           <button
             type="button"
-            className="btn-modal-cancel"
+            className="modal-btn-cancel"
             onClick={onHide}
           >
             Вiдмiна
           </button>
           <button
             type="button"
-            className="btn-modal-success"
+            className="modal-btn-delete"
             onClick={() => {
-              onSuccess();
+              onDelete();
             }}
           >
-            Продовжити
+            Видалити
           </button>
         </div>
       </div>
@@ -51,4 +51,4 @@ const SuccessModal = ({ show, onHide, onSuccess, modalTitle, modalElementName, m
   );
 };
 
-export default SuccessModal;
+export default DeleteModal;

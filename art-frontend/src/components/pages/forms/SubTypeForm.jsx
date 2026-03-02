@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../utils/api';
+import api from '../../../utils/api';
 import '@styles//SubTypeForm.css'; 
 
 const SubTypeForm = ({ mode = "add" }) => {
@@ -97,24 +97,24 @@ const SubTypeForm = ({ mode = "add" }) => {
         </h1>
 
         <form onSubmit={handleSubmit} className="subtype-form">
-          <div className="form-group">
-            <label className="form-label">Назва</label>
+          <div className="subtype-form-group">
+            <label className="subtype-form-label">Назва</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
-              className="form-input"
+              className="subtype-form-input"
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Напрямок</label>
+          <div className="subtype-form-group">
+            <label className="subtype-form-label">Напрямок</label>
             <select
               value={form.activity_id}
               onChange={(e) => setForm({ ...form, activity_id: e.target.value })}
               required
-              className="form-input"
+              className="subtype-form-input"
             >
               <option value="">Оберіть напрямок</option>
               {activities.map(act => (
@@ -124,57 +124,57 @@ const SubTypeForm = ({ mode = "add" }) => {
           </div>
 
           
-            <div className="form-group">
-              <label className="form-label">Ціна (грн)</label>
+            <div className="subtype-form-group">
+              <label className="subtype-form-label">Ціна (грн)</label>
               <input
                 type="number"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 required
-                className="form-input"
+                className="subtype-form-input"
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Кількість занять</label>
+            <div className="subtype-form-group">
+              <label className="subtype-form-label">Кількість занять</label>
               <input
                 type="number"
                 value={form.visits_count}
                 onChange={(e) => setForm({ ...form, visits_count: e.target.value })}
                 required
-                className="form-input"
+                className="subtype-form-input"
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Термін дії (днів)</label>
+            <div className="subtype-form-group">
+              <label className="subtype-form-label">Термін дії (днів)</label>
               <input
                 type="number"
                 value={form.duration_days}
                 onChange={(e) => setForm({ ...form, duration_days: e.target.value })}
                 required
-                className="form-input"
+                className="subtype-form-input"
               />
             </div>
           
 
-          <div className="switch-group">
-              <label className="switch">
+          <div className="subtype-switch-group">
+              <label className="subtype-switch">
                 <input
                 type="checkbox"
                 checked={form.is_active}
                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
               />
-              <span className="slider"></span>
-              <span className="switch-label">Активний</span>
+              <span className="subtype-slider"></span>
+              <span className="subtype-switch-label">Активний</span>
             </label>
           </div>
 
-          <div className="form-actions">
-            <button type="button" onClick={() => navigate(-1)} className="btn-cancel">
+          <div className="subtype-form-actions">
+            <button type="button" onClick={() => navigate(-1)} className="subtype-btn-cancel">
               Скасувати
             </button>
-            <button type="submit" className="btn-save">
+            <button type="submit" className="subtype-btn-save">
               {mode === 'edit' ? 'Зберегти зміни' : 'Створити тип'}
             </button>
           </div>

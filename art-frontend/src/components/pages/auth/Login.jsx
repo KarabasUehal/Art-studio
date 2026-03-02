@@ -1,7 +1,7 @@
     import React, { useState, useContext } from 'react';
-    import api from '../../utils/api';
+    import api from '../../../utils/api';
     import { useNavigate } from 'react-router-dom';
-    import { AuthContext } from '../../context/AuthContext.jsx';
+    import { AuthContext } from '../../../context/AuthContext.jsx';
     import '@styles/Register.css';
 
     const Login = () => {
@@ -40,9 +40,9 @@
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="register-form-input" required />
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="form-actions">
-                <button type="button" onClick={Back} className="btn-register-cancel">Назад</button>
-                <button type="submit" className="btn-register-submit">Увійти</button>
+                <div className="register-form-actions">
+                <button type="button" onClick={Back} className="register-btn-cancel">Назад</button>
+                <button type="submit" className="register-btn-submit">Увійти</button>
                 </div>
             </form>
         );

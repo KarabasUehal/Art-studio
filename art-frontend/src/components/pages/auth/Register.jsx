@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
-import api from '../../utils/api.jsx';
+import api from '../../../utils/api.jsx';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../../context/AuthContext.jsx';
 import '@styles/Register.css';
 
 const Register = ({ adminMode = false }) => {
@@ -55,7 +55,7 @@ const Register = ({ adminMode = false }) => {
     e.preventDefault();
     setError('');
 
-    // Валидация (добавил проверку фамилии)
+    // Валидация
     if (!username || username.length < 6) return setError('Логін повинен бути не менше 6 символів');
     if (!latinRegex.test(username)) return setError('Логін може містити лише латинські літери та цифри');
 
@@ -66,10 +66,10 @@ const Register = ({ adminMode = false }) => {
     if (!phone_number || phone_number.length < 13) return setError('У номері повинно бути 13 символів');
 
     if (!name) return setError('Введіть ім\'я');
-    if (!cyrillicRegex.test(name)) return setError('Ім\'я може містити лише кирилицю (укр / рус)');
+    if (!cyrillicRegex.test(name)) return setError('Ім\'я може містити лише кирилицю');
 
     if (!surname) return setError('Введіть прізвище');
-    if (!cyrillicRegex.test(surname)) return setError('Прізвище може містити лише кирилицю (укр / рус)');
+    if (!cyrillicRegex.test(surname)) return setError('Прізвище може містити лише кирилицю');
 
     // Для обычных пользователей роль фиксирована, для админа — обязательна
     if (isAdminMode && !role) return setError('Оберіть роль');
@@ -121,7 +121,7 @@ const Register = ({ adminMode = false }) => {
                 type="tel" 
                 value={phone_number} 
                 onChange={(e) => {
-                // Оставляем только цифры и + (остальное отфильтровываем)
+
                 const onlyDigits = e.target.value.replace(/[^\d+]/g, '');
                 setPhoneNumber(onlyDigits);
                 }} 
@@ -159,9 +159,9 @@ const Register = ({ adminMode = false }) => {
             
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="form-actions">
-            <button type="button" onClick={Back} className="btn-register-cancel">Назад</button>
-            <button type="submit" className="btn-register-submit">{isAdminMode ? 'Створити користувача' : 'Зареєструватися'}</button>
+            <div className="register-form-actions">
+            <button type="button" onClick={Back} className="register-btn-cancel">Назад</button>
+            <button type="submit" className="register-btn-submit">{isAdminMode ? 'Створити користувача' : 'Зареєструватися'}</button>
             </div>
         </form>
        </div>

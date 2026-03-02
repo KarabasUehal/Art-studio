@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
-import DeleteModal from './DeleteModal';
+import DeleteModal from './modals/DeleteModal';
 import '@styles/List.css';
 
 const ClientKidsPage = () => {
@@ -73,16 +73,20 @@ const ClientKidsPage = () => {
               <div key={kid.ID} className="list-grid-item">
                 <div className="list-card">
                 <div className="list-card-body">
-                  <h4 className="list-name">{kid.name}</h4>
-                  <p className="list-info">
+                  <h5 className="list-card-title">
+                    <strong className="list-strong">
+                      {kid.name}
+                    </strong>
+                    </h5>
+                  <p className="list-text">
                     <strong>Вік:</strong> {kid.age} років
                   </p>
-                 <p className="list-info">
+                 <p className="list-text">
                  <strong>Стать:</strong> {kid.gender === 'male' ? 'Хлопчик' : kid.gender === 'female' ? 'Дівчинка' : 'Неизвестно'}
                  </p>
 
                   {role === 'owner' && (
-                    <div className="admin-list-buttons">
+                    <div className="list-buttons">
                       <button
                         onClick={() => navigate(`/client/kids/edit/${kid.ID}`)}
                           className="list-edit-btn"

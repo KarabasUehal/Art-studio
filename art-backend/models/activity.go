@@ -11,7 +11,7 @@ type Activity struct {
 	ID             uint           `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name           string         `json:"name" gorm:"not null;unique;size:100"`
 	Description    string         `json:"description" gorm:"not null;type:text"`
-	Images         ActivityImage  `json:"images" gorm:"foreignKey:ActivityID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Images         ActivityImage  `json:"images" gorm:"type:jsonb;not null"`
 	Price          uint           `json:"price" gorm:"type:integer;not null"`
 	Duration       uint           `json:"duration" gorm:"type:integer;not null"`
 	AvailableSlots int            `json:"available_slots" gorm:"not null"`

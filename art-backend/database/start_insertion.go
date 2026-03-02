@@ -30,48 +30,118 @@ func ActivityInsertData(db *gorm.DB) error {
 		log.Info().Msg("No data in activity table, starting to insert")
 
 		insertData := `
-            INSERT INTO activities (name, description, price, available_slots, duration, availability, is_regular, images)
+            INSERT INTO activities (name, description, price, available_slots, duration, is_regular, images)
             VALUES 
     ('Ліпка', 
 	  'Майстер-клас з ліплення, на якому дитина ознайомиться з простим та повітряним пластеліном, та виготовить свої фігурки',
-	  300, 15, 60, true, true, 
-	  '{"main_image_url": "https://i.postimg.cc/5y0Qyvng/Lipka.jpg", "caption": "Ліпимо з пластиліну", "photo": []}'::jsonb),
+	  300, 15, 60, true, 
+	  '{
+   "main_image_url": "https://i.postimg.cc/5y0Qyvng/Lipka.jpg",
+   "caption": "Ліпимо з пластиліну",
+   "photo": [
+     "https://i.postimg.cc/25SfnqSd/IMG_9544.jpg",
+     "https://i.postimg.cc/pdLtK9LB/IMG_9550.jpg"
+   ]
+ }'::jsonb),
     ('Живопис 5+', 
       'Майстер-клас з живопису, де дитина навчиться поводитися з гуашшю, акрилом та аквареллю', 
-      300, 15, 90, true, true,
-      '{"main_image_url": "https://i.postimg.cc/x8CN8Htv/Jivopis5.jpg", "caption": "Освоюємо живопис", "photo": []}'::jsonb),
+      300, 15, 90, true,
+      '{
+	  "main_image_url": "https://i.postimg.cc/x8CN8Htv/Jivopis5.jpg",
+	  "caption": "Освоюємо живопис",
+	  "photo": [
+	  "https://i.postimg.cc/bwThG084/968004AB_DE60_4038_A9C6_365C43007FB2.jpg",
+      "https://i.postimg.cc/Vk1wLZyp/9DF8D5C9_D838_48E1_86EB_2157E9531089.jpg",
+      "https://i.postimg.cc/W1nvDmT1/D6ECF737_8B4E_4F30_B77F_25482E2B23A3.jpg"
+	  ]
+	  }'::jsonb),
     ('Живопис + Розвиток', 
       'Майстер-клас з живопису відразом з розвитком дитини', 
-      350, 15, 50, true, true,
-      '{"main_image_url": "https://i.postimg.cc/T1w51mCq/Jivopis_Rozvitok.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+      350, 15, 50, true,
+      '{
+	  "main_image_url": "https://i.postimg.cc/T1w51mCq/Jivopis_Rozvitok.jpg",
+	  "caption": "Живопис + Розвиток",
+	  "photo": [
+	  "https://i.postimg.cc/vZzs17bx/IMG_2129.jpg",
+      "https://i.postimg.cc/Hk2gJ0dr/IMG_6935.jpg"
+	  ]
+	  }'::jsonb),
     ('Fashion ілюстрація', 
 	  'Майстер клас з модної ілюстрації', 
-	  300, 10, 75, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/fL50M5jX/Fashion_illustration.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  300, 10, 75, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/fL50M5jX/Fashion_illustration.jpg",
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/SKxpcXxY/IMG_9444.jpg",
+      "https://i.postimg.cc/W3QLRX6S/IMG_7579.avif"
+	  ]
+	  }'::jsonb),
     ('В''язання', 
 	  'Майстер-клас з в''язання, де дитина навчиться поводитися з пряжею', 
-	  300, 10, 60, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/TwcnpTxz/Vyazanie.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  300, 10, 60, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/TwcnpTxz/Vyazanie.jpg", 
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/SKxpcXxY/IMG_9444.jpg"
+	  ]
+	  }'::jsonb),
     ('Акторська майстерність', 
 	  'Майстер-клас з акторської майстерності, на якому дитина вивчиться грати ролі та вживатись у персонажів', 
-	  300, 8, 55, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/W3SJsS6D/Actor.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  300, 8, 55, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/W3SJsS6D/Actor.jpg", 
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/7Ltr9x5F/IMG_3812.jpg"
+	  ]
+	  }'::jsonb),
     ('STEM', 
 	  'Навчання дитини природним і точним наукам', 
-	  400, 20, 60, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/0jQKjmc4/STEM.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  400, 20, 60, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/0jQKjmc4/STEM.jpg", 
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/13HQg0s4/IMG_2126.jpg",
+      "https://i.postimg.cc/13HQg0s4/IMG_2126.jpg"
+	  ]
+	  }'::jsonb),
     ('Англійська мова', 
 	  'Навчання дитини англійською мовою, практика англійської', 
-	  300, 12, 60, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/Y98mt8fN/English.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  300, 12, 60, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/Y98mt8fN/English.jpg", 
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/RFj5rXQT/IMG_7427.avif"
+	  ]
+	  }'::jsonb),
     ('Шахи', 
 	  'Навчання дитини грі в шахи та стратегічному мисленню', 
-	  300, 12, 60, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/1XtVX6JJ/Shahi.jpg", "caption": "Живопис + Розвиток", "photo": []}'::jsonb),
+	  300, 12, 60, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/1XtVX6JJ/Shahi.jpg", 
+	  "caption": "Живопис + Розвиток", 
+	  "photo": [
+	  "https://i.postimg.cc/FKCXp9YW/IMG_3768.jpg",
+      "https://i.postimg.cc/FKCXp9YW/IMG_3768.jpg",
+      "https://i.postimg.cc/FKCXp9YW/IMG_3768.jpg"
+	  ]
+	  }'::jsonb),
     ('Вiльнi ранки', 
 	  'За дитиною доглядатимуть весь ранок і не дадуть скучити', 
-	  500, 15, 240, true, true,
-	  '{"main_image_url": "https://i.postimg.cc/bNFjfjLS/Freemorning.jpg", "caption": "Вiльнi ранки", "photo": []}'::jsonb)
+	  500, 15, 240, true,
+	  '{
+	  "main_image_url": "https://i.postimg.cc/bNFjfjLS/Freemorning.jpg", 
+	  "caption": "Вiльнi ранки", 
+	  "photo": [
+	  "https://i.postimg.cc/t45j1dpq/IMG_3541.jpg",
+      "https://i.postimg.cc/rpwL5dwd/IMG_3677.jpg",
+      "https://i.postimg.cc/t45j1dpq/IMG_3541.jpg"
+	  ]
+	  }'::jsonb)
         ON CONFLICT (name) DO NOTHING;
         `
 		_, err = DB.Exec(insertData)
@@ -96,13 +166,13 @@ func ActivityInsertData(db *gorm.DB) error {
 
 		insertSlots := `
 		INSERT INTO activity_slots (activity_id, start_time, end_time, capacity, booked) VALUES
-		(1, '2025-11-29 17:00:00', '2025-11-29 18:00:00', 15, 0),
-		(1, '2025-11-30 17:00:00', '2025-11-29 18:00:00', 15, 0),
-		(2, '2025-11-29 16:00:00', '2025-11-29 17:00:00', 15, 0),
-		(2, '2025-11-30 16:00:00', '2025-11-29 17:00:00', 15, 0),
-		(3, '2025-11-29 18:00:00', '2025-11-29 19:00:00', 15, 0),
-		(4, '2025-11-30 17:30:00', '2025-11-29 18:30:00', 10, 0),
-		(5, '2025-11-29 15:00:00', '2025-11-29 16:00:00', 10, 0)
+		(1, '2026-03-29 17:00:00', '2026-03-29 18:00:00', 15, 0),
+		(1, '2026-03-30 17:00:00', '2026-03-29 18:00:00', 15, 0),
+		(2, '2026-03-29 16:00:00', '2026-03-29 17:00:00', 15, 0),
+		(2, '2026-03-30 16:00:00', '2026-03-29 17:00:00', 15, 0),
+		(3, '2026-03-29 18:00:00', '2026-03-29 19:00:00', 15, 0),
+		(4, '2026-03-30 17:30:00', '2026-03-29 18:30:00', 10, 0),
+		(5, '2026-03-29 15:00:00', '2026-03-29 16:00:00', 10, 0)
 		ON CONFLICT (activity_id, start_time) WHERE deleted_at IS NULL DO NOTHING;
 	`
 		_, err = DB.Exec(insertSlots)

@@ -1,7 +1,7 @@
 import React from 'react';
-import '@styles/Modal.css';
+import '@styles/SuccessModal.css';
 
-const ScheduleExtendModal = ({ show, onHide, onExtend}) => {
+const SuccessModal = ({ show, onHide, onSuccess, modalTitle, modalElementName, modalQuestion, modalWarning }) => {
     if (!show) return null;
 
     return (
@@ -9,7 +9,7 @@ const ScheduleExtendModal = ({ show, onHide, onExtend}) => {
       <div className="studio-modal">
         <div className="extend-modal-header">
           <h5 className="studio-modal-title">
-            Шаблон рокладу студії
+            {modalTitle}
           </h5>
           <button
             type="button"
@@ -23,23 +23,24 @@ const ScheduleExtendModal = ({ show, onHide, onExtend}) => {
 
         <div className="studio-modal-body">
           <p>
-            <strong>Продовжити розклад на тиждень?</strong>
+            {modalQuestion} "<strong>{modalElementName}</strong>"?<br />
+            {modalWarning}
           </p>
         </div>
 
         <div className="studio-modal-footer">
           <button
             type="button"
-            className="btn-modal-cancel"
+            className="modal-btn-cancel"
             onClick={onHide}
           >
             Вiдмiна
           </button>
           <button
             type="button"
-            className="btn-modal-success"
+            className="modal-btn-success"
             onClick={() => {
-              onExtend();
+              onSuccess();
             }}
           >
             Продовжити
@@ -50,4 +51,4 @@ const ScheduleExtendModal = ({ show, onHide, onExtend}) => {
   );
 };
 
-export default ScheduleExtendModal;
+export default SuccessModal;

@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
-import DeleteModal from './DeleteModal';
+import DeleteModal from './modals/DeleteModal';
 import "@styles//AdminSchedulePage.css";  
-import "@styles/Calendar.css";  
 
 const AdminSchedulePage = () => {
   const { role } = useContext(AuthContext);
@@ -133,20 +132,20 @@ const filteredSlots = slots;
   return (
     <div className="admin-schedule-page">
       <div className="admin-schedule-card">
-        <h2 className="admin-title">
+        <h2 className="manual-slot-title">
           Ручне створення занять
         </h2>
 
-        {error && <div className="admin-error">{error}</div>}
+        {error && <div className="manual-slot-error">{error}</div>}
 
-            <div className="admin-grid">
+            <div className="manual-slot-grid">
           {/* ЛЕВАЯ КОЛОНКА */}
-          <div className="activities-sidebar">
-            <h4 className="sidebar-title">Події</h4>
+          <div className="manual-slot-activities-sidebar">
+            <h4 className="manual-slot-sidebar-title">Події:</h4>
 
-            <div className="activities-tabs">
+            <div className="manual-slot-activities-tabs">
               <button
-                className={`tab-btn ${
+                className={`manual-slot-tab-btn ${
                   activityType === "one-time" ? "active" : ""
                 }`}
                 onClick={() => {
@@ -159,7 +158,7 @@ const filteredSlots = slots;
               </button>
 
               <button
-                className={`tab-btn ${
+                className={`manual-slot-tab-btn ${
                   activityType === "regular" ? "active" : ""
                 }`}
                 onClick={() => {
@@ -177,11 +176,11 @@ const filteredSlots = slots;
                 Немає {activityType === "regular" ? "регулярних" : "разових"} подій
               </p>
             ) : (
-              <div className="activities-list">
+              <div className="manual-slot-activities-list">
                 {filteredActivities.map((a) => (
                   <button
                     key={a.id}
-                    className={`activity-btn ${
+                    className={`manual-slot-activity-btn ${
                       selectedActivity?.id === a.id ? "active" : ""
                     }`}
                     onClick={() => handleSelectActivity(a)}
@@ -194,7 +193,7 @@ const filteredSlots = slots;
           </div>
 
           {/* Правая часть — слоты и форма */}
-          <div className="slots-content">
+          <div className="manual-slot-content">
             {selectedActivity ? (
               <>
                 <h3 className="selected-activity-title">
@@ -202,31 +201,31 @@ const filteredSlots = slots;
                 </h3>
 
                 {/* Форма добавления слота */}
-                <div className="add-slot-form">
-                 {formError && <div className="form-warning">{formError}</div>}
+                <div className="manual-slot-add-form">
+                 {formError && <div className="manual-slot-form-warning">{formError}</div>}
 
-                  <div className="form-row">
-                    <div className="input-group">
+                  <div className="manual-slot-form-row">
+                    <div className="manual-slot-input-group">
                       <label>Дата та час початку</label>
                       <input
                         type="datetime-local"
                         value={form.start_time}
                         onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                        className="admin-input"
-                        style={{ colorScheme: 'dark' }}
+                        className="manual-slot-admin-input"
+                        style={{ colorScheme: 'light' }}
                       />
                     </div>
-                    <div className="input-group">
+                    <div className="manual-slot-input-group">
                       <label>Місткість</label>
                       <input
                         type="number"
                         min="1"
                         value={form.capacity}
                         onChange={(e) => setForm({ ...form, capacity: +e.target.value })}
-                        className="admin-input"
+                        className="manual-slot-admin-input"
                       />
                     </div>
-                    <button onClick={handleAddSlot} className="btn-add-slot">
+                    <button onClick={handleAddSlot} className="manual-slot-btn-add">
                       Додати слот
                     </button>
                   </div>
@@ -234,30 +233,30 @@ const filteredSlots = slots;
 
                 {/* Список слотов */}
                 {loading ? (
-                  <div className="slot-loading">Завантаження слотів...</div>
+                  <div className="manual-slot-loading">Завантаження слотів...</div>
                 ) : slots.length === 0 ? (
                   <p className="empty-message">Немає активних слотів</p>
                 ) : (
-                  <div className="slots-grid">
+                  <div className="manual-slot-list-grid">
                     {slots.map((s) => {
                       const free = s.capacity - s.booked;
                       return (
-                        <div key={s.id || s.ID} className="slot-card">
-                          <div className="slot-time">
+                        <div key={s.id || s.ID} className="manual-slot-card">
+                          <div className="manual-slot-time">
                             {new Date(s.start_time).toLocaleString('uk-UA', {
                               dateStyle: 'short',
                               timeStyle: 'short',
                               timeZone: 'UTC',
                             })}
                           </div>
-                          <div className="slot-places">
+                          <div className="manual-slot-places">
                             Місць: <strong style={{ color: free > 0 ? '#7fdb7f' : '#ff6b6b' }}>
                               {free}/{s.capacity}
                             </strong>
                           </div>
                           <button
                             onClick={() => {setModalStartTime(formatStartTime(s.start_time)); handleDeleteSlot(s)}}
-                            className="btn-delete-slot"
+                            className="manual-slot-delete"
                             title="Видалити слот"
                           >
                             Видалити
@@ -269,7 +268,7 @@ const filteredSlots = slots;
                 )}
               </>
             ) : (
-              <div className="slot-placeholder">
+              <div className="manual-slot-placeholder">
                 Оберіть заняття зліва
               </div>
             )}
